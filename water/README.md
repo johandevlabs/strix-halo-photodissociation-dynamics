@@ -229,7 +229,7 @@ Shared inputs live in the project root; per-isotopologue outputs in
 | `06_splice.py` | mirror, fill, blend raster into E_H + V_OH(r2); writes surfaces |
 | `07_jacobi.py` | valence (r1,r2,theta) -> Jacobi (R,r,gamma) |
 | `08_relax.py` | imaginary-time relaxation, excited states by projection |
-| `09_propagate.py` | real-time propagation, autocorrelation, cross section |
+| `09_propagate.py` | real-time propagation, autocorrelation, cross section, per-channel flux |
 | `10_mu_sensitivity.py` | ab-initio vs Condon vs scaled transition dipole |
 | `11_compare_obs.py` | fetch MPI-Mainz data, compare shape and scale |
 | `12_vertical.py` | vertical excitation vs basis, active space, method |
@@ -259,8 +259,8 @@ Shared inputs live in the project root; per-isotopologue outputs in
 
 ## Gotchas
 
-Every one of these produced plausible-looking wrong answers rather than an
-error message.
+Most of these produced plausible-looking wrong answers rather than an error
+message; the last two at least failed loudly, if unhelpfully.
 
 **Thread pinning kills process parallelism.** `OMP_PLACES=cores` with
 `OMP_PROC_BIND=close` is right for one process over many cores and
@@ -389,8 +389,8 @@ Nothing about the chemistry. The contribution, such as it is:
    hardware in hours. The literature above used MOLPRO and in-house Fortran.
 2. A characterisation of AMD Strix Halo for quantum chemistry, including the
    512-bit FP64 datapath finding, which corrects a widely repeated figure.
-3. The pitfall catalogue below -- nine distinct failure modes that produced
-   plausible wrong answers rather than error messages.
+3. The pitfall catalogue above -- twelve distinct failure modes, most of which
+   produced plausible wrong answers rather than error messages.
 
 ---
 
@@ -448,9 +448,6 @@ should be checked before being cited anywhere that matters.
   frequencies and narrowing the band toward the measured 0.937 eV.
 - **Vertical excitation not converged at aug-cc-pVTZ.** aug-cc-pVQZ is
   +0.064 eV; a full raster there is ~6 h on 16 cores.
-- **Branching ratios not computed.** The absorber destroys flux rather than
-  analysing it. O-H vs O-D cleavage in HDO — the quantity the fractionation
-  work actually needs — requires flux analysis at the two boundaries.
 - **Energy-resolved branching not implemented.** The channel ratios above
   are band-integrated. Bond selectivity is known to be strongly
   wavelength-dependent, and experimental values are quoted at single

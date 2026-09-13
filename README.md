@@ -55,8 +55,9 @@ None of this is new physics. Engel and Schinke did the HOD calculation in
    undocumented. Includes a correction to a widely repeated FP64 figure: the
    part has a full 512-bit datapath, not the double-pumped 256-bit one that
    a commonly quoted 1.31 TFLOP/s peak assumes.
-3. **A catalogue of ways this goes quietly wrong.** Nine distinct failure
-   modes that produced plausible wrong answers rather than error messages.
+3. **A catalogue of ways this goes quietly wrong.** Twelve distinct failure
+   modes, most of which produced plausible wrong answers rather than error
+   messages.
    Several are generic to scientific Python on many cores and have nothing
    to do with chemistry — OpenMP pinning destroying process parallelism,
    single-threaded NumPy FFT, exponentials recomputed inside a propagator

@@ -1,0 +1,93 @@
+threads=16  max_memory=80000 MB  incore=True  frozen_core=True
+
+=== cc-pVQZ  (115 basis functions) ===
+  SCF         0.67 s   E(HF)   = -76.0647916880
+  CCSD        1.83 s   E_corr  = -0.2860077587  (10 iters)
+  (T)         0.36 s   E(T)    = -0.0089950541
+  TOTAL       2.86 s   E[CCSD(T)] = -76.3597945008   peak RSS 1.0 GB
+
+=== cc-pV5Z  (201 basis functions) ===
+  SCF         2.28 s   E(HF)   = -76.0670469672
+  CCSD        9.48 s   E_corr  = -0.2924705284  (11 iters)
+  (T)         2.69 s   E(T)    = -0.0095239926
+  TOTAL      14.45 s   E[CCSD(T)] = -76.3690414882   peak RSS 7.9 GB
+
+appended 2 rows to h2o_ladder.csv
+
+observed scaling exponent (t ~ nbf^k):
+  CCSD    cc-pVQZ -> cc-pV5Z    k = 2.94
+  (T)     cc-pVQZ -> cc-pV5Z    k = 3.60
+threads=16  max_memory=80000 MB  incore=True  frozen_core=True
+
+=== aug-cc-pV5Z  (287 basis functions) ===
+  SCF         4.48 s   E(HF)   = -76.0672767727
+  CCSD       35.81 s   E_corr  = -0.2933670134  (10 iters)
+  (T)        13.23 s   E(T)    = -0.0096536994
+  TOTAL      53.52 s   E[CCSD(T)] = -76.3702974856   peak RSS 31.9 GB
+/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/basis/__init__.py:689: UserWarning: Basis may be available in basis-set-exchange. It is recommended to install basis-set-exchange: pip install basis-set-exchange
+  warnings.warn(
+Traceback (most recent call last):
+  File "/home/johan/projects/cc-test/02_h2o_ladder.py", line 151, in <module>
+    main()
+  File "/home/johan/projects/cc-test/02_h2o_ladder.py", line 125, in main
+    rows.append(run_one(basis, args))
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/cc-test/02_h2o_ladder.py", line 47, in run_one
+    mol = gto.M(atom=GEOM, basis=basis, unit="Angstrom",
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 119, in M
+    mol.build(*args, **kwargs)
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 2563, in build
+    self._basis = self.format_basis(_basis)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 458, in format_basis
+    _basis = basis_converter(symb, atom_basis)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 493, in converter
+    _basis = load(raw_basis, _std_symbol_without_ghost(symb))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 486, in load
+    _basis = basis.load(basis_name, symb)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/basis/__init__.py", line 700, in load
+    raise BasisNotFoundError(f'Unknown basis format or basis name\n{filename_or_basisname}')
+pyscf.lib.exceptions.BasisNotFoundError: Unknown basis format or basis name
+cc-pV6Z
+threads=16  max_memory=80000 MB  incore=True  frozen_core=True
+
+=== aug-cc-pVQZ  (172 basis functions) ===
+  SCF         1.79 s   E(HF)   = -76.0659575083
+  CCSD        5.92 s   E_corr  = -0.2882536049  (11 iters)
+  (T)         1.51 s   E(T)    = -0.0093738848
+  TOTAL       9.22 s   E[CCSD(T)] = -76.3635849980   peak RSS 4.3 GB
+
+=== cc-pV5Z  (201 basis functions) ===
+  SCF         2.33 s   E(HF)   = -76.0670469672
+  CCSD        9.68 s   E_corr  = -0.2924705284  (11 iters)
+  (T)         2.78 s   E(T)    = -0.0095239926
+  TOTAL      14.79 s   E[CCSD(T)] = -76.3690414882   peak RSS 7.9 GB
+
+appended 2 rows to h2o_ladder.csv
+
+observed scaling exponent (t ~ nbf^k):
+  CCSD aug-cc-pVQZ -> cc-pV5Z    k = 3.16
+  (T)  aug-cc-pVQZ -> cc-pV5Z    k = 3.92
+threads=16  max_memory=80000 MB  incore=True  frozen_core=True
+
+=== aug-cc-pVQZ  (172 basis functions) ===
+  SCF         1.81 s   E(HF)   = -76.0659575083
+  CCSD        5.80 s   E_corr  = -0.2882536049  (11 iters)
+  (T)         1.52 s   E(T)    = -0.0093738848
+  TOTAL       9.14 s   E[CCSD(T)] = -76.3635849980   peak RSS 4.3 GB
+
+=== aug-cc-pV5Z  (287 basis functions) ===
+  SCF         4.45 s   E(HF)   = -76.0672767727
+  CCSD       35.35 s   E_corr  = -0.2933670134  (10 iters)
+  (T)        13.61 s   E(T)    = -0.0096536994
+  TOTAL      53.42 s   E[CCSD(T)] = -76.3702974856   peak RSS 31.9 GB
+
+appended 2 rows to h2o_ladder.csv
+
+observed scaling exponent (t ~ nbf^k):
+  CCSD aug-cc-pVQZ -> aug-cc-pV5Z k = 3.53
+  (T)  aug-cc-pVQZ -> aug-cc-pV5Z k = 4.28

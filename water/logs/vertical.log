@@ -1,0 +1,19 @@
+geometry r(OH) = 0.9578 A, angle = 104.48 deg
+
+         basis         space      CAS  SA-CASSCF   NEVPT2   ADC(2)   ADC(3)  EOM-CCSD    t/s
+   aug-cc-pVDZ       valence    (8,6)      6.809    7.505    6.977    7.858     7.457   98.0
+   aug-cc-pVDZ          +O3s    (8,7)      6.712    7.467    6.977    7.858     7.457   65.1
+   aug-cc-pVDZ        +O3s3p   (8,10)      7.370    7.564    6.977    7.858     7.457  342.9
+   aug-cc-pVTZ       valence    (8,6)      6.794    7.635    7.204    7.853     7.616  111.1
+   aug-cc-pVTZ          +O3s    (8,7)      6.688    7.594    7.204    7.853     7.616   35.5
+   aug-cc-pVTZ        +O3s3p   (8,10)      7.347    7.659    7.204    7.853     7.616  356.8
+   aug-cc-pVQZ       valence    (8,6)      6.788    7.699    7.306    7.865     7.688  480.6
+   aug-cc-pVQZ          +O3s    (8,7)      6.681    7.658    7.306    7.865     7.688  101.7
+   aug-cc-pVQZ        +O3s3p   (8,10)      7.345    7.706    7.306    7.865     7.688  468.2
+
+production surface gives 7.579 eV at its own minimum (aug-cc-pVTZ, CAS(8,6), NEVPT2)
+band maximum: computed 7.402 eV, measured 7.469 eV
+
+The band maximum is not the vertical energy -- zero-point spread
+on a repulsive surface puts the peak above V_ex(r_e). Read the
+TRENDS across basis and active space, not absolute agreement.

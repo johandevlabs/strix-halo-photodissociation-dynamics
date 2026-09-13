@@ -1,0 +1,3 @@
+label=D2O
+m_departing_amu=2.01410177812
+m_spectator_amu=2.01410177812

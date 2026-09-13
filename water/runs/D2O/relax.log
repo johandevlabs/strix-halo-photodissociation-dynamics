@@ -1,0 +1,91 @@
+grid     96 x 77 x 36  (R, r, gamma)
+         V_gs min 0.0145 eV, dtau = 1.0 a.u.
+
+    v=0 step    200  E =   0.444478 eV  dE = 8.829e+04 cm-1
+    v=0 step    400  E =   0.442612 eV  dE = 1.504e+01 cm-1
+    v=0 step    600  E =   0.442585 eV  dE = 2.217e-01 cm-1
+    v=0 step    800  E =   0.442584 eV  dE = 4.774e-03 cm-1
+    v=0 step   1000  E =   0.442584 eV  dE = 2.573e-04 cm-1
+    v=0 converged in 1000 steps, 9.2 s, occupying ~1363 of 266112 grid points
+    v=1 step    200  E =   0.730802 eV  dE = 9.850e+04 cm-1
+    v=1 step    400  E =   0.693117 eV  dE = 3.040e+02 cm-1
+    v=1 step    600  E =   0.623727 eV  dE = 5.597e+02 cm-1
+    v=1 step    800  E =   0.593610 eV  dE = 2.429e+02 cm-1
+    v=1 step   1000  E =   0.588759 eV  dE = 3.912e+01 cm-1
+    v=1 step   1200  E =   0.588145 eV  dE = 4.952e+00 cm-1
+    v=1 step   1400  E =   0.588070 eV  dE = 6.063e-01 cm-1
+    v=1 step   1600  E =   0.588061 eV  dE = 7.395e-02 cm-1
+    v=1 step   1800  E =   0.588060 eV  dE = 9.015e-03 cm-1
+    v=1 step   2000  E =   0.588060 eV  dE = 1.099e-03 cm-1
+    v=1 converged in 2000 steps, 20.2 s, occupying ~1817 of 266112 grid points
+    v=2 step    200  E =   0.737151 eV  dE = 9.982e+04 cm-1
+    v=2 step    400  E =   0.731748 eV  dE = 4.357e+01 cm-1
+    v=2 step    600  E =   0.731465 eV  dE = 2.283e+00 cm-1
+    v=2 step    800  E =   0.731345 eV  dE = 9.692e-01 cm-1
+    v=2 step   1000  E =   0.731279 eV  dE = 5.290e-01 cm-1
+    v=2 step   1200  E =   0.731243 eV  dE = 2.923e-01 cm-1
+    v=2 step   1400  E =   0.731223 eV  dE = 1.617e-01 cm-1
+    v=2 step   1600  E =   0.731212 eV  dE = 8.955e-02 cm-1
+    v=2 step   1800  E =   0.731206 eV  dE = 4.961e-02 cm-1
+    v=2 step   2000  E =   0.731202 eV  dE = 2.749e-02 cm-1
+    v=2 step   2200  E =   0.731200 eV  dE = 1.524e-02 cm-1
+    v=2 step   2400  E =   0.731199 eV  dE = 8.452e-03 cm-1
+    v=2 step   2600  E =   0.731199 eV  dE = 4.689e-03 cm-1
+    v=2 step   2800  E =   0.731198 eV  dE = 2.601e-03 cm-1
+    v=2 step   3000  E =   0.731198 eV  dE = 1.444e-03 cm-1
+    v=2 converged in 3000 steps, 34.8 s, occupying ~2112 of 266112 grid points
+    v=3 step    200  E =   0.914178 eV  dE = 1.048e+05 cm-1
+    v=3 step    400  E =   0.778046 eV  dE = 1.098e+03 cm-1
+    v=3 step    600  E =   0.771610 eV  dE = 5.191e+01 cm-1
+    v=3 step    800  E =   0.771344 eV  dE = 2.143e+00 cm-1
+    v=3 step   1000  E =   0.771298 eV  dE = 3.748e-01 cm-1
+    v=3 step   1200  E =   0.771271 eV  dE = 2.135e-01 cm-1
+    v=3 step   1400  E =   0.771251 eV  dE = 1.604e-01 cm-1
+    v=3 step   1600  E =   0.771235 eV  dE = 1.282e-01 cm-1
+    v=3 step   1800  E =   0.771223 eV  dE = 1.041e-01 cm-1
+    v=3 step   2000  E =   0.771212 eV  dE = 8.490e-02 cm-1
+    v=3 step   2200  E =   0.771203 eV  dE = 6.931e-02 cm-1
+    v=3 step   2400  E =   0.771196 eV  dE = 5.659e-02 cm-1
+    v=3 step   2600  E =   0.771191 eV  dE = 4.619e-02 cm-1
+    v=3 step   2800  E =   0.771186 eV  dE = 3.771e-02 cm-1
+    v=3 step   3000  E =   0.771182 eV  dE = 3.077e-02 cm-1
+    v=3 step   3200  E =   0.771179 eV  dE = 2.511e-02 cm-1
+    v=3 step   3400  E =   0.771177 eV  dE = 2.049e-02 cm-1
+    v=3 step   3600  E =   0.771174 eV  dE = 1.672e-02 cm-1
+    v=3 step   3800  E =   0.771173 eV  dE = 1.364e-02 cm-1
+    v=3 step   4000  E =   0.771171 eV  dE = 1.113e-02 cm-1
+    v=3 step   4200  E =   0.771170 eV  dE = 9.079e-03 cm-1
+    v=3 step   4400  E =   0.771169 eV  dE = 7.406e-03 cm-1
+    v=3 step   4600  E =   0.771169 eV  dE = 6.042e-03 cm-1
+    v=3 step   4800  E =   0.771168 eV  dE = 4.928e-03 cm-1
+    v=3 step   5000  E =   0.771167 eV  dE = 4.020e-03 cm-1
+    v=3 step   5200  E =   0.771167 eV  dE = 3.279e-03 cm-1
+    v=3 step   5400  E =   0.771167 eV  dE = 2.675e-03 cm-1
+    v=3 step   5600  E =   0.771166 eV  dE = 2.182e-03 cm-1
+    v=3 converged in 5600 steps, 66.0 s, occupying ~1885 of 266112 grid points
+    v=4 step    200  E =   1.023776 eV  dE = 1.062e+05 cm-1
+    v=4 step    400  E =   0.871175 eV  dE = 1.231e+03 cm-1
+    v=4 step    600  E =   0.792577 eV  dE = 6.339e+02 cm-1
+    v=4 step    800  E =   0.786069 eV  dE = 5.249e+01 cm-1
+    v=4 step   1000  E =   0.785268 eV  dE = 6.453e+00 cm-1
+    v=4 step   1200  E =   0.785091 eV  dE = 1.431e+00 cm-1
+    v=4 step   1400  E =   0.785044 eV  dE = 3.779e-01 cm-1
+    v=4 step   1600  E =   0.785031 eV  dE = 1.036e-01 cm-1
+    v=4 step   1800  E =   0.785028 eV  dE = 2.870e-02 cm-1
+    v=4 step   2000  E =   0.785027 eV  dE = 7.985e-03 cm-1
+    v=4 step   2200  E =   0.785027 eV  dE = 2.226e-03 cm-1
+    v=4 step   2400  E =   0.785026 eV  dE = 6.208e-04 cm-1
+    v=4 converged in 2400 steps, 32.0 s, occupying ~1858 of 266112 grid points
+
+ state      E / eV   E - E0 / cm-1
+     0    0.442584             0.0
+     1    0.588060          1173.3
+     2    0.731198          2327.8
+     3    0.771166          2650.2
+     4    0.785026          2762.0
+
+H2O observed (cm-1): bend 1594.7, 2*bend 3151.6, sym str 3657.1, antisym str 3755.9
+ZPE above the surface minimum: 3452.5 cm-1 (H2O observed ~4638)
+
+wrote runs/D2O/vib_states.npz
+wrote runs/D2O/vib_states.png

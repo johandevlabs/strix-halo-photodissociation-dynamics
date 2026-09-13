@@ -1,0 +1,3 @@
+label=H2O
+m_departing_amu=1.00782503207
+m_spectator_amu=1.00782503207

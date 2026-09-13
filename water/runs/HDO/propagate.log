@@ -1,0 +1,52 @@
+grid     (256, 128, 36)  dt = 2.0 a.u., 4000 steps = 193.5 fs
+absorb   R from 8.00 bohr, r from 4.00 bohr, eta = 0.15 Ha
+states   5 vibrational levels
+
+energy resolution 2pi/T = 21.4 meV
+
+  v=0  |mu chi| = 2.870762e-01
+        step   1000  |S| = 2.316e-05
+        step   2000  |S| = 1.677e-08
+        step   3000  |S| = 1.098e-09
+        step   4000  |S| = 4.812e-10
+        channels: R (departing atom)  74.6%   r (other bond)  25.4%   captured 100.0% of norm
+  v=1  |mu chi| = 2.813142e-01
+        step   1000  |S| = 3.741e-06
+        step   2000  |S| = 1.323e-07
+        step   3000  |S| = 5.130e-09
+        step   4000  |S| = 1.904e-09
+        channels: R (departing atom)  76.1%   r (other bond)  23.9%   captured 100.0% of norm
+  v=2  |mu chi| = 2.692701e-01
+        step   1000  |S| = 1.071e-05
+        step   2000  |S| = 1.866e-07
+        step   3000  |S| = 1.171e-08
+        step   4000  |S| = 4.356e-09
+        channels: R (departing atom)  58.5%   r (other bond)  41.5%   captured 100.0% of norm
+  v=3  |mu chi| = 2.754400e-01
+        step   1000  |S| = 3.457e-05
+        step   2000  |S| = 3.143e-07
+        step   3000  |S| = 1.642e-08
+        step   4000  |S| = 5.351e-09
+        channels: R (departing atom)  76.3%   r (other bond)  23.7%   captured 100.0% of norm
+  v=4  |mu chi| = 2.599045e-01
+        step   1000  |S| = 1.146e-05
+        step   2000  |S| = 8.622e-08
+        step   3000  |S| = 6.727e-09
+        step   4000  |S| = 1.787e-09
+        channels: R (departing atom)  84.0%   r (other bond)  16.0%   captured 100.0% of norm
+
+    T/K   peak/nm    peak sigma/cm2   FWHM/eV
+    200     166.9         3.707e-18     0.856
+    250     166.9         3.707e-18     0.856
+    298     166.9         3.707e-18     0.856
+
+channel branching, band-integrated (not energy resolved):
+   v   R channel   r channel  norm captured
+   0       74.6%       25.4%         100.0%
+   1       76.1%       23.9%         100.0%
+   2       58.5%       41.5%         100.0%
+   3       76.3%       23.7%         100.0%
+   4       84.0%       16.0%         100.0%
+
+wrote runs/HDO/cross_section.npz
+wrote runs/HDO/cross_section.png

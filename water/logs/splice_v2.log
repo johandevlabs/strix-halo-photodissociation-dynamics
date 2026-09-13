@@ -1,0 +1,22 @@
+raster   3277 usable points, 12 skipped
+         grid 22 x 22 x 13  (24 holes after mirroring)
+         V_gs: filled 24 holes (r1 and r2 interpolation, then symmetrized)
+         V_ex: filled 24 holes (r1 and r2 interpolation, then symmetrized)
+         mu: filled 24 holes (r1 and r2 interpolation, then symmetrized)
+OH curve 32 points, 0.750-4.000 A, E_H = -0.49994832 Ha
+
+V_gs minimum -76.31963116 Ha at r1=0.973 r2=0.973 theta=105.0
+splice   offset at r1=3.40 A over 7 probe points in r2:
+           mean      991.50 meV  (absorbs the basis difference between the raster and the OH curve; magnitude is not diagnostic)
+           spread     13.38 meV  (THIS is the check: a size-consistent method should give a CONSTANT offset)
+         A'/A" splitting at r1=2.86 A (ab initio, pre-blend): max 0.1677 eV, median 0.0455 eV
+
+output   160 x 160 x 48 on r = 0.70-6.00 A
+         blend window 2.9-3.4 A
+         355008 points in the O+2H corner (flagged)
+         symmetry V_gs: max |V - V^T| = 7.734e-13 eV
+         symmetry V_ex: max |V - V^T| = 7.734e-13 eV
+         symmetry mu: max |V - V^T| = 1.110e-16 a.u.
+
+wrote pes_surface_v2.npz
+wrote pes_surface_v2.png

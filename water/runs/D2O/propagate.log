@@ -1,0 +1,53 @@
+grid     (256, 128, 36)  dt = 2.0 a.u., 4000 steps = 193.5 fs
+absorb   R from 8.00 bohr, r from 4.00 bohr, eta = 0.15 Ha
+states   5 vibrational levels
+
+energy resolution 2pi/T = 21.4 meV
+
+  v=0  |mu chi| = 2.907780e-01
+        step   1000  |S| = 1.231e-04
+        step   2000  |S| = 1.076e-07
+        step   3000  |S| = 7.662e-09
+        step   4000  |S| = 1.320e-09
+        channels: R (departing atom)  50.0%   r (other bond)  50.0%   captured 100.0% of norm
+  v=1  |mu chi| = 2.859374e-01
+        step   1000  |S| = 1.715e-05
+        step   2000  |S| = 3.197e-07
+        step   3000  |S| = 3.661e-08
+        step   4000  |S| = 6.247e-09
+        channels: R (departing atom)  49.9%   r (other bond)  50.1%   captured 100.0% of norm
+  v=2  |mu chi| = 2.815335e-01
+        step   1000  |S| = 3.936e-05
+        step   2000  |S| = 4.522e-07
+        step   3000  |S| = 6.750e-08
+        step   4000  |S| = 1.119e-08
+        channels: R (departing atom)  49.8%   r (other bond)  50.2%   captured 100.0% of norm
+  v=3  |mu chi| = 2.824624e-01
+        step   1000  |S| = 1.955e-04
+        step   2000  |S| = 1.064e-06
+        step   3000  |S| = 1.207e-07
+        step   4000  |S| = 1.879e-08
+        channels: R (departing atom)  49.5%   r (other bond)  50.5%   captured 100.0% of norm
+  v=4  |mu chi| = 2.584323e-01
+        step   1000  |S| = 5.350e-08
+        step   2000  |S| = 2.898e-09
+        step   3000  |S| = 4.110e-11
+        step   4000  |S| = 3.760e-12
+        channels: R (departing atom)  50.2%   r (other bond)  49.8%   captured 100.0% of norm
+
+    T/K   peak/nm    peak sigma/cm2   FWHM/eV
+    200     166.8         4.269e-18     0.775
+    250     166.8         4.269e-18     0.775
+    298     166.8         4.268e-18     0.775
+
+channel branching, band-integrated (not energy resolved):
+   v   R channel   r channel  norm captured
+   0       50.0%       50.0%         100.0%
+   1       49.9%       50.1%         100.0%
+   2       49.8%       50.2%         100.0%
+   3       49.5%       50.5%         100.0%
+   4       50.2%       49.8%         100.0%
+50/50 as required when the two bonds are equivalent.
+
+wrote runs/D2O/cross_section.npz
+wrote runs/D2O/cross_section.png

@@ -1,0 +1,35 @@
+mu at equilibrium (R=1.853, r=1.827 bohr) = 0.3148 a.u.
+mu over the grid: min 0.0000, max 0.4137
+
+running ab-initio mu
+    ab-initio v=0 done
+    ab-initio v=1 done
+    ab-initio v=2 done
+    ab-initio v=3 done
+    ab-initio v=4 done
+running Condon (mu frozen at equilibrium)
+    condon v=0 done
+    condon v=1 done
+    condon v=2 done
+    condon v=3 done
+    condon v=4 done
+running scaled mu (x1.352 to match 6.00e-18 cm2)
+    scaled v=0 done
+    scaled v=1 done
+    scaled v=2 done
+    scaled v=3 done
+    scaled v=4 done
+
+     variant   peak/nm     sigma/cm2   FWHM/eV        f
+   ab_initio     167.5     3.285e-18     0.936   0.0294
+      condon     171.7     4.619e-18     0.795   0.0358
+      scaled     167.5     6.000e-18     0.936   0.0537
+    observed     165.0     6.000e-18     1.000   0.0450
+
+shape difference, ab-initio vs Condon (both normalised): max 0.2164
+If that is small, the VARIATION of mu across the FC window does not
+matter and the whole discrepancy is a scale factor, which cancels in
+isotope ratios.
+
+wrote mu_sensitivity.npz
+wrote mu_sensitivity.png

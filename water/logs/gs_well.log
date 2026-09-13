@@ -1,0 +1,49 @@
+basis    aug-cc-pVTZ, frozen core = True
+r grid   16 points, 0.65-1.8 A (morse)
+theta    13 points
+points   1768 (r1>=r2 triangle)
+  50/1768  9067 pts/h  eta 11.4 min
+  100/1768  8898 pts/h  eta 11.2 min
+  150/1768  9705 pts/h  eta 10.0 min
+  200/1768  10087 pts/h  eta 9.3 min
+  250/1768  9974 pts/h  eta 9.1 min
+  300/1768  10298 pts/h  eta 8.6 min
+  350/1768  10420 pts/h  eta 8.2 min
+  400/1768  10438 pts/h  eta 7.9 min
+  450/1768  10695 pts/h  eta 7.4 min
+  500/1768  10611 pts/h  eta 7.2 min
+  550/1768  10744 pts/h  eta 6.8 min
+  600/1768  10739 pts/h  eta 6.5 min
+  650/1768  10778 pts/h  eta 6.2 min
+  700/1768  10838 pts/h  eta 5.9 min
+  750/1768  10907 pts/h  eta 5.6 min
+  800/1768  10816 pts/h  eta 5.4 min
+  850/1768  10952 pts/h  eta 5.0 min
+  900/1768  10908 pts/h  eta 4.8 min
+  950/1768  10926 pts/h  eta 4.5 min
+  1000/1768  10920 pts/h  eta 4.2 min
+  1050/1768  10963 pts/h  eta 3.9 min
+  1100/1768  10908 pts/h  eta 3.7 min
+  1150/1768  10910 pts/h  eta 3.4 min
+  1200/1768  10899 pts/h  eta 3.1 min
+  1250/1768  10886 pts/h  eta 2.9 min
+  1300/1768  10887 pts/h  eta 2.6 min
+  1350/1768  10814 pts/h  eta 2.3 min
+  1400/1768  10879 pts/h  eta 2.0 min
+  1450/1768  10833 pts/h  eta 1.8 min
+  1500/1768  10801 pts/h  eta 1.5 min
+  1550/1768  10813 pts/h  eta 1.2 min
+  1600/1768  10751 pts/h  eta 0.9 min
+  1650/1768  10757 pts/h  eta 0.7 min
+  1700/1768  10799 pts/h  eta 0.4 min
+  1750/1768  10718 pts/h  eta 0.1 min
+  1768/1768  10727 pts/h  eta 0.0 min
+
+raster done in 9.9 min
+assembled: 3328 filled, 0 holes, 0 skipped, max T1 diagnostic 0.2439
+minimum  -76.3418588141 Ha at r1=r2=0.9768 A, theta=105.00 deg
+jacobi   42.7% of the bound box lies outside the raster -> walled at 1.0 Ha
+         (bound states must have no amplitude there; check the participation ratio 08_relax reports)
+
+wrote jacobi_bound_ccsdt.npz
+next: python 08_relax.py --jacobi jacobi_bound_ccsdt.npz --nstates 5 --tol 1e-8

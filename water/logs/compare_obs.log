@@ -1,0 +1,13 @@
+comparing sigma_200K
+downloading https://www.uv-vis-spectral-atlas-mainz.org/uvvis_data/cross_sections/Hydrogen+water/H2O_Chung%282001%29_295K_140-195nm%281nm%29.txt
+
+               peak/nm    sigma/cm2   FWHM/eV        f
+    computed     167.5    3.285e-18     0.936   0.0294
+    measured     166.0    5.410e-18     0.903   0.0497
+
+SHAPE  peak +1.5 nm (-0.067 eV), FWHM +3.6%
+SCALE  sigma x0.607, f x0.592
+       consistent -> pure scale error; mu is off by x1.283.
+       A constant factor cancels in isotope ratios.
+
+wrote compare_obs.png

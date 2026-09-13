@@ -1,0 +1,13 @@
+valence  160x160x48 grid, r = 0.70-6.00 A, theta = 55-175 deg
+masses   departing 2.01410, spectator 2.01410, O 15.99491 amu
+         mu_R = 1.81151 amu, mu_r = 1.78885 amu
+transform  20.9% beyond the valence box in r1 -> analytic E_H + V_OH(r)
+           34.7% outside the raster's theta range, of which
+           27.0% walled at 1.5 Ha (close-in, repulsive)
+            7.7% covered by the asymptote instead
+
+V_gs min 0.0300 eV at R=1.903 r=1.827 bohr
+V_ex - V_gs at the V_gs minimum: 7.5534 eV
+
+wrote runs/D2O/jacobi_surface.npz
+wrote runs/D2O/jacobi_surface.png

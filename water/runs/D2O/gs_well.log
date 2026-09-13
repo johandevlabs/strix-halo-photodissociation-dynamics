@@ -1,0 +1,12 @@
+basis    aug-cc-pVTZ, frozen core = True
+r grid   16 points, 0.65-1.8 A (morse)
+theta    13 points
+points   1768 (r1>=r2 triangle)
+resume   1768 done, 0 remaining
+assembled: 3328 filled, 0 holes, 0 skipped, max T1 diagnostic 0.2439
+minimum  -76.3418588141 Ha at r1=r2=0.9768 A, theta=105.00 deg
+jacobi   44.6% of the bound box lies outside the raster -> walled at 1.0 Ha
+         (bound states must have no amplitude there; check the participation ratio 08_relax reports)
+
+wrote runs/D2O/jacobi_bound.npz
+next: python 08_relax.py --jacobi runs/D2O/jacobi_bound.npz --nstates 5 --tol 1e-8

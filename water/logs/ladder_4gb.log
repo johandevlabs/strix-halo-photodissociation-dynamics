@@ -1,0 +1,23 @@
+threads=16  max_memory=4000 MB  incore=False  frozen_core=True
+
+=== aug-cc-pVQZ  (172 basis functions) ===
+  SCF         2.03 s   E(HF)   = -76.0659575083
+threads=16  max_memory=4000 MB  incore=False  frozen_core=True
+
+=== aug-cc-pVQZ  (172 basis functions) ===
+  SCF         1.99 s   E(HF)   = -76.0659575083
+  CCSD        8.67 s   E_corr  = -0.2882536049  (11 iters)
+  (T)         2.22 s   E(T)    = -0.0093738848
+  TOTAL      12.88 s   E[CCSD(T)] = -76.3635849980   peak RSS 3.6 GB
+
+=== aug-cc-pV5Z  (287 basis functions) ===
+  SCF        15.80 s   E(HF)   = -76.0672767727
+  CCSD       48.83 s   E_corr  = -0.2933670134  (10 iters)
+  (T)        19.44 s   E(T)    = -0.0096536994
+  TOTAL      84.08 s   E[CCSD(T)] = -76.3702974856   peak RSS 3.7 GB
+
+appended 2 rows to h2o_ladder.csv
+
+observed scaling exponent (t ~ nbf^k):
+  CCSD aug-cc-pVQZ -> aug-cc-pV5Z k = 3.38
+  (T)  aug-cc-pVQZ -> aug-cc-pV5Z k = 4.24

@@ -128,6 +128,25 @@ CINT_LIB=$(find_lib "$CONDA_PREFIX/lib" libcint.so) \
 echo "    $CINT_LIB"
 echo "    pyscf libs: $PYSCF_LIB_DIR"
 
+# ...and the same split again for the HEADER. ao2mo/CMakeLists.txt hardcodes
+#     target_include_directories(nrr_opt PRIVATE
+#         ${PYSCF_LIB_DIR} ${PYSCF_LIB_DIR}/deps/include)
+# with no override variable, so cint.h cannot be pointed at the way the
+# library could. Inject it through CMAKE_C_FLAGS, which is additive to the
+# per-target include dirs rather than replacing them.
+echo "--- locating cint.h"
+CINT_INC=""
+for d in "$CONDA_PREFIX/include" "$PYSCF_LIB_DIR/deps/include"; do
+    if [[ -e $d/cint.h ]]; then CINT_INC=$d; break; fi
+done
+if [[ -z $CINT_INC ]]; then
+    echo "cint.h not found in $CONDA_PREFIX/include or $PYSCF_LIB_DIR/deps/include" >&2
+    echo "  conda install -c conda-forge libcint" >&2
+    echo "(conda-forge ships the headers in the same package as the library)" >&2
+    exit 1
+fi
+echo "    $CINT_INC/cint.h"
+
 echo "--- building socutils (bundled x2camf + zquatev)"
 # A previously failed configure leaves a CMakeCache.txt that remembers the
 # failure and ignores the new args. Clear it so a retry is a real retry.
@@ -136,7 +155,8 @@ make -C "$SRC/socutils" -j"$(nproc)" \
     CMAKE_ARGS="-DBLAS_LIBRARIES=$BLAS_LIB \
                 -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
                 -DPYSCF_LIB_DIR=$PYSCF_LIB_DIR \
-                -DPYSCF_CINT_LIB=$CINT_LIB"
+                -DPYSCF_CINT_LIB=$CINT_LIB \
+                -DCMAKE_C_FLAGS=-I$CINT_INC"
 python -m pip install -e "$SRC/socutils"
 
 # ------------------------------------------------------------------- prism

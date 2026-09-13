@@ -212,14 +212,59 @@ multi-state treatment. But only across the Franck-Condon window, exactly as in
 `water/09_propagate.py`: *"The dipole enters only at t = 0, which is why mu(R)
 was only ever needed across the Franck-Condon window."*
 
-- [ ] `04_statespecific_check.py` — does a state-specific triplet reproduce
-      the multi-state 3.4477 eV? Two unrelated methods, dCCSD(T) and
-      dCASSCF+NEVPT2, in the same spirit as water's OH curve where NEVPT2 and
-      UCCSD(T) agreed to 3 meV. Agreement within ~0.05 eV justifies the
-      restructuring on one data point.
-- [ ] If it holds at equilibrium, **repeat at a stretched O-Cl geometry.**
-      Multireference character grows as the bond breaks, and that is where a
-      state-specific treatment would fail if it is going to.
+- [x] `04_statespecific_check.py` — **dCCSD(T) gives 3.4142 eV against the
+      multi-state 3.4477, off by 0.034 eV**, converged, `<S^2>` = 2.0000
+      exactly, 594 CPU-s. The state-specific route reproduces the expensive
+      one at equilibrium.
+
+      dCASSCF+NEVPT2 is a dead end here: unconverged even at 200 macro cycles
+      and 14245 CPU-s, 24x dCCSD(T) and 2.5x the full multi-state route it was
+      meant to undercut. It was also redundant — `03`'s QD-NEVPT2+SOC and
+      `04`'s dCCSD(T) are already two unrelated methods (multireference
+      perturbation vs single-reference coupled cluster) agreeing to 0.034 eV,
+      which is exactly the cross-check water got from NEVPT2 vs UCCSD(T) on
+      the OH curve.
+
+- [x] `05_triplet_scan.py`, O-Cl from 1.4 to 4.0 A — **found a defect.** The
+      triplet surface is not smooth between roughly 2.2 and 2.8 A:
+
+      | r / A | E(T) / Ha | T1(T) | |
+      | --- | --- | --- | --- |
+      | 2.00 | −536.71711832 | 0.0290 | |
+      | 2.20 | −536.72000708 | 0.0411 | minimum |
+      | 2.40 | −536.71561692 | **0.0952** | rises |
+      | 2.60 | −536.71913365 | **0.0995** | **falls again — unphysical** |
+      | 2.80 | −536.71781644 | 0.0182 | T1 recovers |
+
+      Past its minimum a dissociating state must rise monotonically to the
+      asymptote. It does not: a 0.096 eV drop at 2.60 A, with second
+      differences 89x and 54x the median post-minimum curvature at 2.40 and
+      2.60. The reference changes character through that window and leaves a
+      kink in the potential. `<S^2>` is 2.0000 throughout, so it is not spin
+      contamination.
+
+      **Two mitigating facts.** The Franck-Condon window is clean — T1(T) is
+      0.024-0.030 around equilibrium, below the open-shell threshold — and the
+      band position and width follow from that region by the reflection
+      principle. And size consistency passed: the triplet at 4.0 A sits 28 meV
+      from separately computed OH + Cl.
+
+      But the packet travels through 2.2-2.8 A on its way out, so this has to
+      be repaired before any propagation. A wavepacket scattering off an
+      artefact is precisely the class of quiet wrong answer this repo
+      catalogues.
+
+- [ ] **Rerun the scan with `--symmetry Cs`.** The scan above ran with
+      symmetry OFF. If the kink is a 3A"/3A' state-following artefact, forcing
+      the irrep removes it, and this is the cheapest possible test —
+      water/README.md's "force the point group, don't detect it" predicts
+      exactly this failure.
+- [ ] If Cs does not fix it, the region genuinely needs a multireference
+      treatment: either patch 2.2-2.8 A with CASSCF/NEVPT2 and splice, or
+      accept the multireference route for the triplet surface as a whole.
+- [ ] Cost so far: 830 CPU-s/point averaged over the scan (worse than the
+      594 at equilibrium, as expected away from it) = **47 h for 3289 points
+      on 16 cores**, against 330 h for the full multi-state route.
 - [ ] **Force Cs for the raster.** "Lowest triplet" is only well defined if
       a 3A' cannot overtake a 3A" along the dissociation coordinate; within
       the A" irrep it is the ground state of its block. water/README.md's

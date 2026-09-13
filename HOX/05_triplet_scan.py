@@ -116,6 +116,86 @@ def fragment_asymptote(basis, symmetry, verbose=0):
     return oh, cl
 
 
+def analyse_smoothness(rows, key="e_t"):
+    """Find kinks in a curve that physics says should be smooth.
+
+    Past its minimum a dissociating state must rise monotonically towards the
+    asymptote. A decrease after that point is not a feature of the potential,
+    it is the reference changing character -- and unlike a T1 spike it shows up
+    directly as a defect in the surface the propagation would use.
+
+    Returns (monotonicity violations, worst second difference), both as lists
+    of (r, value).
+    """
+    pts = [(r["r"], r[key]) for r in rows if key in r]
+    if len(pts) < 3:
+        return [], []
+    rs = [p[0] for p in pts]
+    es = [p[1] for p in pts]
+
+    imin = int(np.argmin(es))
+    violations = []
+    for i in range(imin + 1, len(es)):
+        if es[i] < es[i - 1]:
+            violations.append((rs[i], (es[i] - es[i - 1]) * HARTREE2EV))
+
+    # Second differences, but ONLY past the minimum. Applied to the whole
+    # curve this test flags the repulsive wall at short r, where curvature is
+    # large because the potential really is strongly curved -- a false
+    # positive that also drowns out the genuine kink further out. Past the
+    # minimum the curve should decay smoothly to the asymptote, so any sharp
+    # curvature there is suspect.
+    d2 = []
+    for i in range(max(imin + 1, 1), len(es) - 1):
+        val = (es[i + 1] - 2 * es[i] + es[i - 1]) * HARTREE2EV
+        d2.append((rs[i], val))
+    if d2:
+        med = float(np.median([abs(v) for _, v in d2]))
+        d2 = [(r, v) for r, v in d2 if med > 0 and abs(v) > 8 * med]
+    return violations, d2
+
+
+def make_plot(rows, path, e_inf=None):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    rs = [r["r"] for r in rows if "e_t" in r]
+    et = [r["e_t"] for r in rows if "e_t" in r]
+    rs_s = [r["r"] for r in rows if "e_s" in r]
+    es = [r["e_s"] for r in rows if "e_s" in r]
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(7, 7), sharex=True)
+    if es:
+        ax1.plot(rs_s, es, "o-", label="X 1A' (CCSD(T))", color="#1f77b4")
+    ax1.plot(rs, et, "s-", label='a 3A" (UCCSD(T))', color="#d62728")
+    if e_inf is not None:
+        ax1.axhline(e_inf, ls=":", color="grey", label="OH + Cl fragments")
+    ax1.axvline(R_OCL_EQ_ANG, ls="--", color="k", lw=0.8, label="equilibrium")
+    ax1.set_ylabel("E / Ha")
+    ax1.legend(fontsize=8)
+    ax1.set_title("HOCl, O-Cl cut at fixed r(OH) and angle")
+
+    t1t = [r["t1_t"] for r in rows if "t1_t" in r]
+    ax2.plot(rs, t1t, "s-", color="#d62728", label='T1, a 3A"')
+    if any("t1_s" in r for r in rows):
+        ax2.plot([r["r"] for r in rows if "t1_s" in r],
+                 [r["t1_s"] for r in rows if "t1_s" in r],
+                 "o-", color="#1f77b4", label="T1, X 1A'")
+    ax2.axhline(T1_THRESHOLD_OPEN, ls=":", color="#d62728",
+                label=f"open-shell {T1_THRESHOLD_OPEN}")
+    ax2.axhline(T1_THRESHOLD_CLOSED, ls=":", color="#1f77b4",
+                label=f"closed-shell {T1_THRESHOLD_CLOSED}")
+    ax2.axvline(R_OCL_EQ_ANG, ls="--", color="k", lw=0.8)
+    ax2.set_xlabel("r(O-Cl) / A")
+    ax2.set_ylabel("T1 diagnostic")
+    ax2.legend(fontsize=8)
+
+    fig.tight_layout()
+    fig.savefig(path, dpi=140)
+    print(f"  wrote {path}")
+
+
 def main():
     p = argparse.ArgumentParser(
         description=__doc__,
@@ -132,6 +212,7 @@ def main():
                         "region anyway")
     p.add_argument("--no-asymptote", action="store_true")
     p.add_argument("--csv", default="hocl_scan.csv")
+    p.add_argument("--png", default="hocl_scan.png")
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
 
@@ -183,6 +264,7 @@ def main():
         rows.append(row)
 
     # ------------------------------------------------------------ asymptote
+    e_inf = None
     if not args.no_asymptote:
         print("\n  --- separated fragments (size-consistency check)")
         try:
@@ -221,6 +303,10 @@ def main():
             for row in rows:
                 w.writerow({k: row.get(k, "") for k in keys})
         print(f"\n  wrote {args.csv}")
+        try:
+            make_plot(rows, args.png, e_inf)
+        except Exception as exc:
+            print(f"  plot FAILED: {type(exc).__name__}: {exc}")
 
     # -------------------------------------------------------------- verdict
     wall, cpu = time.time() - t0, time.process_time() - c0
@@ -236,14 +322,43 @@ def main():
              if "t1_t" in r and r["t1_t"] > T1_THRESHOLD_OPEN]
     bad_s = [r["r"] for r in rows
              if "t1_s" in r and r["t1_s"] > T1_THRESHOLD_CLOSED]
+
+    # A kink in the curve is more damning than a T1 value: T1 warns that the
+    # reference is strained, a non-monotonic tail proves the surface is wrong.
+    viol, kinks = analyse_smoothness(rows, "e_t")
+    if viol or kinks:
+        print("  TRIPLET SURFACE IS NOT SMOOTH.")
+        for r, dv in viol:
+            print(f"    r = {r:.2f} A: energy DROPS by {abs(dv):.4f} eV past "
+                  f"the minimum -- unphysical for a dissociating state")
+        for r, dv in kinks:
+            print(f"    r = {r:.2f} A: second difference {dv:+.4f} eV, far "
+                  f"above the curve's typical curvature")
+        print("  This is a defect in the potential itself, not a warning about")
+        print("  the reference. A propagation on this surface would scatter the")
+        print("  wavepacket off an artefact.")
+        print()
+
     if bad_t:
         print(f"  TRIPLET T1 above {T1_THRESHOLD_OPEN} at r = "
               f"{', '.join(f'{r:.2f}' for r in bad_t)} A")
-        print("  This is the surface the wavepacket moves on, so this is the")
-        print("  one that matters. If the flagged points are a contiguous")
-        print("  region rather than scattered, the state-specific route needs")
-        print("  a multireference patch there -- or the whole triplet surface")
-        print("  needs CASSCF/NEVPT2 after all.")
+        lo, hi = min(bad_t), max(bad_t)
+        fc_lo, fc_hi = R_OCL_EQ_ANG - 0.2, R_OCL_EQ_ANG + 0.2
+        if hi < fc_lo or lo > fc_hi:
+            print(f"  The flagged region ({lo:.2f}-{hi:.2f} A) lies OUTSIDE the")
+            print(f"  Franck-Condon window (~{fc_lo:.2f}-{fc_hi:.2f} A), where")
+            print("  the band position and width are set by the reflection")
+            print("  principle. That is the good case: the absorption profile")
+            print("  is governed by a region the reference handles, and the")
+            print("  defect sits where it mainly affects fine structure. It")
+            print("  still has to be repaired before propagating -- the packet")
+            print("  travels through it -- but it does not invalidate the")
+            print("  state-specific approach near equilibrium.")
+        else:
+            print("  The flagged region OVERLAPS the Franck-Condon window.")
+            print("  That is the bad case: the band position, width and")
+            print("  intensity all derive from precisely this region, so the")
+            print("  state-specific route cannot be trusted for the spectrum.")
     else:
         print(f"  Triplet T1 stayed below {T1_THRESHOLD_OPEN} across the whole")
         print("  scan. The state-specific triplet surface is sound along the")

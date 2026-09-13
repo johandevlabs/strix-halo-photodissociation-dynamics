@@ -29,15 +29,30 @@ Two things come out of this script.
      than seconds the SOMF variant or geometry-independent SOC is the
      fallback, not the full treatment.
 
-MIXED MULTIPLICITIES -- the part written without a worked example. Every
-shipped Prism SOC example uses one mol.spin and one SA-CASSCF over roots of a
-single multiplicity. Singlet-plus-triplet needs PySCF's state_average_mix_
-with two FCI solvers. Prism reporting per-state active electrons as
-[(3, 2), (3, 2), (3, 2)] and counting "reference microstates" separately says
-it tracks (nalpha, nbeta) per state, which is what that requires -- but it is
-inference, not a documented API. --triplet-only is the graceful fallback: it
-runs the molecular SOC path with a single multiplicity, which still gives the
-timing even if the mixed setup needs work.
+MIXED MULTIPLICITIES, and why it is not state_average_mix_. Prism's interface
+takes ONE mc and uses a single global mc.nelecas for every state -- passing
+state_average_mix_ dies in make_rdm1 with a CI vector of the wrong length,
+because a triplet (7,5) and a singlet (6,6) have different (nalpha, nbeta).
+
+But it also computes each state's spin from its own CI vector, via
+compute_spin_square(). That is the opening: singlet and triplet states share
+the same (nalpha, nbeta) as long as both are taken from the **Ms = 0
+determinant space**, which spans S = 0, 1, 2 ... at once. So the reference is
+a single ordinary state-averaged CASSCF at mol.spin = 0, with two departures
+from the water pipeline:
+
+  - fci.direct_spin1 rather than direct_spin0. PySCF picks direct_spin0 for a
+    closed-shell molecule, and that projects onto singlets, which would throw
+    away the triplet entirely.
+  - NO fix_spin_. water/README.md lists "constrain the spin in CASSCF" as a
+    gotcha, because there the solver returning a triplet as an excited root
+    was the bug. Here it is the entire point, and constraining S would remove
+    the state whose intensity we are trying to compute.
+
+Because the roots come out mixed, you cannot ask for a given number of each:
+you take the lowest --nroots and read off what they are. The script prints
+<S^2> per root before doing any SOC work, so a reference containing no triplet
+is caught immediately rather than after the expensive step.
 
 Usage:
     python 03_soc_hocl_vertical.py 2>&1 | tee logs/soc_hocl.log
@@ -80,7 +95,39 @@ def hocl_geometry(r_oh=R_OH_ANG, r_ocl=R_OCL_ANG, angle=ANGLE_HOCL_DEG):
             ["H", (r_oh * np.cos(th), r_oh * np.sin(th), 0.0)]]
 
 
-def build_reference(basis, cas=None, nsinglet=1, ntriplet=1,
+def report_reference_spins(mc):
+    """<S^2> per CASSCF root, before any SOC work is done.
+
+    In the Ms = 0 space the multiplicities come out mixed and unordered, so
+    this is how you find out what the reference actually contains. A reference
+    with no triplet cannot borrow intensity, and finding that out here costs
+    seconds instead of after the SOC step.
+    """
+    cis = mc.ci if isinstance(mc.ci, (list, tuple)) else [mc.ci]
+    energies = getattr(mc, "e_states", None)
+    print(f"\n  {'root':>5}{'E / Ha':>20}{'<S^2>':>10}{'2S+1':>8}  assignment")
+    mults = []
+    for i, c in enumerate(cis):
+        ss, mult = mc.fcisolver.spin_square(c, mc.ncas, mc.nelecas)
+        m = int(round(mult))
+        mults.append(m)
+        label = {1: "singlet", 3: "triplet", 5: "quintet"}.get(
+            m, f"multiplicity {mult:.2f}")
+        e = energies[i] if energies is not None else float("nan")
+        print(f"  {i:>5}{e:20.10f}{ss:10.4f}{mult:8.2f}  {label}")
+
+    if 3 not in mults:
+        print("\n  !! no triplet among the reference states. There is nothing")
+        print("     for the singlets to lend intensity to, so any f computed")
+        print("     below is meaningless. Raise --nroots, or check that the")
+        print("     solver is direct_spin1 and that fix_spin_ is NOT applied.")
+    elif 1 not in mults:
+        print("\n  !! no singlet among the reference states -- nothing to")
+        print("     borrow FROM. Raise --nroots.")
+    return mults
+
+
+def build_reference(basis, cas=None, nroots=4, max_cycle=100,
                     triplet_only=False, verbose=0):
     """Mean field plus a state-averaged CASSCF spanning the states we need.
 
@@ -114,30 +161,25 @@ def build_reference(basis, cas=None, nsinglet=1, ntriplet=1,
     mc = mcscf.CASSCF(mf, ncas, nelecas)
     mc.conv_tol = 1e-11
     mc.conv_tol_grad = 1e-6
+    mc.max_cycle_macro = max_cycle
 
     if triplet_only:
-        weights = np.ones(ntriplet) / ntriplet
-        mc = mc.state_average_(weights)
+        mc.fcisolver = fci.direct_spin1.FCI(mol)
         fci.addons.fix_spin_(mc.fcisolver, ss=2.0)          # triplet S(S+1)=2
+        mc = mc.state_average_(np.ones(nroots) / nroots)
     else:
-        # Two solvers, one per multiplicity. This is what lets the state
-        # interaction mix them; a single solver cannot represent both.
-        solver_s = fci.direct_spin0.FCI(mol)
-        solver_s.spin = 0
-        solver_s.nroots = nsinglet
-        fci.addons.fix_spin_(solver_s, ss=0.0)
-
-        solver_t = fci.direct_spin1.FCI(mol)
-        solver_t.spin = 2
-        solver_t.nroots = ntriplet
-        fci.addons.fix_spin_(solver_t, ss=2.0)
-
-        n = nsinglet + ntriplet
-        mcscf.state_average_mix_(mc, [solver_s, solver_t], np.ones(n) / n)
+        # direct_spin1 in the Ms = 0 space, deliberately UNCONSTRAINED in S:
+        # that space holds singlets and triplets together, and they share one
+        # (nalpha, nbeta), which is what Prism's single global nelecas needs.
+        # direct_spin0 would project the triplet away; fix_spin_ would too.
+        mc.fcisolver = fci.direct_spin1.FCI(mol)
+        mc = mc.state_average_(np.ones(nroots) / nroots)
 
     mc.kernel(mo)
     if not mc.converged:
-        print("  WARNING: CASSCF did not converge")
+        print("  WARNING: CASSCF did not converge -- raise --max-cycle, or "
+              "try a smaller\n           active space with --cas. SOC results "
+              "from an unconverged reference\n           are not trustworthy.")
     return mol, mf, mc
 
 
@@ -223,14 +265,17 @@ def main():
     p.add_argument("--soc", default="DKH1", help="DKH1 or breit-pauli")
     p.add_argument("--cas", nargs=2, type=int, metavar=("NCAS", "NELEC"),
                    default=None, help="override the AVAS active space")
-    p.add_argument("--nsinglet", type=int, default=2,
-                   help="singlet roots (default 2: X 1A' plus the bright "
-                        "1A\" that the triplet borrows from)")
-    p.add_argument("--ntriplet", type=int, default=2,
-                   help="triplet roots (default 2: a 3A\" and its partner)")
+    p.add_argument("--nroots", type=int, default=6,
+                   help="CASSCF roots in the Ms=0 space (default 6). The "
+                        "multiplicities come out mixed and cannot be "
+                        "requested individually; raise this if no triplet "
+                        "appears among them.")
+    p.add_argument("--max-cycle", type=int, default=100,
+                   help="CASSCF macro iterations (default 100)")
     p.add_argument("--triplet-only", action="store_true",
-                   help="single multiplicity -- fallback that still gives the "
-                        "timing if the mixed-multiplicity setup needs work")
+                   help="spin-constrained triplets only -- no borrowing, but "
+                        "it still gives the timing if the mixed reference "
+                        "misbehaves")
     p.add_argument("--no-nevpt2", action="store_true",
                    help="CASSCF-level state interaction, no perturbation")
     p.add_argument("--raster-points", type=int, default=3289,
@@ -254,11 +299,12 @@ def main():
     t0 = time.time()
     try:
         mol, mf, mc = build_reference(
-            args.basis, cas=cas, nsinglet=args.nsinglet,
-            ntriplet=args.ntriplet, triplet_only=args.triplet_only,
+            args.basis, cas=cas, nroots=args.nroots,
+            max_cycle=args.max_cycle, triplet_only=args.triplet_only,
             verbose=args.verbose)
         t_ref = time.time() - t0
         print(f"  reference done in {t_ref:8.1f} s  (nao {mol.nao_nr()})")
+        report_reference_spins(mc)
 
         t1 = time.time()
         energies, osc = run_soc(mf, mc, soc=args.soc,

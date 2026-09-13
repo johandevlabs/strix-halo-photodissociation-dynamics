@@ -102,12 +102,27 @@ def2-TZVP, SA-CASSCF(5e,3o)/3 roots, DKH1-QD-NEVPT2:
 | --- | --- |
 | degeneracy pattern | **[4, 2]** — correct for a 2P term |
 | ordering | 4-fold at 0, 2-fold at +844.54 cm-1: **inverted**, correct for p^5 |
-| 2P_1/2 − 2P_3/2 | **844.54 vs 882.35 cm-1 observed, −4.3%** |
-| oscillator strengths | returned, ~4e-24, i.e. zero as required within a term |
-| cost | 5.3 s total; the SOC step 1.2 s wall / 37 s CPU (31x parallel) |
+| 2P_1/2 − 2P_3/2 (Cl) | **844.54 vs 882.35 cm-1 observed, −4.3%** |
+| 2P_1/2 − 2P_3/2 (Br) | **3072.71 vs 3685.24 cm-1 observed, −16.6%** |
+| oscillator strengths | returned, ~1e-24, i.e. zero as required within a term |
+| cost | Cl 5.3 s, Br 9.5 s; SOC step 1.1 and 3.2 s wall (~30x parallel) |
 
 The inversion is the check that matters most: a normal ordering would have been
 a sign error wearing a plausible magnitude. Toolchain is sound.
+
+**The Br error needs chasing before Phase 2.** −4.3% on Cl and −16.6% on Br is
+too steep a degradation to blame on the method, and Br is the target element.
+The prime suspect is the basis rather than the SOC treatment: def2-TZVP is
+all-electron for Br but *non-relativistically contracted*, while the SOC
+operator samples the near-nuclear region where that contraction is wrong.
+Cheapest test, minutes:
+
+    python 02_soc_atoms.py --atoms Br --basis unc-def2-tzvp
+
+If decontracting recovers most of the missing 17%, the diagnosis is confirmed
+and the fix for HOBr is a relativistic basis (x2c-TZVPall, ANO-RCC, dyall --
+most need `pip install basis-set-exchange`) rather than anything structural.
+If it does not, suspect the DKH1 SOC operator and compare `--soc breit-pauli`.
 
 Remaining caveats:
 

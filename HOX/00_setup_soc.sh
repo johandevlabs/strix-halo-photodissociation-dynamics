@@ -189,9 +189,24 @@ install_pkg "$SRC/socutils" socutils
 clone_or_pull https://github.com/sokolov-group/prism.git "$SRC/prism"
 install_pkg "$SRC/prism" prism
 
-# Prism lists these as optional but wants them for SOC and for any tensor
-# contraction of a size worth caring about.
-python -m pip install "sympy>=1.12" opt_einsum
+# Prism ships no setup.py or pyproject.toml, so pip never resolves its
+# dependencies -- they have to be installed by hand or the first import of
+# prism.nevpt dies on a missing module. Its docs list numpy, scipy, h5py and
+# psutil as required, sympy as required specifically for SOC, and opt_einsum
+# as the tensor backend every SOC example asks for by name.
+#
+# Install only what is actually absent: h5py and friends generally come from
+# conda-forge here, and pip-installing over them reintroduces exactly the
+# duplicate-library problem this env already has with numpy.
+echo "--- prism dependencies"
+for pkg in psutil sympy opt_einsum h5py numpy scipy; do
+    if python -c "import $pkg" 2>/dev/null; then
+        echo "    present    $pkg"
+    else
+        echo "    installing $pkg"
+        python -m pip install "$pkg"
+    fi
+done
 
 echo
 echo "=== smoke test ==="
@@ -201,7 +216,11 @@ import importlib
 # x2camf is a dual-backend dispatcher bundled INSIDE socutils, not a separate
 # top-level distribution, so accept either spelling. zquatev likewise ships as
 # a bundled library rather than a standalone module.
-REQUIRED = ["pyscf", "socutils", "prism"]
+# `import prism` alone touches almost nothing -- it imported cleanly while
+# prism.nevpt was dead on a missing psutil. Import the LEAF modules the SOC
+# path actually uses, so a missing dependency fails here rather than three
+# scripts later.
+REQUIRED = ["pyscf", "socutils", "prism", "prism.interface", "prism.nevpt"]
 EITHER = [("x2camf", "socutils.x2camf"), ("zquatev", "socutils.zquatev")]
 
 failed = []

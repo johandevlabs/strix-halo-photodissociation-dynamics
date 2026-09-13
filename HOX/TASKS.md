@@ -179,22 +179,66 @@ plausibly 2500-4000 CPU-seconds, so a 3289-point raster is roughly
 raster was 41 minutes. `03` now measures CPU time directly and reports this
 properly, so the next run replaces that range with a number.
 
-If it lands where expected, do NOT raster at this level. Levers, cheapest
-first:
+**Measured, 2026-09-13: 5783 CPU-seconds per point.** A 3289-point raster is
+**5283 CPU-hours, 330 h (~14 days) on 16 cores**, against 41 minutes for the
+whole of `water/`. The observed parallel factor was 31.7x over 32 logical CPUs,
+so the machine was fully committed — there is no headroom to reclaim by
+rearranging the job.
 
-- [ ] **Fewer states.** 6 roots drove 6 NEVPT2 solves. Two singlets plus two
-      triplets may suffice for the lowest triplet's borrowing: `--nroots 4`.
-- [ ] **Reuse orbitals between geometries.** The reference took 141 s of the
-      155 s — CASSCF convergence is the bottleneck, not SOC. Seeding from a
-      neighbouring geometry is the obvious fix, but note water/README.md's
-      warning about seeding active spaces along a scan; AVAS-per-point was
-      chosen there precisely to avoid propagating damage. Needs care.
-- [ ] **Smaller active space or basis** for the raster, with a few points
-      checked against the full treatment.
-- [ ] **Geometry-independent SOC.** Compute the SOC constant once near
-      equilibrium and apply it across the surface. Physically defensible — it
-      is dominated by the halogen core and varies weakly with bond length —
-      and it removes SOC from the raster entirely.
+`--nroots 4` made it **worse**, not better: wall 155 -> 183 s, because the
+CASSCF stopped converging (hit the cycle limit). Averaging over more states
+evidently stabilises it. The unconverged reference also moved f from 8.92e-07
+to 4.71e-07, nearly 2x, while the vertical energy barely moved (3.4477 ->
+3.4495 eV). **f is the sensitive quantity; the energy is not.** Any future
+economy has to be judged on f, not on the excitation energy.
+
+So the full multi-state raster is off the table at this level of theory.
+
+### Phase 1, restructured — state-specific surfaces
+
+Johan's observation, and it is the way out: the two states HOX needs are each
+the **lowest of their own spin manifold**, so neither requires excited-state
+theory at all.
+
+| quantity | method | where | cost |
+| --- | --- | --- | --- |
+| V(X 1A') | CCSD(T), closed shell | bound region | water's `13_gs_well.py` |
+| V(a 3A") | state-specific, spin=2 | full 3D raster | to be measured |
+| mu_SOC(R) | 6-state QD-NEVPT2 + SOC | **FC window only** | 5783 CPU-s/pt |
+
+The intensity is the one thing this does not give: a 3A" <- X 1A' is
+spin-forbidden and borrows entirely from bright singlets, so f needs the
+multi-state treatment. But only across the Franck-Condon window, exactly as in
+`water/09_propagate.py`: *"The dipole enters only at t = 0, which is why mu(R)
+was only ever needed across the Franck-Condon window."*
+
+- [ ] `04_statespecific_check.py` — does a state-specific triplet reproduce
+      the multi-state 3.4477 eV? Two unrelated methods, dCCSD(T) and
+      dCASSCF+NEVPT2, in the same spirit as water's OH curve where NEVPT2 and
+      UCCSD(T) agreed to 3 meV. Agreement within ~0.05 eV justifies the
+      restructuring on one data point.
+- [ ] If it holds at equilibrium, **repeat at a stretched O-Cl geometry.**
+      Multireference character grows as the bond breaks, and that is where a
+      state-specific treatment would fail if it is going to.
+- [ ] **Force Cs for the raster.** "Lowest triplet" is only well defined if
+      a 3A' cannot overtake a 3A" along the dissociation coordinate; within
+      the A" irrep it is the ground state of its block. water/README.md's
+      "force the point group, don't detect it" stops being tidiness here — a
+      state-specific solver with symmetry off would follow the lower adiabat
+      through a crossing and produce a kinked surface with no error message.
+- [ ] **Sample mu_SOC coarsely.** `water/10_mu_sensitivity.py` measured what
+      freezing mu costs: peak moved 4 nm, band narrowed 15%. So mu matters but
+      does not need the full raster grid — a coarse FC-window scan plus
+      interpolation is the likely answer.
+
+Still-open fallbacks if the state-specific route fails:
+
+- [ ] **Geometry-independent SOC.** Compute the coupling once near equilibrium
+      and apply it across the surface — defensible, since it is dominated by
+      the halogen core and varies weakly with bond length.
+- [ ] **Orbital reuse between geometries**, with water's warning about seeding
+      active spaces along a scan (negative excitation energies, 66 eV roots).
+- [ ] **SOMF-QDNEVPT2**, a smaller active space, or a smaller basis.
 
 ### Phase 0.5 — validate the SOC toolchain (cheap, do with Phase 0)
 

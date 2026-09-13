@@ -290,7 +290,13 @@ def report(energies, osc):
         elif len(idx) == 1:
             label = "singlet-derived" + (" (ground)" if idx[0] == 0 else "")
         else:
-            label = f"{len(idx)} components -- unexpected, check --nroots"
+            # Not necessarily an error. Energy clustering cannot separate a
+            # triplet whose own SOC splitting exceeds the gap to a neighbouring
+            # singlet -- seen here, where the second triplet spans 0.023 eV
+            # while a singlet sits 0.028 eV away. The lowest triplet, the one
+            # that matters, is isolated by ~0.9 eV and unaffected.
+            label = (f"{len(idx)} components -- a triplet split wider than "
+                     f"--cluster-tol, or overlapping states")
         nm = f"{NM_PER_EV / ev:10.1f}" if ev > 1e-9 else f"{'--':>10}"
         print(f"  {k:>6}{len(idx):>4}{ev:10.4f}{nm}{fsum:13.4e}   {label}")
 

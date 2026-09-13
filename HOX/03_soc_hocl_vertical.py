@@ -61,6 +61,7 @@ Usage:
     python 03_soc_hocl_vertical.py --cas 10 8         # override AVAS
 """
 import argparse
+import os
 import time
 import traceback
 
@@ -216,6 +217,25 @@ def run_soc(mf, mc, soc="DKH1", use_nevpt2=True, verbose=4):
     return np.atleast_1d(np.asarray(e_tot, dtype=float)).ravel(), osc
 
 
+def cluster_states(rel_ev, tol=0.02):
+    """Group SOC states into near-degenerate clusters.
+
+    A singlet-derived state stands alone; a triplet-derived one appears as
+    three components split only by SOC (a few cm-1 here). So cluster size is
+    the multiplicity label, which the SOC states do not otherwise carry --
+    they are mixed by construction.
+    """
+    clusters, cur = [], [0]
+    for i in range(1, len(rel_ev)):
+        if rel_ev[i] - rel_ev[cur[-1]] < tol:
+            cur.append(i)
+        else:
+            clusters.append(cur)
+            cur = [i]
+    clusters.append(cur)
+    return clusters
+
+
 def report(energies, osc):
     """Excitation energies and the borrowed intensity."""
     e0 = energies[0]
@@ -253,15 +273,55 @@ def report(energies, osc):
         print("  f is small and nonzero, which is what a SOC-borrowed")
         print("  singlet-triplet transition should look like.")
 
-    i = int(np.argmax(np.abs(osc_arr))) + 1
-    ev = rel_ev[i]
-    print(f"\n  brightest excited state: #{i}, {ev:.4f} eV "
-          f"= {NM_PER_EV / ev:.1f} nm, f = {osc_arr[i - 1]:.4e}")
-    print(f"  measured HOCl triplet band: {OBS_PEAK_NM:.0f} nm "
-          f"({NM_PER_EV / OBS_PEAK_NM:.3f} eV), sigma ~ {OBS_SIGMA_CM2:.0e} cm^2")
-    print(f"  vertical energy is NOT the band peak -- the peak sits below it "
-          f"by the reorganisation\n  along the dissociation coordinate, so a "
-          f"vertical value above 3.26 eV is expected.")
+    # Max |f| finds the bright SINGLET, which is not the quantity of interest.
+    # Cluster instead: the a 3A" band is a three-component cluster and its
+    # intensity is the SUM over those components.
+    clusters = cluster_states(rel_ev)
+    print(f"\n  {'group':>6}{'n':>4}{'dE / eV':>10}{'dE / nm':>10}"
+          f"{'sum f':>13}   assignment")
+    triplets = []
+    for k, idx in enumerate(clusters):
+        ev = float(np.mean([rel_ev[i] for i in idx]))
+        fsum = float(sum(osc_arr[i - 1] for i in idx
+                         if 0 < i <= osc_arr.size))
+        if len(idx) == 3:
+            label = "TRIPLET-derived (borrowed)"
+            triplets.append((ev, fsum))
+        elif len(idx) == 1:
+            label = "singlet-derived" + (" (ground)" if idx[0] == 0 else "")
+        else:
+            label = f"{len(idx)} components -- unexpected, check --nroots"
+        nm = f"{NM_PER_EV / ev:10.1f}" if ev > 1e-9 else f"{'--':>10}"
+        print(f"  {k:>6}{len(idx):>4}{ev:10.4f}{nm}{fsum:13.4e}   {label}")
+
+    if not triplets:
+        print("\n  !! no three-component cluster: no triplet-derived band was")
+        print("     resolved. Nothing here is the a 3A\" transition.")
+        return fmax
+
+    ev, fsum = triplets[0]
+    nm = NM_PER_EV / ev
+    obs_ev = NM_PER_EV / OBS_PEAK_NM
+    print(f"\n  lowest triplet-derived band (the a 3A\" candidate):")
+    print(f"      vertical   {ev:.4f} eV = {nm:.1f} nm,  summed f = {fsum:.4e}")
+    print(f"      measured   {obs_ev:.4f} eV = {OBS_PEAK_NM:.0f} nm,  "
+          f"sigma ~ {OBS_SIGMA_CM2:.0e} cm^2")
+    print(f"      difference {ev - obs_ev:+.4f} eV ({nm - OBS_PEAK_NM:+.1f} nm)")
+
+    # Very rough band-integrated f from the measured peak cross section, to
+    # put the computed f on a comparable scale:
+    #     f = 1.13e12 * Int sigma dnu~   (sigma in cm^2, nu~ in cm^-1)
+    # The width is a guess, so this is an order-of-magnitude check only.
+    for width_cm in (2000.0, 5000.0):
+        f_obs = 1.13e12 * OBS_SIGMA_CM2 * width_cm
+        print(f"      f(obs) ~ {f_obs:.2e} if the band is {width_cm:.0f} cm-1 wide"
+              f"   -> calc/obs = {fsum / f_obs:.2f}")
+    print("""      The width is assumed, not measured, so treat the ratio as an
+      order of magnitude. A vertical f is also not a band-integrated f: mu
+      varies along the dissociation coordinate, which is what the propagation
+      in Phase 1 would actually integrate over. water/ found the analogous
+      quantity low by a constant 1.29, so a shortfall here is expected in kind
+      if not in size.""")
     return fmax
 
 
@@ -304,7 +364,7 @@ def main():
           f"{'CASSCF SI' if args.no_nevpt2 else 'QD-NEVPT2 + SOC'}")
     print("=" * 72)
 
-    t0 = time.time()
+    t0, c0 = time.time(), time.process_time()
     try:
         mol, mf, mc = build_reference(
             args.basis, cas=cas, nroots=args.nroots,
@@ -319,6 +379,7 @@ def main():
                                 use_nevpt2=not args.no_nevpt2)
         t_soc = time.time() - t1
         print(f"  SOC step done in  {t_soc:8.1f} s")
+        cpu_total = time.process_time() - c0
         report(energies, osc)
     except Exception as exc:
         print(f"\n  FAILED: {type(exc).__name__}: {exc}")
@@ -329,33 +390,58 @@ def main():
             print("  which uses one multiplicity and still gives the timing.")
         return
 
-    total = time.time() - t0
-    per_point = total
-    serial = per_point * args.raster_points
-    wall = serial / args.nproc
+    wall_total = time.time() - t0
+    par = cpu_total / wall_total if wall_total > 0 else float("nan")
+    ncpu = os.cpu_count() or 1
+    npts = args.raster_points
+
+    # The cost of a raster is TOTAL CPU WORK divided by the throughput of the
+    # machine. It is NOT wall-time-per-point times points over processes: this
+    # point used every core, so 30 concurrent copies of it cannot each run at
+    # this speed. Whether the work is arranged as 30 single-threaded workers
+    # or as one all-core job at a time barely matters -- the machine has a
+    # fixed number of cores either way, and that is what sets the answer.
+    cpu_hours = cpu_total * npts / 3600.0
+    phys = ncpu // 2 if ncpu > 1 else 1          # assume SMT; cores, not threads
 
     print("\n" + "=" * 72)
     print("== raster cost estimate")
     print("=" * 72)
-    print(f"  one point            {per_point:10.1f} s  "
+    print(f"  one point, wall      {wall_total:10.1f} s   "
           f"(reference {t_ref:.1f} + SOC {t_soc:.1f})")
-    print(f"  x {args.raster_points} points        {serial / 3600:10.1f} core-hours")
-    print(f"  / {args.nproc} processes       {wall / 3600:10.1f} hours wall")
+    print(f"  one point, CPU       {cpu_total:10.1f} s   "
+          f"observed parallel factor {par:.1f}x over {ncpu} logical CPUs")
+    print(f"\n  x {npts} points")
+    print(f"  total work           {cpu_hours:10.1f} CPU-hours")
+    print(f"  wall on {phys:2d} cores    {cpu_hours / phys:10.1f} h"
+          f"   <- the realistic figure")
+    print(f"  wall on {ncpu:2d} threads  {cpu_hours / ncpu:10.1f} h"
+          f"   <- only if SMT scaled perfectly, which it does not")
     print(f"""
-  The water raster was {args.raster_points} points of SA-CASSCF+NEVPT2 in 41 minutes.
-  Read this estimate against that:
+  Naively dividing the 155 s wall time by {args.nproc} processes would give
+  {wall_total * npts / args.nproc / 3600:.1f} h, and that is wrong: this point already
+  consumed the whole machine at a {par:.0f}x parallel factor. Total CPU work over
+  available cores is the honest measure, and it is the figure above.
 
-    under ~6 h     comparable to water; the full treatment is affordable.
-    6-24 h         viable but do HOCl only, and reconsider before HOBr, where
-                   the basis is larger and the SOC step heavier.
-    over ~24 h     fall back to SOMF-QDNEVPT2, or treat SOC as geometry
-                   independent and compute it once at equilibrium.
+  For scale, water's raster was {npts} points of SA-CASSCF+NEVPT2 in 41 minutes
+  of wall clock on the same machine.
 
-  Two caveats on this number. The raster runs single-threaded workers, but
-  this point had all cores available -- the Cl SOC step showed 31x parallel
-  speedup, so a single-threaded point will be substantially slower than the
-  wall time above. And a dissociating geometry converges worse than
-  equilibrium, so the average point costs more than this one.
+    under ~12 h    comparable in spirit to water; affordable.
+    12-72 h        a weekend job. Viable for HOCl once, but reconsider before
+                   HOBr, where the basis is larger and the SOC step heavier,
+                   and before any thought of repeating it per temperature.
+    over ~72 h     do not raster this. Fall back to SOMF-QDNEVPT2, a smaller
+                   active space or basis, or treat SOC as geometry-independent
+                   and compute it once near equilibrium -- physically
+                   defensible, since the SOC constant is dominated by the
+                   halogen core and varies weakly with bond length.
+
+  Two things still push the real cost UP from this estimate. A dissociating
+  geometry converges worse than equilibrium, and this reference needed 141 s
+  of the 155 s total -- CASSCF convergence, not the SOC step, is the
+  bottleneck, and it is the part that degrades away from equilibrium. Against
+  that, a raster can reuse converged orbitals from neighbouring geometries,
+  which water did not need to do but which would help a lot here.
 """)
 
 

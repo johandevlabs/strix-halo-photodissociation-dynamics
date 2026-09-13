@@ -141,6 +141,61 @@ Remaining caveats:
   used for water. If it is too slow, SOMF-QDNEVPT2 or a geometry-independent
   (constant) SOC approximation are the fallbacks.
 
+### HOCl molecular test — intensity borrowing works, 2026-09-13
+
+`03_soc_hocl_vertical.py`, def2-TZVP, AVAS CAS(12e,7o), 6 roots in the Ms=0
+space, DKH1-QD-NEVPT2. Prism logged `Apply S_plus due to Ms=0...`, confirming
+it recognises the mixed-multiplicity reference and builds the missing Ms
+components itself. Three singlets + three triplets gave 3(1) + 3(3) = **12 SOC
+states**, exactly as the microstate count requires.
+
+| group | n | dE / eV | dE / nm | sum f | |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 1 | 0.0000 | — | — | singlet, ground |
+| 1 | **3** | **3.4477** | **359.6** | **8.92e-07** | **a 3A" — borrowed** |
+| 2 | 1 | 4.3620 | 284.2 | 9.03e-04 | singlet |
+| 3 | 3 | 4.4220 | 280.6 | 1.97e-04 | triplet |
+| 4 | 1 | 5.3837 | 230.3 | 5.92e-03 | singlet |
+| 5 | 3 | 7.2025 | 172.1 | 1.55e-06 | triplet |
+
+**The borrowing works.** The a 3A" band is dark by spin selection and comes out
+with f = 8.9e-7 — small, nonzero, and split into three components by ~4 cm-1.
+Against the measured band at 380 nm: vertical is **+0.185 eV (+5.7%)**, good
+for this level. The intensity is roughly 10-25x low depending on the assumed
+band width, which is the same *kind* of failure water had with mu (low by a
+constant 1.29), though larger.
+
+### Cost: the blocker for Phase 1
+
+One point cost 155 s wall **using the entire machine** — htop showed all 32
+threads saturated, and the SOC step alone reported a 30x parallel factor. The
+first estimate in the script divided wall time by 30 processes and got 4.7 h,
+which is simply wrong: 30 concurrent copies cannot each have all 16 cores.
+
+The honest measure is total CPU work over the machine's throughput. The SOC
+step alone was 414 CPU-seconds; with the reference included a point is
+plausibly 2500-4000 CPU-seconds, so a 3289-point raster is roughly
+**2300-3700 CPU-hours, or 6-10 days on 16 cores.** For scale, water's entire
+raster was 41 minutes. `03` now measures CPU time directly and reports this
+properly, so the next run replaces that range with a number.
+
+If it lands where expected, do NOT raster at this level. Levers, cheapest
+first:
+
+- [ ] **Fewer states.** 6 roots drove 6 NEVPT2 solves. Two singlets plus two
+      triplets may suffice for the lowest triplet's borrowing: `--nroots 4`.
+- [ ] **Reuse orbitals between geometries.** The reference took 141 s of the
+      155 s — CASSCF convergence is the bottleneck, not SOC. Seeding from a
+      neighbouring geometry is the obvious fix, but note water/README.md's
+      warning about seeding active spaces along a scan; AVAS-per-point was
+      chosen there precisely to avoid propagating damage. Needs care.
+- [ ] **Smaller active space or basis** for the raster, with a few points
+      checked against the full treatment.
+- [ ] **Geometry-independent SOC.** Compute the SOC constant once near
+      equilibrium and apply it across the surface. Physically defensible — it
+      is dominated by the halogen core and varies weakly with bond length —
+      and it removes SOC from the raster entirely.
+
 ### Phase 0.5 — validate the SOC toolchain (cheap, do with Phase 0)
 
 Scripts are written; run them on the EVO in order, tee'ing into `logs/`.

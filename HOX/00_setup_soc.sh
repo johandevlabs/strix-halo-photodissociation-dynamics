@@ -88,28 +88,55 @@ clone_or_pull https://github.com/xubwa/socutils.git "$SRC/socutils"
 # Makefile forwards $CMAKE_ARGS, and the CMakeLists honours a user-supplied
 # BLAS_LIBRARIES (and then assumes LAPACK is in the same library, which is
 # true for OpenBLAS). So point it straight at the conda one.
+find_lib () {            # find_lib <dir> <name...>  -> first match on stdout
+    local dir=$1; shift
+    local name cand
+    for name in "$@"; do
+        for cand in "$dir/$name" "$dir/$name".*; do
+            [[ -e $cand ]] && { echo "$cand"; return 0; }
+        done
+    done
+    return 1
+}
+
 echo "--- locating BLAS in the conda env"
-BLAS_LIB=""
-for cand in libopenblas.so libopenblas.so.0 libblas.so libblas.so.3; do
-    if [[ -e $CONDA_PREFIX/lib/$cand ]]; then
-        BLAS_LIB="$CONDA_PREFIX/lib/$cand"
-        break
-    fi
-done
-if [[ -z $BLAS_LIB ]]; then
+BLAS_LIB=$(find_lib "$CONDA_PREFIX/lib" libopenblas.so libblas.so) || {
     echo "no BLAS found in $CONDA_PREFIX/lib -- install one:" >&2
     echo "  conda install -c conda-forge 'libopenblas=*=*openmp*'" >&2
     echo "(the openmp build, not pthreads -- see water/README.md Environment)" >&2
     exit 1
-fi
+}
 echo "    $BLAS_LIB"
+
+# socutils assumes a PIP-layout pyscf, where the bundled dependencies sit in
+# pyscf/lib/deps/lib, and looks for libcint there with NO_DEFAULT_PATH.
+# Conda-forge pyscf instead links a SHARED libcint from $CONDA_PREFIX/lib, so
+# that search finds nothing. The other three libs it wants (cgto, np_helper,
+# ao2mo) are pyscf's own and do live in pyscf/lib, which is why only cint
+# failed. find_library is a no-op when its cache variable is already set, so
+# handing it the path directly skips the broken search.
+echo "--- locating libcint"
+PYSCF_LIB_DIR=$(python -c \
+    "import os, pyscf; print(os.path.join(os.path.dirname(pyscf.__file__), 'lib'))")
+CINT_LIB=$(find_lib "$CONDA_PREFIX/lib" libcint.so) \
+    || CINT_LIB=$(find_lib "$PYSCF_LIB_DIR/deps/lib" libcint.so) \
+    || {
+    echo "no libcint found in $CONDA_PREFIX/lib or $PYSCF_LIB_DIR/deps/lib" >&2
+    echo "  conda install -c conda-forge libcint" >&2
+    exit 1
+}
+echo "    $CINT_LIB"
+echo "    pyscf libs: $PYSCF_LIB_DIR"
 
 echo "--- building socutils (bundled x2camf + zquatev)"
 # A previously failed configure leaves a CMakeCache.txt that remembers the
 # failure and ignores the new args. Clear it so a retry is a real retry.
 rm -rf "$SRC/socutils/lib/build"
 make -C "$SRC/socutils" -j"$(nproc)" \
-    CMAKE_ARGS="-DBLAS_LIBRARIES=$BLAS_LIB -DCMAKE_PREFIX_PATH=$CONDA_PREFIX"
+    CMAKE_ARGS="-DBLAS_LIBRARIES=$BLAS_LIB \
+                -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
+                -DPYSCF_LIB_DIR=$PYSCF_LIB_DIR \
+                -DPYSCF_CINT_LIB=$CINT_LIB"
 python -m pip install -e "$SRC/socutils"
 
 # ------------------------------------------------------------------- prism

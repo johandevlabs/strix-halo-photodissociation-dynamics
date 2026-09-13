@@ -103,12 +103,20 @@ def report_reference_spins(mc):
     with no triplet cannot borrow intensity, and finding that out here costs
     seconds instead of after the SOC step.
     """
+    from pyscf.fci import spin_op
+
     cis = mc.ci if isinstance(mc.ci, (list, tuple)) else [mc.ci]
     energies = getattr(mc, "e_states", None)
     print(f"\n  {'root':>5}{'E / Ha':>20}{'<S^2>':>10}{'2S+1':>8}  assignment")
     mults = []
     for i, c in enumerate(cis):
-        ss, mult = mc.fcisolver.spin_square(c, mc.ncas, mc.nelecas)
+        # Use the bare FCI routine, NOT mc.fcisolver.spin_square. After
+        # state_average_ the solver is a wrapper whose spin_square expects the
+        # whole list of CI vectors and iterates over it, so handing it one
+        # vector makes it treat each ROW as a state: "cannot reshape array of
+        # size 7 into shape (7,7)". spin_square0 is correct here because alpha
+        # and beta share the same spatial orbitals.
+        ss, mult = spin_op.spin_square0(c, mc.ncas, mc.nelecas)
         m = int(round(mult))
         mults.append(m)
         label = {1: "singlet", 3: "triplet", 5: "quintet"}.get(

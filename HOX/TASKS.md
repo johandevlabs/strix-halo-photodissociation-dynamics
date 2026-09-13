@@ -110,19 +110,22 @@ def2-TZVP, SA-CASSCF(5e,3o)/3 roots, DKH1-QD-NEVPT2:
 The inversion is the check that matters most: a normal ordering would have been
 a sign error wearing a plausible magnitude. Toolchain is sound.
 
-**The Br error needs chasing before Phase 2.** −4.3% on Cl and −16.6% on Br is
-too steep a degradation to blame on the method, and Br is the target element.
-The prime suspect is the basis rather than the SOC treatment: def2-TZVP is
-all-electron for Br but *non-relativistically contracted*, while the SOC
-operator samples the near-nuclear region where that contraction is wrong.
-Cheapest test, minutes:
+**Br: the basis, confirmed.** def2-TZVP gave −16.6%; simply decontracting it
+(`--basis unc-def2-tzvp`) gave **−7.6%**, recovering more than half the error
+for 14.9 s instead of 9.5 s (nao 48 -> 103). So the SOC treatment was never the
+problem: def2-TZVP is all-electron for Br but *non-relativistically
+contracted*, and the SOC operator samples precisely the near-nuclear region
+that contraction gets wrong.
 
-    python 02_soc_atoms.py --atoms Br --basis unc-def2-tzvp
+Follow-ups, in order of expected value:
 
-If decontracting recovers most of the missing 17%, the diagnosis is confirmed
-and the fix for HOBr is a relativistic basis (x2c-TZVPall, ANO-RCC, dyall --
-most need `pip install basis-set-exchange`) rather than anything structural.
-If it does not, suspect the DKH1 SOC operator and compare `--soc breit-pauli`.
+- [ ] A basis built for this, rather than one repaired by decontraction:
+      x2c-TZVPall, ANO-RCC, or dyall (`pip install basis-set-exchange`).
+      Expect better than −7.6% at lower cost than full decontraction.
+- [ ] Compare `--soc breit-pauli` against DKH1 on the same basis. Cheap, and
+      it bounds how much of the residual belongs to the SOC operator.
+- [ ] Whatever basis wins here is the one HOBr should use. Fixing this at the
+      atom is far cheaper than discovering it in a 3D raster.
 
 Remaining caveats:
 

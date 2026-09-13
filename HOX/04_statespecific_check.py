@@ -116,11 +116,34 @@ def run_ccsd_t(spin, basis, symmetry, verbose=0):
     if not mycc.converged:
         raise RuntimeError(f"spin={spin}: CCSD did not converge")
     e_t = mycc.ccsd_t()
-    return mycc.e_tot + e_t, f"SCF {mf.e_tot:.8f}{ss}"
+    return mycc.e_tot + e_t, f"SCF {mf.e_tot:.8f}{ss}", True
 
 
-def run_casscf_nevpt2(spin, basis, symmetry, cas=None, verbose=0):
+def determine_cas(basis, symmetry, cas=None, verbose=0):
+    """Pick ONE active space, from the singlet, for both spins to share.
+
+    Running AVAS separately per spin is wrong and was the original bug here:
+    it chose CAS(12e,7o) for the singlet and CAS(10e,6o) for the triplet, and
+    the difference of two energies computed in different active spaces is not
+    an excitation energy. The orbitals are returned too, so both CASSCF runs
+    start from the same space and only the occupation differs.
+    """
+    mol = build_mol(0, basis, symmetry, verbose)
+    mf = scf.RHF(mol).x2c()
+    mf.conv_tol = 1e-11
+    mf.kernel()
+    if cas is not None:
+        ncas, nelecas = cas
+        return ncas, nelecas, mf.mo_coeff
+    from pyscf.mcscf import avas
+    ncas, nelecas, mo = avas.avas(mf, ["Cl 3p", "O 2p"], minao="ano")
+    return ncas, nelecas, mo
+
+
+def run_casscf_nevpt2(spin, basis, symmetry, cas_data, max_cycle=200,
+                      verbose=0):
     """Single-root CASSCF then SC-NEVPT2 -- the method water used."""
+    ncas, nelecas, mo_ref = cas_data
     mol = build_mol(spin, basis, symmetry, verbose)
     mf = (scf.RHF(mol) if spin == 0 else scf.ROHF(mol)).x2c()
     mf.conv_tol = 1e-11
@@ -128,24 +151,28 @@ def run_casscf_nevpt2(spin, basis, symmetry, cas=None, verbose=0):
     if not mf.converged:
         raise RuntimeError(f"spin={spin}: SCF did not converge")
 
-    if cas is not None:
-        ncas, nelecas = cas
-        mo = mf.mo_coeff
-    else:
-        from pyscf.mcscf import avas
-        ncas, nelecas, mo = avas.avas(mf, ["Cl 3p", "O 2p"], minao="ano")
-
+    # Same ncas and same TOTAL active electrons for both spins; PySCF splits
+    # nelecas into (na, nb) according to mol.spin, so the triplet gets (7,5)
+    # where the singlet gets (6,6) -- same space, different occupation, which
+    # is exactly what a vertical excitation energy requires.
     mc = mcscf.CASSCF(mf, ncas, nelecas)
     mc.conv_tol = 1e-10
+    mc.max_cycle_macro = max_cycle
     # One root, spin-constrained: this is a state-SPECIFIC calculation, the
     # whole point of the exercise. fix_spin_ is correct here precisely because
     # we are NOT trying to reach a different multiplicity than mol.spin.
-    fci.addons.fix_spin_(mc.fcisolver, ss=(spin / 2.0) * (spin / 2.0 + 1.0))
-    mc.kernel(mo)
-    if not mc.converged:
-        print(f"    WARNING: spin={spin}: CASSCF did not converge")
+    S = spin / 2.0
+    fci.addons.fix_spin_(mc.fcisolver, ss=S * (S + 1.0))
+    mc.kernel(mo_ref)
+    conv = bool(mc.converged)
+    if not conv:
+        print(f"    WARNING: spin={spin}: CASSCF did not converge in "
+              f"{max_cycle} macro cycles")
     e_pt = mrpt.NEVPT(mc).kernel()
-    return mc.e_tot + e_pt, f"CAS({nelecas}e,{ncas}o), CASSCF {mc.e_tot:.8f}"
+    na, nb = mc.nelecas
+    return (mc.e_tot + e_pt,
+            f"CAS({nelecas}e,{ncas}o) as ({na},{nb}), CASSCF {mc.e_tot:.8f}",
+            conv)
 
 
 def main():
@@ -161,6 +188,9 @@ def main():
                    default=None)
     p.add_argument("--no-nevpt2", action="store_true",
                    help="CCSD(T) only -- fastest check")
+    p.add_argument("--max-cycle", type=int, default=200,
+                   help="CASSCF macro iterations (default 200; both spins "
+                        "hit the old 50-cycle default)")
     p.add_argument("--raster-points", type=int, default=3289)
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
@@ -173,59 +203,72 @@ def main():
     print(f"== basis {args.basis}, symmetry {sym}")
     print("=" * 72)
 
-    results = {}
-    c0 = time.process_time()
-    t0 = time.time()
+    results, timings, converged = {}, {}, {}
 
     methods = [("dCCSD(T)", lambda s: run_ccsd_t(s, args.basis, sym,
                                                  args.verbose))]
     if not args.no_nevpt2:
+        # One active space, chosen once, shared by both spins.
+        cas_data = determine_cas(args.basis, sym, cas, args.verbose)
+        print(f"\n  active space for both spins: "
+              f"CAS({cas_data[1]}e, {cas_data[0]}o)")
         methods.append(("dCASSCF+NEVPT2",
-                        lambda s: run_casscf_nevpt2(s, args.basis, sym, cas,
+                        lambda s: run_casscf_nevpt2(s, args.basis, sym,
+                                                    cas_data, args.max_cycle,
                                                     args.verbose)))
 
     for name, fn in methods:
         print(f"\n--- {name} " + "-" * (60 - len(name)))
+        # Time each METHOD separately: lumping them together let two broken
+        # CASSCF runs poison the cost estimate for the one that worked.
+        c_m, t_m = time.process_time(), time.time()
         try:
             ts = time.time()
-            e_s, info_s = fn(0)
+            e_s, info_s, conv_s = fn(0)
             print(f"  singlet X 1A'   {e_s:18.10f} Ha   {info_s}"
                   f"   [{time.time() - ts:.1f} s]")
 
             tt = time.time()
-            e_t, info_t = fn(2)
+            e_t, info_t, conv_t = fn(2)
             print(f"  triplet a 3A\"   {e_t:18.10f} Ha   {info_t}"
                   f"   [{time.time() - tt:.1f} s]")
 
             de = (e_t - e_s) * HARTREE2EV
             results[name] = de
+            converged[name] = conv_s and conv_t
             print(f"  vertical T <- S {de:8.4f} eV = {NM_PER_EV / de:.1f} nm")
         except Exception as exc:
             print(f"  FAILED: {type(exc).__name__}: {exc}")
             traceback.print_exc()
             results[name] = None
-
-    cpu_total = time.process_time() - c0
-    wall_total = time.time() - t0
+            converged[name] = False
+        timings[name] = (time.time() - t_m, time.process_time() - c_m)
 
     print("\n" + "=" * 72)
     print("== vertical a 3A\" <- X 1A', against the multi-state result")
     print("=" * 72)
-    print(f"  {'method':>18}{'dE / eV':>11}{'nm':>9}{'vs 6-root':>12}")
+    print(f"  {'method':>18}{'dE / eV':>11}{'nm':>9}{'vs 6-root':>12}  conv")
     print(f"  {'03, 6 roots':>18}{REF_6ROOT_EV:11.4f}"
-          f"{NM_PER_EV / REF_6ROOT_EV:9.1f}{'--':>12}")
+          f"{NM_PER_EV / REF_6ROOT_EV:9.1f}{'--':>12}   yes")
     print(f"  {'03, 4 roots*':>18}{REF_4ROOT_EV:11.4f}"
           f"{NM_PER_EV / REF_4ROOT_EV:9.1f}"
-          f"{REF_4ROOT_EV - REF_6ROOT_EV:+12.4f}")
+          f"{REF_4ROOT_EV - REF_6ROOT_EV:+12.4f}   NO")
     for name, de in results.items():
+        ok = "yes" if converged.get(name) else "NO"
         if de is None:
-            print(f"  {name:>18}{'--':>11}{'--':>9}{'--':>12}")
+            print(f"  {name:>18}{'--':>11}{'--':>9}{'--':>12}   {ok}")
         else:
             print(f"  {name:>18}{de:11.4f}{NM_PER_EV / de:9.1f}"
-                  f"{de - REF_6ROOT_EV:+12.4f}")
+                  f"{de - REF_6ROOT_EV:+12.4f}   {ok}")
     print("  * unconverged reference; shown for scale, not as a target")
+    if any(not converged.get(n) for n in results):
+        print("\n  Rows marked NO did not converge. Their numbers are not")
+        print("  evidence of anything -- do not read them as a method")
+        print("  comparison. Raise --max-cycle or change the active space.")
 
-    good = [d for d in results.values() if d is not None]
+    # Only converged methods count towards the verdict.
+    good = [d for n, d in results.items()
+            if d is not None and converged.get(n)]
     if good:
         worst = max(abs(d - REF_6ROOT_EV) for d in good)
         print(f"\n  largest deviation from the 6-root answer: {worst:.4f} eV")
@@ -246,18 +289,20 @@ def main():
         print(f"  -> {verdict}")
 
     npts = args.raster_points
-    cpu_hours = cpu_total * npts / 3600.0
     ncpu = os.cpu_count() or 1
     phys = ncpu // 2 if ncpu > 1 else 1
-    # Both spins were computed, which is what a raster point actually needs.
+    # Per method, since each is a complete route to both surfaces and they
+    # cost wildly different amounts.
     print("\n" + "=" * 72)
-    print("== raster cost, both surfaces")
+    print("== raster cost, per method (both surfaces, one geometry)")
     print("=" * 72)
-    print(f"  one point, wall      {wall_total:10.1f} s")
-    print(f"  one point, CPU       {cpu_total:10.1f} s   "
-          f"(parallel factor {cpu_total / wall_total:.1f}x)")
-    print(f"  x {npts} points        {cpu_hours:10.1f} CPU-hours")
-    print(f"  wall on {phys:2d} cores    {cpu_hours / phys:10.1f} h")
+    print(f"  {'method':>18}{'wall/s':>10}{'CPU/s':>10}{'par':>7}"
+          f"{'CPU-h':>12}{'h/16 cores':>12}")
+    for name, (w, c) in timings.items():
+        par = c / w if w > 0 else float("nan")
+        ch = c * npts / 3600.0
+        print(f"  {name:>18}{w:10.1f}{c:10.1f}{par:6.1f}x"
+              f"{ch:12.1f}{ch / phys:12.1f}")
     print(f"""
   Compare 03, the full multi-state point: 5783 CPU-s, 5283 CPU-hours,
   330 h on 16 cores. The speedup here is the whole argument.

@@ -76,11 +76,29 @@ needs — not a separate piece of machinery to build. It also sits directly on
 the SA-CASSCF/NEVPT2 stack `water/` already uses, so the single-toolchain
 property survives.
 
-Three caveats, all unverified:
+**Confirmed on the EVO, 2026-09-13.** Both plugins build and import against
+conda-forge PySCF 2.14 (the build needed three fixes, all the same
+pip-vs-conda layout split; see `00_setup_soc.sh`). The API, from the shipped
+`prism/examples/soc/01-qdnevpt2-SOC.py`:
 
-- **This is from documentation, abstracts and the method paper, not from
-  running it.** Nothing has been installed or benchmarked. See the Phase 0.5
-  task below.
+```python
+interface = prism.interface.PYSCF(mf, mc, backend='opt_einsum')
+nevpt = prism.nevpt.NEVPT(interface)
+nevpt.method = "nevpt2"; nevpt.method_type = "qd"
+nevpt.soc = "DKH1"          # or breit-pauli
+e_tot, e_corr, osc = nevpt.kernel()
+```
+
+That last line is from `04-qdnevpt2-SUS.py` and it is the important one:
+**`kernel()` returns oscillator strengths**, so the SOC-borrowed intensity is
+read straight out rather than assembled by hand. There is also a cheaper
+CASSCF-level route, `interface.run_soc("x2c-1")`, with no perturbation
+correction.
+
+Remaining caveats:
+
+- **Nothing has been benchmarked yet.** Imports and API confirmed; no number
+  has been checked against a known answer. That is `02_soc_atoms.py`.
 - **Prism's NEVPT2 is not PySCF's.** `water/` used PySCF's native strongly
   contracted `mrpt.NEVPT2`; Prism is a separate fully internally contracted
   implementation. This is a new dependency, not a flag on existing code.

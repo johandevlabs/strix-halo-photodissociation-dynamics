@@ -162,7 +162,10 @@ def show_signatures(prism):
         try:
             m = importlib.import_module(modname)
         except Exception as exc:
-            print(f"  {modname}: not importable ({type(exc).__name__})")
+            # Print the MESSAGE, not just the type. A bare ModuleNotFoundError
+            # on prism.nevpt says nothing; "No module named 'foo'" names the
+            # missing dependency and is the whole diagnosis.
+            print(f"  {modname}: not importable -- {type(exc).__name__}: {exc}")
             continue
         print(f"\n  --- {modname}")
         for attr in sorted(dir(m)):
@@ -225,10 +228,11 @@ def main():
     p.add_argument("--atom", default="Cl",
                    help="halogen to probe integrals with (default Cl: "
                         "cheapest of the three that matter)")
-    p.add_argument("--basis", default="ano-rcc-vdzp",
-                   help="basis for the integral probe. If this name is "
-                        "rejected try: ano-rcc, unc-ano-rcc, cc-pvtz-dk, "
-                        "sarc-dkh2")
+    p.add_argument("--basis", default="def2-tzvp",
+                   help="basis for the integral probe. def2-tzvp is what the "
+                        "Prism SOC examples use and is all-electron through "
+                        "Kr. ano-rcc etc. generally need "
+                        "`pip install basis-set-exchange`.")
     p.add_argument("--src", default="~/src",
                    help="where 00_setup_soc.sh cloned prism (for examples)")
     args = p.parse_args()

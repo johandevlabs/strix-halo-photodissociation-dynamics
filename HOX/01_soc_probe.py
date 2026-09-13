@@ -53,17 +53,38 @@ def probe(label):
 
 # ---------------------------------------------------------------- imports
 def report_imports():
+    """x2camf and zquatev are bundled inside socutils rather than being
+    separate top-level distributions, so try both spellings and record the
+    one that works under the short name."""
     section("1. import chain")
     mods = {}
-    for name in ("numpy", "scipy", "pyscf", "socutils", "x2camf",
-                 "zquatev", "prism", "sympy", "opt_einsum"):
-        try:
-            m = importlib.import_module(name)
-            mods[name] = m
+    candidates = [
+        ("numpy",      ["numpy"]),
+        ("scipy",      ["scipy"]),
+        ("pyscf",      ["pyscf"]),
+        ("socutils",   ["socutils"]),
+        ("x2camf",     ["x2camf", "socutils.x2camf"]),
+        ("zquatev",    ["zquatev", "socutils.zquatev"]),
+        ("prism",      ["prism"]),
+        ("sympy",      ["sympy"]),
+        ("opt_einsum", ["opt_einsum"]),
+    ]
+    for short, names in candidates:
+        for name in names:
+            try:
+                m = importlib.import_module(name)
+            except Exception as exc:
+                last = exc
+                continue
+            mods[short] = m
             ver = getattr(m, "__version__", "(no __version__)")
-            print(f"  ok      {name:10s} {ver:12s} {getattr(m, '__file__', '')}")
-        except Exception as exc:
-            print(f"  MISSING {name:10s} {type(exc).__name__}: {exc}")
+            print(f"  ok      {short:10s} {ver:12s} "
+                  f"{'as ' + name + '  ' if name != short else ''}"
+                  f"{getattr(m, '__file__', '')}")
+            break
+        else:
+            print(f"  MISSING {short:10s} tried {', '.join(names)}: "
+                  f"{type(last).__name__}: {last}")
     return mods
 
 
@@ -184,10 +205,17 @@ def probe_integrals(atom, basis):
     for attr in sorted(a for a in dir(socutils) if not a.startswith("_")):
         print(f"    socutils.{attr}")
 
-    import x2camf
-    print("\n  x2camf public API:")
-    for attr in sorted(a for a in dir(x2camf) if not a.startswith("_")):
-        print(f"    x2camf.{attr}")
+    for name in ("x2camf", "socutils.x2camf"):
+        try:
+            x2camf = importlib.import_module(name)
+        except Exception:
+            continue
+        print(f"\n  {name} public API:")
+        for attr in sorted(a for a in dir(x2camf) if not a.startswith("_")):
+            print(f"    {name}.{attr}")
+        break
+    else:
+        print("\n  x2camf not importable under either name")
     return mol
 
 
@@ -220,10 +248,10 @@ def main():
         print("\n  prism did not import -- skipping API probes")
     show_examples(args.src)
 
-    if "socutils" in mods and "x2camf" in mods:
+    if "socutils" in mods:
         probe_integrals(args.atom, args.basis)
     else:
-        print("\n  socutils/x2camf missing -- skipping integral probe")
+        print("\n  socutils missing -- skipping integral probe")
 
     section("what to do with this")
     print("""

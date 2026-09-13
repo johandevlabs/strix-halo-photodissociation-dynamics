@@ -79,6 +79,32 @@ clone_or_pull () {
     fi
 }
 
+SITE=$(python -c "import site; print(site.getsitepackages()[0])")
+
+# socutils ships no setup.py or pyproject.toml -- upstream's install.rst says
+# to put its PARENT directory on PYTHONPATH (the repo root is itself the
+# `socutils` package; it has an __init__.py). A .pth file in site-packages is
+# the same thing without depending on every future shell exporting a variable.
+install_pkg () {                    # install_pkg <repo-dir> <name>
+    local repo=$1 name=$2 target pth
+    if [[ -f $repo/setup.py || -f $repo/pyproject.toml ]]; then
+        echo "--- pip install -e $repo"
+        python -m pip install -e "$repo"
+        return
+    fi
+    # No packaging. Decide which directory to put on sys.path: if the repo
+    # root is the package, add its parent; otherwise add the repo itself.
+    if [[ -f $repo/__init__.py ]]; then
+        target=$(dirname "$repo")
+    else
+        target=$repo
+    fi
+    pth="$SITE/${name}-dev.pth"
+    echo "--- $repo has no packaging; writing $pth"
+    echo "$target" > "$pth"
+    echo "    sys.path += $target"
+}
+
 # ---------------------------------------------------------------- socutils
 clone_or_pull https://github.com/xubwa/socutils.git "$SRC/socutils"
 
@@ -157,11 +183,11 @@ make -C "$SRC/socutils" -j"$(nproc)" \
                 -DPYSCF_LIB_DIR=$PYSCF_LIB_DIR \
                 -DPYSCF_CINT_LIB=$CINT_LIB \
                 -DCMAKE_C_FLAGS=-I$CINT_INC"
-python -m pip install -e "$SRC/socutils"
+install_pkg "$SRC/socutils" socutils
 
 # ------------------------------------------------------------------- prism
 clone_or_pull https://github.com/sokolov-group/prism.git "$SRC/prism"
-python -m pip install -e "$SRC/prism"
+install_pkg "$SRC/prism" prism
 
 # Prism lists these as optional but wants them for SOC and for any tensor
 # contraction of a size worth caring about.
@@ -171,13 +197,37 @@ echo
 echo "=== smoke test ==="
 python - <<'PY'
 import importlib
-for name in ("pyscf", "socutils", "x2camf", "zquatev", "prism"):
+
+# x2camf is a dual-backend dispatcher bundled INSIDE socutils, not a separate
+# top-level distribution, so accept either spelling. zquatev likewise ships as
+# a bundled library rather than a standalone module.
+REQUIRED = ["pyscf", "socutils", "prism"]
+EITHER = [("x2camf", "socutils.x2camf"), ("zquatev", "socutils.zquatev")]
+
+failed = []
+for name in REQUIRED:
     try:
         m = importlib.import_module(name)
-        print(f"  ok      {name:10s} {getattr(m, '__version__', '(no __version__)')}"
+        print(f"  ok      {name:16s} "
+              f"{getattr(m, '__version__', '(no __version__)'):12s}"
               f"  {getattr(m, '__file__', '')}")
     except Exception as exc:
-        print(f"  FAILED  {name:10s} {type(exc).__name__}: {exc}")
+        print(f"  FAILED  {name:16s} {type(exc).__name__}: {exc}")
+        failed.append(name)
+
+for names in EITHER:
+    for name in names:
+        try:
+            m = importlib.import_module(name)
+            print(f"  ok      {name:16s} (bundled)  {getattr(m, '__file__', '')}")
+            break
+        except Exception:
+            continue
+    else:
+        print(f"  absent  {' / '.join(names)}  -- 01_soc_probe.py will say "
+              f"whether this matters")
+
+raise SystemExit(1 if failed else 0)
 PY
 
 echo

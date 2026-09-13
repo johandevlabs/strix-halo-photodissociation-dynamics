@@ -189,6 +189,42 @@ install_pkg "$SRC/socutils" socutils
 clone_or_pull https://github.com/sokolov-group/prism.git "$SRC/prism"
 install_pkg "$SRC/prism" prism
 
+# prism/libsoc/general_somf.py does NOT find socutils by import. It checks a
+# hardcoded sibling path and refuses before importing anything:
+#
+#     socutils_dir = Path(__file__).resolve().parent.parent / "socutils"
+#     if (not socutils_dir.exists()) or (not any(socutils_dir.iterdir())):
+#         raise Exception('socutilis is not available. ...')
+#     sys.path.insert(0, prism_path); from socutils.somf import somf
+#
+# so having socutils importable is not enough -- it must physically sit at
+# prism/socutils. Upstream says to init the git submodule, but that clones a
+# SECOND copy whose C libraries would then need rebuilding with the same conda
+# BLAS and libcint flags worked out above, and the two could drift. Symlink the
+# copy already built instead: one source, one build.
+#
+# (.gitmodules also declares `external` pointing at the same repo, and `cppe`
+# for polarizable embedding. If a later traceback names either, this is the
+# pattern to repeat.)
+echo "--- linking socutils into prism"
+SOC_LINK="$SRC/prism/socutils"
+if [[ -L $SOC_LINK ]]; then
+    echo "    already linked -> $(readlink -f "$SOC_LINK")"
+elif [[ -d $SOC_LINK ]]; then
+    if [[ -z $(ls -A "$SOC_LINK") ]]; then
+        # Submodule registered but never initialised: an empty directory
+        # fails prism's any(iterdir()) check just as a missing one does.
+        rmdir "$SOC_LINK"
+        ln -s "$SRC/socutils" "$SOC_LINK"
+        echo "    replaced empty submodule dir with link -> $SRC/socutils"
+    else
+        echo "    real directory with contents; leaving it alone"
+    fi
+else
+    ln -s "$SRC/socutils" "$SOC_LINK"
+    echo "    linked $SOC_LINK -> $SRC/socutils"
+fi
+
 # Prism ships no setup.py or pyproject.toml, so pip never resolves its
 # dependencies -- they have to be installed by hand or the first import of
 # prism.nevpt dies on a missing module. Its docs list numpy, scipy, h5py and
@@ -220,7 +256,8 @@ import importlib
 # prism.nevpt was dead on a missing psutil. Import the LEAF modules the SOC
 # path actually uses, so a missing dependency fails here rather than three
 # scripts later.
-REQUIRED = ["pyscf", "socutils", "prism", "prism.interface", "prism.nevpt"]
+REQUIRED = ["pyscf", "socutils", "socutils.somf", "prism", "prism.interface",
+            "prism.nevpt", "prism.libsoc.general_somf"]
 EITHER = [("x2camf", "socutils.x2camf"), ("zquatev", "socutils.zquatev")]
 
 failed = []

@@ -1,0 +1,268 @@
+#!/usr/bin/env python3
+"""
+Phase 0.5, step 6: does the state-specific route survive bond dissociation?
+
+04 showed dCCSD(T) reproduces the multi-state vertical energy to 0.034 eV at
+EQUILIBRIUM. That is the easy case. A raster spends most of its points away
+from equilibrium, and single-reference coupled cluster fails where
+multireference character grows. This scans r(O-Cl) and measures that failure
+directly, rather than assuming it does not happen.
+
+THE TWO SURFACES HAVE OPPOSITE DIFFICULTY, which is the useful realisation:
+
+  a 3A" over the FULL range is the EASY one. It dissociates to OH(2Pi) +
+  Cl(2P) coupled high-spin, and a high-spin open-shell pair is exactly what a
+  spin-unrestricted or ROHF reference describes well. This is the surface the
+  wavepacket actually moves on, and it is single-reference friendly all the
+  way out.
+
+  X 1A' at large r is the HARD one. It becomes a singlet diradical, OH. + Cl.,
+  which RHF cannot represent at all and RCCSD(T) inherits that failure.
+
+But the ground state is only ever needed over the BOUND region, to make chi_0
+-- water/13_gs_well.py computes V_gs "over the bound region only" for exactly
+this reason. So the hard case is one we never have to enter. The scan verifies
+that claim instead of asserting it: it reports T1 diagnostics for both spins at
+every point, so the breakdown is visible where it happens.
+
+Two checks beyond the diagnostics:
+
+  SIZE CONSISTENCY. As r -> infinity the triplet energy must approach
+  E(OH) + E(Cl) computed as separate fragments. This is the same test water
+  applied to its splice, where the offset was constant to 13 meV and the
+  A'/A" splitting went to 0.0000 eV at 10 A. CCSD(T) is size consistent, so
+  a drift here means the reference is failing, not the theory.
+
+  T-S GAP -> 0. At infinite separation the singlet and triplet are the same
+  two radicals with no interaction, so the gap must vanish. It will not, in
+  this scan, because the singlet reference collapses first -- and watching
+  WHERE it stops vanishing is a clean measure of where RHF gives up.
+
+T1 DIAGNOSTIC thresholds, the conventional ones: above 0.02 for a closed
+shell, or 0.04 for an open shell, single-reference CC is suspect. These are
+rules of thumb, not physics, but they are the standard rules of thumb.
+
+Usage:
+    python 05_triplet_scan.py 2>&1 | tee logs/triplet_scan.log
+    python 05_triplet_scan.py --rmin 1.4 --rmax 5.0 --npoints 19
+    python 05_triplet_scan.py --triplet-only      # skip the singlet entirely
+    python 05_triplet_scan.py --symmetry Cs
+"""
+import argparse
+import os
+import time
+import traceback
+
+import numpy as np
+
+from pyscf import gto, scf, cc
+
+HARTREE2EV = 27.211386245988
+
+R_OH_ANG = 0.9644
+R_OCL_EQ_ANG = 1.6891
+ANGLE_HOCL_DEG = 102.96
+
+T1_THRESHOLD_CLOSED = 0.02
+T1_THRESHOLD_OPEN = 0.04
+
+
+def geometry(r_ocl):
+    th = np.deg2rad(ANGLE_HOCL_DEG)
+    return [["O", (0.0, 0.0, 0.0)],
+            ["Cl", (r_ocl, 0.0, 0.0)],
+            ["H", (R_OH_ANG * np.cos(th), R_OH_ANG * np.sin(th), 0.0)]]
+
+
+def t1_diagnostic(mycc):
+    """||t1|| / sqrt(n correlated electrons), the Lee-Taylor diagnostic."""
+    t1 = mycc.t1
+    if isinstance(t1, (list, tuple)):                    # UCCSD: (t1a, t1b)
+        norm = np.sqrt(sum(float(np.linalg.norm(t)) ** 2 for t in t1))
+        nelec = sum(t.shape[0] for t in t1)
+    else:                                                # RCCSD
+        norm = float(np.linalg.norm(t1))
+        nelec = 2 * t1.shape[0]
+    return norm / np.sqrt(nelec) if nelec else float("nan")
+
+
+def run_point(atom, spin, basis, symmetry, verbose=0):
+    """CCSD(T) on the lowest state of this spin. Returns a dict of results."""
+    mol = gto.M(atom=atom, basis=basis, spin=spin, charge=0,
+                symmetry=symmetry, unit="Angstrom", verbose=verbose)
+    mf = (scf.RHF(mol) if spin == 0 else scf.ROHF(mol)).x2c()
+    mf.conv_tol = 1e-11
+    mf.kernel()
+
+    out = {"e_scf": mf.e_tot, "scf_conv": bool(mf.converged),
+           "s2": float("nan")}
+    if spin != 0:
+        out["s2"] = float(mf.spin_square()[0])
+
+    mycc = cc.CCSD(mf)
+    mycc.conv_tol = 1e-9
+    mycc.kernel()
+    out["cc_conv"] = bool(mycc.converged)
+    out["t1"] = t1_diagnostic(mycc)
+    out["e_tot"] = mycc.e_tot + mycc.ccsd_t()
+    return out
+
+
+def fragment_asymptote(basis, symmetry, verbose=0):
+    """E(OH) + E(Cl) as separated fragments -- water's 05_oh_diatomic move."""
+    oh = run_point([["O", (0.0, 0.0, 0.0)], ["H", (0.0, 0.0, R_OH_ANG)]],
+                   1, basis, symmetry, verbose)
+    cl = run_point([["Cl", (0.0, 0.0, 0.0)]], 1, basis, symmetry, verbose)
+    return oh, cl
+
+
+def main():
+    p = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--basis", default="def2-tzvp")
+    p.add_argument("--symmetry", default=None,
+                   help="point group to FORCE, e.g. Cs. For a real raster "
+                        "this is not optional -- see TASKS.md.")
+    p.add_argument("--rmin", type=float, default=1.4)
+    p.add_argument("--rmax", type=float, default=4.0)
+    p.add_argument("--npoints", type=int, default=14)
+    p.add_argument("--triplet-only", action="store_true",
+                   help="skip the singlet; it is only needed in the bound "
+                        "region anyway")
+    p.add_argument("--no-asymptote", action="store_true")
+    p.add_argument("--csv", default="hocl_scan.csv")
+    p.add_argument("--verbose", type=int, default=0)
+    args = p.parse_args()
+
+    sym = args.symmetry if args.symmetry else False
+    rs = np.linspace(args.rmin, args.rmax, args.npoints)
+
+    print("=" * 78)
+    print("== HOX Phase 0.5 -- dCCSD(T) along the O-Cl dissociation coordinate")
+    print(f"== basis {args.basis}, symmetry {sym}, "
+          f"r = {args.rmin} to {args.rmax} A in {args.npoints} points")
+    print(f"== equilibrium is r(O-Cl) = {R_OCL_EQ_ANG} A")
+    print("=" * 78)
+
+    t0, c0 = time.time(), time.process_time()
+    rows = []
+    print(f"\n  {'r/A':>7}{'E(S)/Ha':>18}{'T1(S)':>8}"
+          f"{'E(T)/Ha':>18}{'T1(T)':>8}{'<S^2>':>8}{'dE/eV':>9}  flags")
+    for r in rs:
+        atom = geometry(r)
+        row = {"r": r}
+        flags = []
+        try:
+            if not args.triplet_only:
+                s = run_point(atom, 0, args.basis, sym, args.verbose)
+                row["e_s"], row["t1_s"] = s["e_tot"], s["t1"]
+                if s["t1"] > T1_THRESHOLD_CLOSED:
+                    flags.append("S:T1")
+                if not (s["scf_conv"] and s["cc_conv"]):
+                    flags.append("S:noconv")
+            t = run_point(atom, 2, args.basis, sym, args.verbose)
+            row["e_t"], row["t1_t"], row["s2"] = t["e_tot"], t["t1"], t["s2"]
+            if t["t1"] > T1_THRESHOLD_OPEN:
+                flags.append("T:T1")
+            if not (t["scf_conv"] and t["cc_conv"]):
+                flags.append("T:noconv")
+            if abs(t["s2"] - 2.0) > 0.02:
+                flags.append("T:spin")
+
+            de = ((row["e_t"] - row["e_s"]) * HARTREE2EV
+                  if "e_s" in row else float("nan"))
+            row["de"] = de
+            es = f"{row.get('e_s', float('nan')):18.8f}"
+            t1s = f"{row.get('t1_s', float('nan')):8.4f}"
+            print(f"  {r:7.3f}{es}{t1s}{row['e_t']:18.8f}{row['t1_t']:8.4f}"
+                  f"{row['s2']:8.4f}{de:9.4f}  {' '.join(flags)}")
+        except Exception as exc:
+            print(f"  {r:7.3f}  FAILED: {type(exc).__name__}: {exc}")
+            traceback.print_exc()
+        rows.append(row)
+
+    # ------------------------------------------------------------ asymptote
+    if not args.no_asymptote:
+        print("\n  --- separated fragments (size-consistency check)")
+        try:
+            oh, cl = fragment_asymptote(args.basis, sym, args.verbose)
+            e_inf = oh["e_tot"] + cl["e_tot"]
+            print(f"      OH(2Pi)   {oh['e_tot']:18.8f} Ha  "
+                  f"T1 {oh['t1']:.4f}")
+            print(f"      Cl(2P)    {cl['e_tot']:18.8f} Ha  "
+                  f"T1 {cl['t1']:.4f}")
+            print(f"      sum       {e_inf:18.8f} Ha")
+            last = [r for r in rows if "e_t" in r]
+            if last:
+                far = last[-1]
+                diff = (far["e_t"] - e_inf) * HARTREE2EV
+                print(f"      triplet at r = {far['r']:.3f} A is "
+                      f"{diff:+.4f} eV from the fragment sum")
+                if abs(diff) < 0.05:
+                    print("      -> size consistent to better than 50 meV. The "
+                          "triplet surface can be\n         spliced onto the "
+                          "fragment asymptote as water/06_splice.py does.")
+                else:
+                    print("      -> the gap is large. Either r_max is not yet "
+                          "asymptotic (check whether\n         dE/eV is still "
+                          "falling above), or the reference is failing out "
+                          "there.")
+        except Exception as exc:
+            print(f"      asymptote FAILED: {type(exc).__name__}: {exc}")
+
+    # ------------------------------------------------------------------ csv
+    if rows:
+        import csv
+        keys = ["r", "e_s", "t1_s", "e_t", "t1_t", "s2", "de"]
+        with open(args.csv, "w", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=keys, extrasaction="ignore")
+            w.writeheader()
+            for row in rows:
+                w.writerow({k: row.get(k, "") for k in keys})
+        print(f"\n  wrote {args.csv}")
+
+    # -------------------------------------------------------------- verdict
+    wall, cpu = time.time() - t0, time.process_time() - c0
+    ncpu = os.cpu_count() or 1
+    phys = ncpu // 2 if ncpu > 1 else 1
+    per_point = cpu / max(len(rs), 1)
+
+    print("\n" + "=" * 78)
+    print("== verdict")
+    print("=" * 78)
+
+    bad_t = [r["r"] for r in rows
+             if "t1_t" in r and r["t1_t"] > T1_THRESHOLD_OPEN]
+    bad_s = [r["r"] for r in rows
+             if "t1_s" in r and r["t1_s"] > T1_THRESHOLD_CLOSED]
+    if bad_t:
+        print(f"  TRIPLET T1 above {T1_THRESHOLD_OPEN} at r = "
+              f"{', '.join(f'{r:.2f}' for r in bad_t)} A")
+        print("  This is the surface the wavepacket moves on, so this is the")
+        print("  one that matters. If the flagged points are a contiguous")
+        print("  region rather than scattered, the state-specific route needs")
+        print("  a multireference patch there -- or the whole triplet surface")
+        print("  needs CASSCF/NEVPT2 after all.")
+    else:
+        print(f"  Triplet T1 stayed below {T1_THRESHOLD_OPEN} across the whole")
+        print("  scan. The state-specific triplet surface is sound along the")
+        print("  dissociation coordinate, which is what Phase 1 depends on.")
+
+    if bad_s:
+        print(f"\n  Singlet T1 above {T1_THRESHOLD_CLOSED} from r = "
+              f"{min(bad_s):.2f} A outward. EXPECTED: the ground state becomes")
+        print("  a diradical that RHF cannot represent. Harmless, provided the")
+        print("  ground-state surface is built only over the bound region, as")
+        print("  water/13_gs_well.py does. Treat min(flagged r) as the outer")
+        print("  limit of where V_gs may be trusted.")
+
+    print(f"\n  cost: {cpu:.0f} CPU-s for {len(rs)} points = "
+          f"{per_point:.0f} CPU-s/point ({wall:.0f} s wall)")
+    print(f"  a 3289-point raster at this rate: "
+          f"{per_point * 3289 / 3600:.0f} CPU-hours = "
+          f"{per_point * 3289 / 3600 / phys:.0f} h on {phys} cores")
+
+
+if __name__ == "__main__":
+    main()

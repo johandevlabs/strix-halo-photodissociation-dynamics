@@ -54,6 +54,66 @@ Cheap, and it either hardens the claim or saves months.
 - [ ] Search specifically for HOI 3D wavepacket dynamics on any surface.
       The review found none, but the search was not exhaustive.
 
+### SOC route — resolved on paper, 2026-09-13
+
+The open question was whether the PySCF toolchain can produce SOC matrix
+elements and SOC-borrowed transition dipoles at all. It can, via two
+open-source PySCF plugins:
+
+- **Prism** (sokolov-group/prism) — NEVPT2 and QD-NEVPT2 with
+  *state-interaction spin-orbit coupling*, Breit-Pauli and X2C-DKH
+  Hamiltonians, plus a cheaper SOMF-QDNEVPT2 variant. The method paper is
+  Sokolov and co-workers, "Simulating Spin-Orbit Coupling with Quasidegenerate
+  N-Electron Valence Perturbation Theory", *J. Phys. Chem. A* (2023),
+  arXiv:2211.06466, with a second-order follow-up arXiv:2404.04716.
+- **socutils** (xubwa/socutils) — the SOC integrals (X2CAMF, optional Gaunt
+  and Breit), bundled with a quaternion spinor SCF eigensolver. Prism
+  requires it for SOC.
+
+This matters because SO-QDNEVPT2 reports **oscillator strengths from the
+spin-orbit-mixed states**, which *is* the borrowed intensity the ã 3A" band
+needs — not a separate piece of machinery to build. It also sits directly on
+the SA-CASSCF/NEVPT2 stack `water/` already uses, so the single-toolchain
+property survives.
+
+Three caveats, all unverified:
+
+- **This is from documentation, abstracts and the method paper, not from
+  running it.** Nothing has been installed or benchmarked. See the Phase 0.5
+  task below.
+- **Prism's NEVPT2 is not PySCF's.** `water/` used PySCF's native strongly
+  contracted `mrpt.NEVPT2`; Prism is a separate fully internally contracted
+  implementation. This is a new dependency, not a flag on existing code.
+- **Cost per geometry is the real open question.** A 3D raster is thousands of
+  points, and SO-QDNEVPT2 over several roots is far heavier than the SC-NEVPT2
+  used for water. If it is too slow, SOMF-QDNEVPT2 or a geometry-independent
+  (constant) SOC approximation are the fallbacks.
+
+### Phase 0.5 — validate the SOC toolchain (cheap, do with Phase 0)
+
+Scripts are written; run them on the EVO in order, tee'ing into `logs/`.
+
+- [ ] `00_setup_soc.sh` — install Prism + socutils into the `qc` env. socutils
+      needs a `make` at its repo root against BLAS/LAPACK, so run it inside
+      the activated env.
+- [ ] `01_soc_probe.py` — diagnostic, not a calculation. Dumps the Prism API
+      surface and prints the shipped `examples/soc/*.py` verbatim, which is
+      the real documentation. Every probe is independently guarded so one
+      missing piece does not hide the rest.
+- [ ] `02_soc_atoms.py` — halogen fine structure (2P_1/2 − 2P_3/2) against
+      NIST. Chosen over reproducing a paper table because the answer is known
+      to six figures, it is cheap, and the atomic SOC on the halogen is
+      precisely what lends the ã 3A" band its intensity. Three checks in one
+      run: the 4+2 degeneracy pattern, the *inverted* multiplet ordering, and
+      the magnitude.
+- [ ] `03_soc_hocl_vertical.py` — **not yet written.** Molecular singlet–triplet
+      with an SOC-borrowed oscillator strength at the HOCl equilibrium
+      geometry, plus the per-point timing that sets the raster cost. Deliberately
+      deferred until `01` reveals the real API, rather than guessing twice.
+
+The one piece of `02` written without having seen the API is `run_soc()`,
+flagged in place; everything else in it is API-independent.
+
 **Kill criteria.** If any of the above turns out to be a full 3D quantum
 wavepacket treatment on an ab initio triplet surface, stop and pivot to HOI
 (see Phase 4). If a temperature-dependent HOX cross section exists anywhere,
@@ -72,13 +132,11 @@ HOCl has a **measured** triplet band at 380 nm, σ ≈ 4 × 10⁻²¹ cm², tail
       and the asymptotic fragment change.
 - [ ] Ground-state surface: CCSD(T)/aug-cc-pVTZ over the bound region, as in
       `water/13_gs_well.py`. Validate against known HOCl fundamentals.
-- [ ] Add spin-orbit coupling. Decide the route:
+- [ ] Add spin-orbit coupling. **Leading route: Prism + socutils**, which keeps
+      everything in the PySCF toolchain (see "SOC route" below). Fallbacks if
+      it does not work out:
       - OpenMolcas RASSI-SO (atomic mean-field SOC over CASSCF/RASSCF)
       - MOLPRO state-interaction SOC over MRCI
-      - PySCF x2c / SOC, keeping everything in one toolchain
-      The last is most attractive for repo coherence but needs checking that
-      PySCF can produce the SOC matrix elements and SOC-borrowed transition
-      dipoles required.
 - [ ] Build the a 3A'' surface and the SOC-borrowed transition dipole
       surface.
 - [ ] Propagate. Compare against the measured 380 nm band.
@@ -137,10 +195,13 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
 
 ## Known risks
 
-- **SOC machinery is the real unknown.** Everything else is a port of
-  working code. If PySCF cannot produce what is needed, adding OpenMolcas
-  or MOLPRO breaks the single-toolchain property that makes this repo
-  reproducible on commodity hardware.
+- **SOC machinery: route identified, cost unknown.** Prism + socutils gives
+  state-interaction SOC over QD-NEVPT2 with oscillator strengths, inside the
+  PySCF toolchain (see "SOC route" above), so the single-toolchain property
+  looks safe. The unknown has moved from *can it be done* to *what does it
+  cost per geometry* — SO-QDNEVPT2 over several roots at thousands of raster
+  points is a different proposition from the SC-NEVPT2 water used. Phase 0.5
+  answers this before anything else is built.
 - **The triplet surface may need more states.** If the a 3A'' band borrows
   intensity from several singlets, a two-state model will not suffice.
 - **HOBr ground-state PES quality.** CAS(8,6)-equivalent active spaces were

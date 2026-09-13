@@ -95,10 +95,26 @@ read straight out rather than assembled by hand. There is also a cheaper
 CASSCF-level route, `interface.run_soc("x2c-1")`, with no perturbation
 correction.
 
+**Validated against experiment, 2026-09-13.** `02_soc_atoms.py` on Cl,
+def2-TZVP, SA-CASSCF(5e,3o)/3 roots, DKH1-QD-NEVPT2:
+
+| check | result |
+| --- | --- |
+| degeneracy pattern | **[4, 2]** — correct for a 2P term |
+| ordering | 4-fold at 0, 2-fold at +844.54 cm-1: **inverted**, correct for p^5 |
+| 2P_1/2 − 2P_3/2 | **844.54 vs 882.35 cm-1 observed, −4.3%** |
+| oscillator strengths | returned, ~4e-24, i.e. zero as required within a term |
+| cost | 5.3 s total; the SOC step 1.2 s wall / 37 s CPU (31x parallel) |
+
+The inversion is the check that matters most: a normal ordering would have been
+a sign error wearing a plausible magnitude. Toolchain is sound.
+
 Remaining caveats:
 
-- **Nothing has been benchmarked yet.** Imports and API confirmed; no number
-  has been checked against a known answer. That is `02_soc_atoms.py`.
+- **Only a light atom, and only an atom.** Cl SOC is small and a free atom has
+  no bonding to get wrong. Br is the real scaling test, and the molecular case
+  adds the part HOX actually needs — SOC *borrowing* between states of
+  different multiplicity, which the atomic test does not exercise at all.
 - **Prism's NEVPT2 is not PySCF's.** `water/` used PySCF's native strongly
   contracted `mrpt.NEVPT2`; Prism is a separate fully internally contracted
   implementation. This is a new dependency, not a flag on existing code.

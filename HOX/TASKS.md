@@ -203,7 +203,7 @@ theory at all.
 | quantity | method | where | cost |
 | --- | --- | --- | --- |
 | V(X 1A') | CCSD(T), closed shell | bound region | water's `13_gs_well.py` |
-| V(a 3A") | state-specific, spin=2 | full 3D raster | to be measured |
+| V(a 3A") | ~~state-specific, spin=2~~ **SA-CASSCF + SC-NEVPT2 over 3A" roots** — see `06` below | full 3D raster | 624 CPU-s/pt |
 | mu_SOC(R) | 6-state QD-NEVPT2 + SOC | **FC window only** | 5783 CPU-s/pt |
 
 The intensity is the one thing this does not give: a 3A" <- X 1A' is
@@ -219,7 +219,9 @@ was only ever needed across the Franck-Condon window."*
 
       dCASSCF+NEVPT2 is a dead end here: unconverged even at 200 macro cycles
       and 14245 CPU-s, 24x dCCSD(T) and 2.5x the full multi-state route it was
-      meant to undercut. It was also redundant — `03`'s QD-NEVPT2+SOC and
+      meant to undercut. *(Later overturned by `06`: the problem was the
+      single-root CASSCF. Averaged over several 3A" roots it converges at
+      every point and costs 624 CPU-s.)* It was also redundant — `03`'s QD-NEVPT2+SOC and
       `04`'s dCCSD(T) are already two unrelated methods (multireference
       perturbation vs single-reference coupled cluster) agreeing to 0.034 eV,
       which is exactly the cross-check water got from NEVPT2 vs UCCSD(T) on
@@ -275,7 +277,7 @@ was only ever needed across the Franck-Condon window."*
       flip. Whatever crowds our state is itself 3A": a 3A' would genuinely
       cross, aufbau would have jumped to it, and this run would have said so.
 
-- [ ] **Is it an avoided crossing?** Johan's reading of the plots: a higher
+- [x] **Is it an avoided crossing?** Johan's reading of the plots: a higher
       3A" state appears to come down and meet ours near 2.5 A. It fits
       everything so far:
       - same-symmetry states repel rather than cross, and the pin run shows
@@ -302,21 +304,90 @@ was only ever needed across the Franck-Condon window."*
       synthetic weak, strong and no-crossing cases before being sent to the
       EVO.
 
-- [ ] **If it is an avoided crossing, what to propagate on.** A fast packet
-      at a narrowly avoided crossing tends to stay diabatic (Landau-Zener).
-      `06` prints a rough 1D Landau-Zener probability from the computed gap,
-      diabatic slopes and the kinetic energy gained falling from the FC
-      region. Large P: propagate on the diabatic continuation, or both states
-      coupled, not the lower adiabat, however well computed. Small P: a single
-      adiabatic surface is right. In between: two coupled states. The sampled
-      gap can only overestimate the true minimum, so the true P is at least the
-      printed one. This also bears on products: the Cl 2P spin-orbit splitting
-      (882 cm-1, 0.11 eV) is the size of the gaps here, so the Cl(2P3/2) vs
-      Cl(2P1/2) branching is plausibly decided in this region.
+      **Result, 2026-09-14: no avoided crossing — the higher 3A" states converge
+      on ours asymptotically instead.** Four runs, 4 roots, AVAS [Cl 3p, O 2p]
+      giving CAS(10e,6o) from 1.8 A outward, def2-TZVP, all points converged:
+      CASSCF 1.7-3.2 A, SC-NEVPT2 1.7-3.2 A, then SC-NEVPT2 at 0.025 A
+      spacing over 3.0-3.4 and 3.2-3.6 A.
 
-- [ ] Whatever `06` shows, the region needs a multireference treatment for the
-      surface: patch 2.2-2.8 A with CASSCF/NEVPT2 and splice, or accept it for
-      the triplet surface as a whole.
+      | r / A | root 0 NEVPT2, eV rel. 2.0 A | UCCSD(T), same | gap 1-0 / eV | gap 2-1 / eV | w0 | w1 | T1(T) |
+      | --- | --- | --- | --- | --- | --- | --- | --- |
+      | 1.8 | +0.436 | +0.514 | 2.848 | 1.783 | 0.82 | 0.71 | 0.024 |
+      | 2.0 | 0.000 | 0.000 | 1.752 | 1.230 | 0.64 | 0.54 | 0.029 |
+      | 2.2 | **−0.076** | **−0.079** | 1.029 | 0.751 | 0.45 | 0.37 | 0.041 |
+      | 2.4 | −0.038 | +0.041 | 0.583 | 0.441 | 0.41 | 0.39 | 0.095 |
+      | 2.6 | +0.012 | −0.055 | 0.329 | 0.257 | 0.43 | 0.45 | 0.100 |
+      | 2.8 | +0.052 | −0.019 | 0.191 | 0.150 | 0.43 | 0.48 | 0.018 |
+      | 3.2 | +0.102 | +0.013 | 0.078 | 0.054 | 0.44 | 0.53 | 0.015 |
+
+      - **The multireference lower curve is smooth.** NEVPT2 root 0 has a
+        shallow minimum at 2.20 A and rises monotonically after it, with no
+        drops. Relative to 2.0 A it agrees with UCCSD(T) at the minimum to
+        **3 meV**, then the two separate by 0.07-0.09 eV from 2.4 A outward.
+      - **The gap never has an interior minimum.** Root 1 - root 0 closes
+        monotonically from 2.85 eV at 1.8 A to 0.042 eV at 3.6 A. At 3.6 A
+        roots 0, 1 and 2 sit at 0, +0.042 and +0.063 eV while root 3 is at
+        +4.15 eV: three 3A" states converging, which is exactly the count
+        OH(2Pi) x Cl(2P) predicts (a'/a" x a'/a'/a" gives three A").
+      - **No exchange of character.** In the CASSCF run the root 0 and root 1
+        dipoles converge smoothly to ~1.83 D together.
+      - **Why UCCSD(T) fails there.** The weight of root 0's dominant
+        configuration falls from 0.82 at 1.8 A through 0.64 at 2.0 to 0.45 at
+        2.2 and 0.39 at 2.3 A, then stays near 0.43. The T1 spike (0.041 at
+        2.2, 0.095 at 2.4) coincides with the state becoming strongly
+        multiconfigurational as the neighbouring 3A" states close in. A single
+        determinant cannot represent a state whose largest configuration is
+        ~40% of it. No crossing is needed to explain the kink.
+
+      So Johan's eye was right that higher 3A" states come down to meet ours:
+      two of them do. They converge on a shared asymptote rather than crossing.
+
+- [x] **What to propagate on.** With no interior crossing, Landau-Zener does
+      not apply. The band σ(E, T) is set in the Franck-Condon region on a
+      femtosecond timescale, on a single smooth 3A" surface. The manifold only
+      becomes coupled beyond ~3 A, where the 3A" gaps (0.12 eV at 3.0 A,
+      falling) drop below the Cl 2P spin-orbit splitting (882 cm-1, 0.11 eV).
+      There SOC reorganises the three states, which is where the
+      Cl(2P3/2) vs Cl(2P1/2) product branching is decided. That matters for
+      product fine structure, not for the absorption band, so it is optional
+      scope rather than a blocker.
+
+- [ ] **Build the triplet surface multireference, not dCCSD(T).**
+      SA-CASSCF(10,6) over 4 3A" roots + SC-NEVPT2 cost **624 CPU-s/point**
+      and converged at all 16 points, against 830-922 CPU-s/point for the
+      dCCSD(T) scan. That is *cheaper* than the single-reference route, smooth
+      where UCCSD(T) is not, and it yields the neighbouring 3A" states as a
+      by-product. About 570 CPU-hours, or ~36 h on 16 cores, for 3289 points.
+      The ground-state surface stays CCSD(T) over the bound region, where
+      T1(S) stays below 0.02 out to 2.4 A (0.018) and passes it by 2.6 A.
+- [ ] **Fix the active space inside the Franck-Condon window first.** AVAS
+      gives CAS(12e,7o) at 1.7 A (and at 1.6891 A in `04`) but CAS(10e,6o)
+      from 1.8 A outward, so the switch falls right where the band is decided.
+      A raster needs one size throughout. Compare the two at equilibrium and
+      pick one, via an AVAS threshold or an explicit orbital count.
+- [ ] **Check the vertical energy on this footing**: singlet and triplet with
+      the same active space and SC-NEVPT2, against the multi-state 3.4477 eV
+      and dCCSD(T) 3.4142 eV.
+
+      **Three bugs in `06`, found in these runs and fixed:**
+      - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI
+        object's attributes by reference and its kernel replaces
+        `ci[root]` with a vector in rotated natural orbitals, while the CASCI
+        keeps the old orbitals. Dipoles computed afterwards rose linearly to
+        6 D at 3.6 A. **The dipole columns in the three NEVPT2 CSVs
+        (`_cas2`, `_cas3`, `_cas4`) are invalid.** Energies, weights and
+        `<S^2>` are unaffected. Dipoles are now computed before any NEVPT2.
+      - *A gap minimum on the grid edge was reported as "inconclusive" with a
+        suggestion to rescan around it.* That only moves the edge, and it
+        cost two follow-up runs chasing it from 3.2 to 3.6 A. An edge minimum
+        is now reported as monotonic convergence, not a crossing.
+      - *The 1.7 A point, in a different active space, was included in the
+        analysis* and supplied the starting energy for Landau-Zener, so the
+        P = 0.39 and 0.22 in the first two logs mean nothing. Analysis now
+        uses only the points sharing the most common active space.
+      Replaying the real CSVs through the fixed verdict gives "no avoided
+      crossing, roots 0-2 converging" for both runs, and the synthetic weak
+      crossing is still detected.
 - [ ] Cost so far: 830 CPU-s/point averaged over the scan (worse than the
       594 at equilibrium, as expected away from it) = **47 h for 3289 points
       on 16 cores**, against 330 h for the full multi-state route.

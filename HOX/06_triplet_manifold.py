@@ -192,18 +192,29 @@ def run_point(r, args):
     cis = mci.ci if isinstance(mci.ci, (list, tuple)) else [mci.ci]
     nel = mci.nelecas
 
+    # Everything derived from the CI vectors is computed BEFORE any NEVPT2.
+    # PySCF's NEVPT copies the CASCI object's attributes by reference
+    # (self.__dict__.update(mc.__dict__)) and its kernel then writes
+    # self.ci[root] = <CI in rotated natural orbitals> into that shared list,
+    # while the CASCI object keeps the old orbitals. A density built after
+    # NEVPT2 therefore pairs new CI with old orbitals. In the first version of
+    # this script the dipoles were computed after the loop and came out wrong
+    # -- rising linearly to 6 D at 3.6 A -- while the CASSCF-only run, which
+    # never calls NEVPT, gave a sensible ~1.8 D. Energies were unaffected:
+    # each root's NEVPT2 reads its own untouched vector and the orbitals.
     for i in range(n):
         row[f"e_cas_{i}"] = float(e_cas[i])
         row[f"s2_{i}"] = float(spin_op.spin_square0(cis[i], ncas, nel)[0])
         row[f"w_{i}"] = dominant_weight(cis[i], ncas, nel)
-        if not args.no_nevpt2:
-            row[f"e_nev_{i}"] = float(e_cas[i]
-                                      + mrpt.NEVPT(mci, root=i).kernel())
-
     for i in (0, 1):
         dm = mci.make_rdm1(ci=cis[i])
         d = scf_hf.dip_moment(mol_t, dm, unit="Debye", verbose=0)
         row[f"dip_{i}"] = float(np.linalg.norm(d))
+
+    if not args.no_nevpt2:
+        for i in range(n):
+            row[f"e_nev_{i}"] = float(e_cas[i]
+                                      + mrpt.NEVPT(mci, root=i).kernel())
 
     row["wall"], row["cpu"] = time.time() - t0, time.process_time() - c0
     return row
@@ -390,26 +401,43 @@ def main():
         print(f"  plot FAILED: {type(exc).__name__}: {exc}")
 
     # -------------------------------------------------------------- verdict
-    r = np.array([x["r"] for x in rows])
-    gap = (energies(rows, 1, key) - energies(rows, 0, key)) * HARTREE2EV
-    imin = int(np.argmin(gap))
-    w0 = np.array([x["w_0"] for x in rows])
-    w1 = np.array([x["w_1"] for x in rows])
-    d0 = np.array([x["dip_0"] for x in rows])
-    d1 = np.array([x["dip_1"] for x in rows])
-
     print("\n" + "=" * 78)
     print("== verdict")
     print("=" * 78)
-    sizes = {(x["nelecas"], x["ncas"]) for x in rows}
-    if len(sizes) > 1:
-        print(f"  !! AVAS chose different active spaces along the scan: "
-              f"{sorted(sizes)}. Energies at points with a different space")
-        print("     are not on the same footing; treat the curves as suspect.")
     unconv = [x["r"] for x in rows if not x["conv"]]
     if unconv:
         print(f"  !! CASSCF unconverged at r = "
               f"{', '.join(f'{v:.2f}' for v in unconv)} A")
+
+    # Analyse only the points sharing the most common active space. A point
+    # with a different space sits on a different energy scale. In the first
+    # run that was the innermost point, 1.7 A, at (12,7) against (10,6)
+    # everywhere else -- and the Landau-Zener estimate took its starting
+    # energy from exactly that point.
+    sizes = {}
+    for x in rows:
+        sz = (int(x["nelecas"]), int(x["ncas"]))
+        sizes[sz] = sizes.get(sz, 0) + 1
+    common = max(sizes, key=sizes.get)
+    ana = [x for x in rows
+           if (int(x["nelecas"]), int(x["ncas"])) == common]
+    if len(sizes) > 1:
+        dropped = [x["r"] for x in rows if x not in ana]
+        print(f"  !! AVAS active space varies along the scan "
+              f"(CAS(nelec,norb): points) {sizes}.")
+        print(f"     Analysing only the CAS{common} points; excluded r = "
+              f"{', '.join(f'{v:.2f}' for v in dropped)} A.")
+    if len(ana) < 3:
+        print("  too few points share one active space to analyse")
+        return
+
+    r = np.array([x["r"] for x in ana])
+    gap = (energies(ana, 1, key) - energies(ana, 0, key)) * HARTREE2EV
+    imin = int(np.argmin(gap))
+    w0 = np.array([x["w_0"] for x in ana])
+    w1 = np.array([x["w_1"] for x in ana])
+    d0 = np.array([x["dip_0"] for x in ana])
+    d1 = np.array([x["dip_1"] for x in ana])
 
     print(f"  smallest root 1 - root 0 gap: {gap[imin]:.3f} eV at "
           f"r = {r[imin]:.2f} A  (grid spacing {r[1] - r[0]:.3f} A)")
@@ -438,7 +466,30 @@ def main():
         print(f"  05 UCCSD(T) max T1 at r = {r_t1:.2f} A, "
               f"{abs(r_t1 - r[imin]):.2f} A from the gap minimum")
 
-    if gap[imin] < 0.3 and (swap or mixed):
+    # A minimum on the edge of the grid is not a minimum: the gap is still
+    # heading somewhere the scan did not reach. The first version reported
+    # this as INCONCLUSIVE and suggested a narrower window around the edge,
+    # which only moves the edge; two follow-up runs chased it from 3.2 to
+    # 3.6 A with the gap still closing. Say what it actually is instead.
+    if imin == len(r) - 1:
+        e_last = [ana[-1][f"{key}_{i}"] for i in range(n)]
+        near = [i for i in range(n)
+                if (e_last[i] - e_last[0]) * HARTREE2EV < 0.15]
+        print(f"\n  -> NO AVOIDED CROSSING between {r[0]:.2f} and {r[-1]:.2f} A."
+              f" The gap closes\n     monotonically all the way to the outer "
+              f"edge, so the minimum is the grid\n     running out, not a "
+              f"feature. At r = {r[-1]:.2f} A roots {near} lie within "
+              f"0.15 eV\n     of root 0: they are converging on a shared "
+              f"asymptote. OH(2Pi) + Cl(2P)\n     gives exactly three 3A\" "
+              f"states. Scanning further out only follows that\n     "
+              f"convergence; it will not find a minimum.")
+        print("\n  Landau-Zener: not applicable (no interior gap minimum).")
+    elif imin == 0:
+        print(f"\n  -> NO AVOIDED CROSSING between {r[0]:.2f} and {r[-1]:.2f} A."
+              f" The gap is smallest at\n     the inner edge and opens "
+              f"outward.")
+        print("\n  Landau-Zener: not applicable (no interior gap minimum).")
+    elif gap[imin] < 0.3 and (swap or mixed):
         print("\n  -> AVOIDED CROSSING. A higher 3A\" state comes down and the "
               "two exchange\n     character at the gap minimum. The kink "
               "in 05 is the single-reference\n     method failing to follow "
@@ -459,26 +510,29 @@ def main():
               f"{max(r[imin] - 0.2, args.rmin):.2f} --rmax "
               f"{r[imin] + 0.2:.2f} --npoints 17.")
 
-    p_lz, detail = landau_zener(rows, key, imin)
-    if p_lz is None:
-        print(f"\n  Landau-Zener: not estimated ({detail})")
-    else:
-        print(f"\n  Landau-Zener estimate of staying DIABATIC: P = {p_lz:.2f}"
-              f"\n     ({detail})")
-        print("     Rough, 1D and classical. The sampled gap can only be LARGER "
-              "than the\n     true minimum on this grid, so the true P is at "
-              "least this large.")
-        if p_lz > 0.5:
-            print("     A fast packet mostly jumps the gap: propagate on the "
-                  "DIABATIC\n     continuation, or on both coupled states, "
-                  "not on the lower adiabat.")
-        elif p_lz < 0.1:
-            print("     The packet mostly follows the lower adiabat: a single "
-                  "smooth adiabatic\n     surface is the right object, "
-                  "provided it is computed with this method.")
+    # Landau-Zener only means something at an interior gap minimum; the edge
+    # cases above have already said it does not apply.
+    if 0 < imin < len(r) - 1:
+        p_lz, detail = landau_zener(ana, key, imin)
+        if p_lz is None:
+            print(f"\n  Landau-Zener: not estimated ({detail})")
         else:
-            print("     Neither limit holds: this region needs the two states "
-                  "propagated\n     together with their coupling.")
+            print(f"\n  Landau-Zener estimate of staying DIABATIC: "
+                  f"P = {p_lz:.2f}\n     ({detail})")
+            print("     Rough, 1D and classical. The sampled gap can only be "
+                  "LARGER than the\n     true minimum on this grid, so the "
+                  "true P is at least this large.")
+            if p_lz > 0.5:
+                print("     A fast packet mostly jumps the gap: propagate on "
+                      "the DIABATIC\n     continuation, or on both coupled "
+                      "states, not on the lower adiabat.")
+            elif p_lz < 0.1:
+                print("     The packet mostly follows the lower adiabat: a "
+                      "single smooth adiabatic\n     surface is the right "
+                      "object, provided it is computed with this method.")
+            else:
+                print("     Neither limit holds: this region needs the two "
+                      "states propagated\n     together with their coupling.")
 
     wall, cpu = time.time() - t_start, time.process_time() - c_start
     print(f"\n  cost: {cpu:.0f} CPU-s over {len(rows)} points "

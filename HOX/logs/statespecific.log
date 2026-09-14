@@ -1,0 +1,55 @@
+========================================================================
+== HOX Phase 0.5 -- state-specific surfaces, without excited states
+== basis def2-tzvp, symmetry False
+========================================================================
+
+  active space for both spins: CAS(12e, 7o)
+
+--- dCCSD(T) ----------------------------------------------------
+  singlet X 1A'      -536.8009028937 Ha   SCF -536.21349656   [5.1 s]
+  triplet a 3A"      -536.6754339189 Ha   SCF -536.07748433, <S^2> = 2.0000 (2S+1 = 3.00, want 3.00)   [13.6 s]
+  vertical T <- S   3.4142 eV = 363.1 nm
+
+--- dCASSCF+NEVPT2 ----------------------------------------------
+  singlet X 1A'      -536.7345213901 Ha   CAS(12e,7o) as (6,6), CASSCF -536.24750876   [173.4 s]
+    WARNING: spin=2: CASSCF did not converge in 200 macro cycles
+  triplet a 3A"      -536.6018269284 Ha   CAS(12e,7o) as (7,5), CASSCF -536.10208172   [275.6 s]
+  vertical T <- S   3.6108 eV = 343.4 nm
+
+========================================================================
+== vertical a 3A" <- X 1A', against the multi-state result
+========================================================================
+              method    dE / eV       nm   vs 6-root  conv
+         03, 6 roots     3.4477    359.6          --   yes
+        03, 4 roots*     3.4495    359.4     +0.0018   NO
+            dCCSD(T)     3.4142    363.1     -0.0335   yes
+      dCASSCF+NEVPT2     3.6108    343.4     +0.1631   NO
+  * unconverged reference; shown for scale, not as a target
+
+  Rows marked NO did not converge. Their numbers are not
+  evidence of anything -- do not read them as a method
+  comparison. Raise --max-cycle or change the active space.
+
+  largest deviation from the 6-root answer: 0.0335 eV
+  -> state-specific reproduces the multi-state result. The restructuring
+  is justified: build both surfaces state-specifically and spend the
+  expensive multi-state machinery only on mu in the FC window.
+
+========================================================================
+== raster cost, per method (both surfaces, one geometry)
+========================================================================
+              method    wall/s     CPU/s    par       CPU-h  h/16 cores
+            dCCSD(T)      18.6     594.1  31.9x       542.8        33.9
+      dCASSCF+NEVPT2     449.0   14244.9  31.7x     13014.3       813.4
+
+  Compare 03, the full multi-state point: 5783 CPU-s, 5283 CPU-hours,
+  330 h on 16 cores. The speedup here is the whole argument.
+
+  Remember this does NOT include mu_SOC, which still needs the multi-state
+  treatment over the Franck-Condon window. At 5783 CPU-s per point, a few
+  hundred FC points is 30 h on 16 cores -- so budget for that
+  separately, and consider whether mu can be sampled coarsely and
+  interpolated. water/10_mu_sensitivity.py measured what freezing mu costs:
+  the peak moved 4 nm and the band narrowed 15%, so mu is not negligible but
+  it is also not needed on the full raster grid.
+

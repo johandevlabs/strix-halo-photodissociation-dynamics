@@ -1,0 +1,467 @@
+========================================================================
+== HOX Phase 0.5 -- SOC toolchain probe
+========================================================================
+
+========================================================================
+== 1. import chain
+========================================================================
+  ok      numpy      2.4.3        /home/johan/.local/lib/python3.12/site-packages/numpy/__init__.py
+  ok      scipy      1.17.1       /home/johan/.local/lib/python3.12/site-packages/scipy/__init__.py
+  ok      pyscf      2.14.0       /home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/__init__.py
+  ok      socutils   (no __version__) /home/johan/src/socutils/__init__.py
+  ok      x2camf     0.1          /home/johan/src/socutils/x2camf_c/x2camf/__init__.py
+  MISSING zquatev    tried zquatev, socutils.zquatev: ModuleNotFoundError: No module named 'socutils.zquatev'
+  ok      prism      (no __version__) /home/johan/src/prism/__init__.py
+  ok      sympy      1.14.0       /home/johan/.local/lib/python3.12/site-packages/sympy/__init__.py
+  ok      opt_einsum 3.4.0        /home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/opt_einsum/__init__.py
+
+========================================================================
+== 2a. prism submodules
+========================================================================
+  package root: /home/johan/src/prism
+
+  prism.interface
+  prism.mr_adc
+  prism.nevpt
+
+========================================================================
+== 2b. SOC- and intensity-related names
+========================================================================
+  (nothing matched -- read the examples in 2c instead)
+
+========================================================================
+== 2d. signatures of the QD-NEVPT2 / SOC entry points
+========================================================================
+  prism.qdnevpt: not importable (ModuleNotFoundError)
+  prism.nevpt: not importable (ModuleNotFoundError)
+
+  --- prism.interface
+    PYSCF(mf, mc=None, backend=None, select_reference=None)
+        attrs: einsum_backend, with_df
+  prism.soc: not importable (ModuleNotFoundError)
+  prism.mr_adc: not importable (ModuleNotFoundError)
+
+========================================================================
+== 2c. prism SOC examples (VERBATIM -- this is the API)
+========================================================================
+  mr_adc/: 01-cvs_ip_mr_adc_2.py, 02-multiple_cvs_spaces.py, 03-cvs_ip_mr_adc_2_x.py, 04-dyson_mos.py, 05-density_fitting.py, 06-einsum-options.py, 07-single-reference.py, 08-ROHF-reference.py
+  nevpt/: 01-nevpt2-basic.py, 02-nevpt2-references.py, 03-nevpt2-density-fitting.py, 04-nevpt2_sc_vs_fic.py, 05-nevpt2-expert-options.py, 06-nevpt2-1RDMS.py, 07-nevpt2-ntos.py, 08-nevpt2-einsum-options.py, 09-nevpt2-scf-reference.py
+  qdnevpt/: 01-qdnevpt2-basic.py, 02-qdnevpt2-density-fitting.py, 03-qdnevpt2-expert-options.py, 04-qdnevpt2-1RDMS.py, 05-qdnevpt2-einsum-options.py, 06-qdnevpt2-eigenvector-analysis.py
+  soc/: 01-qdnevpt2-SOC.py, 02-qdnevpt2-gtensor.py, 03-casscf-SOC.py, 04-qdnevpt2-SUS.py, 05-casscf-gtensor.py, 06-casscf-SUS.py
+  solvent/: pe
+  spectrum/: 01-mr-adc-spectrum.py, 02-qdnevpt-spectrum.py
+
+----- soc/01-qdnevpt2-SOC.py --------------------
+#!/usr/bin/env python
+
+'''
+SOC QD-NEVPT2 calculation for B
+'''
+
+import numpy as np
+import math
+import pyscf.gto
+import pyscf.scf
+import pyscf.mcscf
+import prism.interface
+import prism.nevpt
+
+np.set_printoptions(suppress=True)
+
+mol = pyscf.gto.Mole()
+mol.atom = [
+            ['B', (0.0, 0.0, 0.0)]
+            ]
+mol.basis = 'def2-tzvp' 
+mol.symmetry = False
+mol.spin = 1
+mol.verbose = 4
+mol.build()
+
+
+# RDFT calculation
+mf = pyscf.scf.RKS(mol).x2c()
+mf.xc = "bp86"
+ehf = mf.scf()
+mf.analyze()
+
+# SA-CASSCF calculation
+n_states = 3
+weights = np.ones(n_states)/n_states
+mc = pyscf.mcscf.CASSCF(mf, 4, 3).state_average_(weights)
+mc.conv_tol = 1e-11
+mc.conv_tol_grad = 1e-6
+emc = mc.mc1step()[0]
+mc.analyze()
+
+
+# QD-NEVPT2 with all electrons correlated
+interface = prism.interface.PYSCF(mf, mc, backend = 'opt_einsum')
+nevpt = prism.nevpt.NEVPT(interface)
+nevpt.method = "nevpt2"
+nevpt.method_type = "qd"
+nevpt.soc = "DKH1" # Possible methods: Breit-Pauli (BP), DKH1 (x2c-1)
+nevpt.verbose = 4
+nevpt.kernel()
+
+
+
+----- soc/02-qdnevpt2-gtensor.py --------------------
+#!/usr/bin/env python
+
+'''
+SOC QD-NEVPT2 calculation for ZnH g-tensor
+'''
+
+import numpy as np
+import math
+import pyscf.gto
+import pyscf.scf
+import pyscf.mcscf
+import prism.interface
+import prism.nevpt
+
+np.set_printoptions(suppress=True)
+
+mol = pyscf.gto.Mole()
+mol.atom = [
+            ['Zn', (0.0, 0.0, 0.0)],
+            ['H', (0.0,  0,  1.595 )]]
+mol.basis = 'def2-tzvp'
+mol.symmetry = False
+mol.spin = 1
+mol.verbose = 4
+mol.build()
+
+
+# RDFT calculation
+mf = pyscf.scf.RKS(mol).x2c()
+mf.xc = "bp86"
+ehf = mf.scf()
+mf.analyze()
+
+# SA-CASSCF calculation
+n_states = 3
+weights = np.ones(n_states)/n_states
+mc = pyscf.mcscf.CASSCF(mf, 5, 3).state_average_(weights)
+mc.conv_tol = 1e-11
+mc.conv_tol_grad = 1e-6
+emc = mc.mc1step()[0]
+mc.analyze()
+
+
+# QD-NEVPT2 with all electrons correlated
+interface = prism.interface.PYSCF(mf, mc, backend = 'opt_einsum')
+nevpt = prism.nevpt.NEVPT(interface)
+nevpt.method = "nevpt2"
+nevpt.method_type = "qd"
+nevpt.soc = "DKH1" # Possible methods: Breit-Pauli (BP), DKH1 (x2c-1)
+nevpt.verbose = 4
+nevpt.gtensor = True
+nevpt.kernel()
+
+----- soc/03-casscf-SOC.py --------------------
+'''
+SOC CASSCF calculation for ZnH
+'''
+
+import numpy as np
+import math
+import pyscf.gto
+import pyscf.scf
+import pyscf.mcscf
+import prism.interface
+import prism.mr_adc
+import prism.nevpt
+import time
+
+np.set_printoptions(linewidth=150, edgeitems=10, suppress=True)
+mol = pyscf.gto.Mole()
+mol.atom = [
+            ['Zn', (0.0, 0.0, 0.0)],
+            ['H', (0.0,  0,  1.595 )]]
+mol.basis = 'def2-tzvp'
+mol.symmetry = False
+mol.spin = 1
+mol.verbose = 4
+mol.build()
+
+
+# RDFT calculation
+mf = pyscf.scf.RKS(mol).x2c()
+mf.xc = "bp86"
+ehf = mf.scf()
+mf.analyze()
+
+# SA-CASSCF calculation
+n_states = 3
+weights = np.ones(n_states)/n_states
+mc = pyscf.mcscf.CASSCF(mf, 5, 3).state_average_(weights)
+mc.conv_tol = 1e-11
+mc.conv_tol_grad = 1e-6
+emc = mc.mc1step()[0]
+mc.analyze()
+
+
+interface = prism.interface.PYSCF(mf, mc, backend = 'opt_einsum')
+interface.run_soc("x2c-1")
+
+
+----- soc/04-qdnevpt2-SUS.py --------------------
+'''
+SOC QD-NEVPT2 calculation for ZnH Magnetization and Magnetic Susceptibility 
+'''
+
+import numpy as np
+import math
+import pyscf.gto
+import pyscf.scf
+import pyscf.mcscf
+import prism.interface
+import prism.mr_adc
+import prism.nevpt
+import time
+
+
+np.set_printoptions(linewidth=150, edgeitems=10, suppress=True)
+r = 0.96
+x = r * math.sin(104.5 * math.pi/(2 * 180.0))
+y = r * math.cos(104.5 * math.pi/(2 * 180.0))
+
+mol = pyscf.gto.Mole()
+mol.atom =[ 
+[ 'Zn',  (0, 0, 0)],
+[ 'H',  ( 0, 0, 1.595)]
+]
+
+mol.basis = 'def2-tzvp'
+mol.symmetry = False
+mol.spin = 1
+mol.verbose = 4
+mol.build()
+
+# RHF calculation
+mf = pyscf.scf.RHF(mol).x2c()
+mf.conv_tol = 1e-12
+ehf = mf.scf()
+mf.analyze()
+print("SCF energy: %f\n" % ehf)
+
+# SA-CASSCF calculation
+n_states = 3
+weights = np.ones(n_states)/n_states
+mc = pyscf.mcscf.CASSCF(mf, 5, 3).state_average_(weights)
+mc.conv_tol = 1e-11
+mc.conv_tol_grad = 1e-6
+emc = mc.mc1step()[0]
+mc.analyze()
+
+# QD-NEVPT2 with all electrons correlated
+interface = prism.interface.PYSCF(mf, mc, backend = 'opt_einsum')
+nevpt = prism.nevpt.QDNEVPT(interface)
+nevpt.soc = "breit-pauli"
+nevpt.s_thresh_singles = 1e-10
+nevpt.s_thresh_doubles = 1e-10
+
+nevpt.mag_av = True
+nevpt.sus_av = True
+nevpt.mag_vec = True
+nevpt.sus_tensor = True
+nevpt.step_h_s = 0.001 
+
+Bs_list = []
+for i in range(15):
+    H = i * 0.5
+    Bs_list.append(H)
+
+T_list = []
+for i in range(21):
+    T = 14.75 * i + 5
+    T_list.append(T)
+
+nevpt.Bs_powder_M = Bs_list 
+nevpt.T_powder_M = [1.8]
+nevpt.T_powder_chi = T_list
+nevpt.Bs_powder_chi = [0.1]
+nevpt.B_vec_M = [0,0,1]
+nevpt.Bs_vec_M = Bs_list 
+nevpt.T_vec_M = [1.8]
+nevpt.B_vec_chi = [0,0,1]
+nevpt.Bs_vec_chi = [0.1]
+nevpt.T_vec_chi = [5,100,200,250]
+e_tot, e_corr, osc = nevpt.kernel()
+
+
+
+
+
+
+----- soc/05-casscf-gtensor.py --------------------
+'''
+SOC CASSCF calculation for ZnH g-tensor
+'''
+
+import numpy as np
+import math
+import pyscf.gto
+import pyscf.scf
+import pyscf.mcscf
+import prism.interface
+import prism.mr_adc
+import prism.nevpt
+import time
+
+np.set_printoptions(linewidth=150, edgeitems=10, suppress=True)
+mol = pyscf.gto.Mole()
+mol.atom = [
+            ['Zn', (0.0, 0.0, 0.0)],
+            ['H', (0.0,  0,  1.595 )]]
+mol.basis = 'def2-tzvp'
+mol.symmetry = False
+mol.spin = 1
+mol.verbose = 4
+mol.build()
+
+
+# RDFT calculation
+mf = pyscf.scf.RKS(mol).x2c()
+mf.xc = "bp86"
+ehf = mf.scf()
+mf.analyze()
+
+# SA-CASSCF calculation
+n_states = 3
+weights = np.ones(n_states)/n_states
+mc = pyscf.mcscf.CASSCF(mf, 5, 3).state_average_(weights)
+mc.conv_tol = 1e-11
+mc.conv_tol_grad = 1e-6
+emc = mc.mc1step()[0]
+mc.analyze()
+
+
+interface = prism.interface.PYSCF(mf, mc, backend = 'opt_einsum')
+interface.gtensor = True
+interface.soc = "bp"
+interface.run_soc()
+/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/basis/__init__.py:689: UserWarning: Basis may be available in basis-set-exchange. It is recommended to install basis-set-exchange: pip install basis-set-exchange
+  warnings.warn(
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/01_soc_probe.py", line 45, in inner
+    return fn(*a, **kw)
+           ^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/01_soc_probe.py", line 194, in probe_integrals
+    mol = gto.M(atom=f"{atom} 0 0 0", basis=basis, spin=1,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 119, in M
+    mol.build(*args, **kwargs)
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 2563, in build
+    self._basis = self.format_basis(_basis)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 458, in format_basis
+    _basis = basis_converter(symb, atom_basis)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 493, in converter
+    _basis = load(raw_basis, _std_symbol_without_ghost(symb))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/mole.py", line 486, in load
+    _basis = basis.load(basis_name, symb)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/basis/__init__.py", line 700, in load
+    raise BasisNotFoundError(f'Unknown basis format or basis name\n{filename_or_basisname}')
+pyscf.lib.exceptions.BasisNotFoundError: Unknown basis format or basis name
+ano-rcc-vdzp
+
+
+----- soc/06-casscf-SUS.py --------------------
+'''
+SOC CASSCF calculation for ZnH magnetic susceptibility and  magnetization
+'''
+
+import numpy as np
+import math
+import pyscf.gto
+import pyscf.scf
+import pyscf.mcscf
+import prism.interface
+import prism.mr_adc
+import prism.nevpt
+import time
+
+np.set_printoptions(linewidth=150, edgeitems=10, suppress=True)
+mol = pyscf.gto.Mole()
+mol.atom = [
+            ['Zn', (0.0, 0.0, 0.0)],
+            ['H', (0.0,  0,  1.595 )]]
+mol.basis = 'def2-tzvp'
+mol.symmetry = False
+mol.spin = 1
+mol.verbose = 4
+mol.build()
+
+
+# RDFT calculation
+mf = pyscf.scf.RKS(mol).x2c()
+mf.xc = "bp86"
+ehf = mf.scf()
+mf.analyze()
+
+# SA-CASSCF calculation
+n_states = 3
+weights = np.ones(n_states)/n_states
+mc = pyscf.mcscf.CASSCF(mf, 5, 3).state_average_(weights)
+mc.conv_tol = 1e-11
+mc.conv_tol_grad = 1e-6
+emc = mc.mc1step()[0]
+mc.analyze()
+
+
+interface = prism.interface.PYSCF(mf, mc, backend = 'opt_einsum')
+interface.soc = "bp"
+interface.mag_av = True
+interface.sus_av = True
+interface.mag_vec = True
+interface.sus_tensor = True
+interface.step_h_s = 0.001 
+
+Bs_list = []
+for i in range(15):
+    H = i * 0.5
+    Bs_list.append(H)
+
+T_list = []
+for i in range(21):
+    T = 14.75 * i + 5
+    T_list.append(T)
+
+interface.Bs_powder_M = Bs_list 
+interface.T_powder_M = [1.8]
+interface.T_powder_chi = T_list
+interface.Bs_powder_chi = [0.1]
+interface.B_vec_M = [0,0,1]
+interface.Bs_vec_M = Bs_list 
+interface.T_vec_M = [1.8]
+interface.B_vec_chi = [0,0,1]
+interface.Bs_vec_chi = [0.1]
+interface.T_vec_chi = [5,100,200,250]
+interface.run_soc()
+
+
+========================================================================
+== 3. X2CAMF spin-orbit integrals for Cl/ano-rcc-vdzp
+========================================================================
+
+  !! X2CAMF integrals FAILED: BasisNotFoundError: Unknown basis format or basis name
+ano-rcc-vdzp
+
+========================================================================
+== what to do with this
+========================================================================
+
+  Paste the whole log back. The decisive parts are 2c (the shipped SOC
+  examples, which give the exact call sequence) and 2d (signatures, which
+  show whether oscillator strengths and SOC eigenvectors are reachable).
+
+  02_soc_atoms.py has its Prism call isolated in one function with the
+  assumptions written out; it gets corrected from this output rather than
+  guessed at twice.
+

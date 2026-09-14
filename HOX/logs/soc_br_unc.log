@@ -1,0 +1,140 @@
+========================================================================
+== HOX Phase 0.5 -- halogen fine structure as an SOC validation
+== basis unc-def2-tzvp, soc DKH1, QD-NEVPT2 + SOC
+========================================================================
+
+--- Br ------------------------------------------------------------
+  reference done in    10.0 s (nao 103, CAS(5,3), 3 roots)
+
+Computing NEVPT energies...
+
+Method:                                            nevpt2
+Method type:                                       qd
+Nuclear repulsion energy:                          0.000000000000
+Number of electrons:                               35
+Number of basis functions:                         103
+Reference wavefunction type:                       sa-casscf
+Number of reference states:                        3
+Number of reference microstates:                   3
+Number of frozen orbitals:                         0
+Number of core orbitals:                           15
+Number of active orbitals:                         3
+Number of external orbitals:                       85
+Number of active electrons:                        [(3, 2), (3, 2), (3, 2)]
+Spin–orbit coupling:                               dkh1
+G-tensor:                                          False
+Reference density fitting?                         False
+Correlation density fitting?                       False
+Temporary directory path:                          /tmp
+
+Internal contraction:                              Full (= Partial)
+Compute singles amplitudes?                        False
+Overlap truncation parameter (singles):            1.00e-08
+Overlap truncation parameter (doubles):            1.00e-08
+
+Einsum Backend:                                    opt_einsum
+
+Transforming integrals to MO basis...
+Correlation energy [0]:                           -0.782231992425
+
+Computing energy of state #1...
+Reference state active-space energy:              -6.410230295508
+Reference state spin multiplicity:                 2
+Number of active electrons:                        [(3, 2)]
+Correlation energy [0']:                          -0.018712418608
+Correlation energy [+1']:                         -0.000000000000
+Correlation energy [-1']:                         -0.003859869235
+Correlation energy [+1]:                          -0.007336746130
+Correlation energy [-1]:                          -0.077728725830
+Correlation energy [+2]:                           0.000000000000
+Correlation energy [-2]:                          -0.068816001171
+Correlation energy [0]:                           -0.782231992425
+SA-CASSCF reference state total energy:        -2604.416972545643
+NEVPT2 correlation energy:                        -0.958685753400
+Total NEVPT2 energy:                           -2605.375658299042
+
+Computing energy of state #2...
+Reference state active-space energy:              -6.410230294844
+Reference state spin multiplicity:                 2
+Number of active electrons:                        [(3, 2)]
+Correlation energy [0']:                          -0.018712418307
+Correlation energy [+1']:                         -0.000000000000
+Correlation energy [-1']:                         -0.003859869825
+Correlation energy [+1]:                          -0.007336746154
+Correlation energy [-1]:                          -0.077728725878
+Correlation energy [+2]:                           0.000000000000
+Correlation energy [-2]:                          -0.068816001285
+Correlation energy [0]:                           -0.782231992425
+SA-CASSCF reference state total energy:        -2604.416972544979
+NEVPT2 correlation energy:                        -0.958685753874
+Total NEVPT2 energy:                           -2605.375658298853
+
+Computing energy of state #3...
+Reference state active-space energy:              -6.410230294834
+Reference state spin multiplicity:                 2
+Number of active electrons:                        [(3, 2)]
+Correlation energy [0']:                          -0.018712418307
+Correlation energy [+1']:                         -0.000000000000
+Correlation energy [-1']:                         -0.003859869825
+Correlation energy [+1]:                          -0.007336746154
+Correlation energy [-1]:                          -0.077728725878
+Correlation energy [+2]:                           0.000000000000
+Correlation energy [-2]:                          -0.068816001286
+Correlation energy [0]:                           -0.782231992425
+SA-CASSCF reference state total energy:        -2604.416972544968
+NEVPT2 correlation energy:                        -0.958685753875
+Total NEVPT2 energy:                           -2605.375658298843
+
+Computing the QD-NEVPT2 effective Hamiltonian...
+
+Initializing state-interaction spin–orbit coupling program...
+Performing state-interaction spin–orbit coupling calculation within spin-free framework...
+
+Note that SOC Hamiltionian is sf-X2C-1e+so-DKH1 instead of usual DKH. 
+
+Calculating Wigner 1-RDM...
+> CPU time for total None calculation     80.45 sec, wall time      2.87 sec
+
+Summary of results for the DKH1-QD-NEVPT2 calculation with the SA-CASSCF reference:
+------------------------------------------------------------------------------------------------------------------
+  State    Degen.        E(total)            dE(a.u.)        dE(eV)      dE(nm)       dE(cm-1)      Osc Str.  
+------------------------------------------------------------------------------------------------------------------
+    1        1        -2605.380830550315     0.00000000       0.0000                      0.0000               
+    2        1        -2605.380830550315     0.00000000       0.0000                      0.0000               
+    3        1        -2605.380830550187     0.00000000       0.0000                      0.0000               
+    4        1        -2605.380830550185     0.00000000       0.0000                      0.0000               
+    5        1        -2605.365313796238     0.01551675       0.4222    2936.3972      3405.5339     0.00000000
+    6        1        -2605.365313796236     0.01551675       0.4222    2936.3972      3405.5339     0.00000000
+----------------------------------------------------------------------------------------------------------------
+> CPU time for total SOC-NEVPT2 calculation    122.78 sec, wall time      4.24 sec
+  oscillator strengths returned: 5 values, max 3.400e-24
+      (meaningless for a free atom -- what matters is that kernel() returns them at all, since that is the borrowed intensity HOX needs)
+  6 spin-orbit states:
+      0    -2605.3808305503 Ha           0.00 cm-1
+      1    -2605.3808305503 Ha           0.00 cm-1
+      2    -2605.3808305502 Ha           0.00 cm-1
+      3    -2605.3808305502 Ha           0.00 cm-1
+      4    -2605.3653137962 Ha        3405.53 cm-1
+      5    -2605.3653137962 Ha        3405.53 cm-1
+  degeneracy pattern: [4, 2]   (want [4, 2])
+  wall time    14.9 s
+
+========================================================================
+== fine structure 2P_1/2 - 2P_3/2
+========================================================================
+  atom     calc/cm-1    obs/cm-1       err    wall/s
+    Br       3405.53     3685.24     -7.6%      14.9
+
+Reading the result:
+  within a few %          toolchain is sound; go on to the molecular test.
+  right sign, 20-30% off  plausible for Br at this basis -- basis quality and
+                          scalar relativity, not a broken pipeline.
+  wrong degeneracy, or
+  wrong sign              misconfigured. Do not build on it.
+
+The wall times feed the Phase 1 go/no-go, but only weakly: an atom is far
+cheaper than a triatomic, and the raster cost is set by the molecule.
+03_soc_hocl_vertical.py measures the real thing. What these times DO tell you
+is how steeply cost climbs from Cl to Br, which is the relevant gradient for
+whether HOBr and eventually HOI stay affordable.
+

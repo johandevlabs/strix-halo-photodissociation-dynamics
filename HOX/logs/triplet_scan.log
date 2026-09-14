@@ -1,0 +1,50 @@
+==============================================================================
+== HOX Phase 0.5 -- dCCSD(T) along the O-Cl dissociation coordinate
+== basis def2-tzvp, symmetry False, r = 1.4 to 4.0 A in 14 points
+== equilibrium is r(O-Cl) = 1.6891 A
+==============================================================================
+
+      r/A           E(S)/Ha   T1(S)           E(T)/Ha   T1(T)   <S^2>    dE/eV  flags
+    1.400     -536.73157143  0.0066     -536.55467879  0.0267  2.0000   4.8135  
+    1.600     -536.79592432  0.0071     -536.64858081  0.0303  2.0000   4.0094  
+    1.800     -536.79724080  0.0083     -536.69822344  0.0243  2.0000   2.6944  
+    2.000     -536.77804358  0.0103     -536.71711832  0.0290  2.0000   1.6579  
+    2.200     -536.75617094  0.0135     -536.72000708  0.0411  2.0000   0.9841  T:T1
+    2.400     -536.73899234  0.0177     -536.71561692  0.0952  2.0000   0.6361  T:T1
+    2.600     -536.72862938  0.0224     -536.71913365  0.0995  2.0000   0.2584  S:T1 T:T1
+    2.800     -536.72448816  0.0270     -536.71781644  0.0182  2.0000   0.1815  S:T1
+    3.000     -536.72483089  0.0310     -536.71722820  0.0164  2.0000   0.2069  S:T1
+    3.200     -536.72777604  0.0341     -536.71664189  0.0154  2.0000   0.3030  S:T1
+    3.400     -536.73182054  0.0363     -536.71612498  0.0147  2.0000   0.4271  S:T1
+    3.600     -536.73599498  0.0376     -536.71569529  0.0143  2.0000   0.5524  S:T1
+    3.800     -536.73979232  0.0384     -536.71535620  0.0140  2.0000   0.6649  S:T1
+    4.000     -536.74302015  0.0387     -536.71508733  0.0139  2.0000   0.7601  S:T1
+
+  --- separated fragments (size-consistency check)
+      OH(2Pi)         -75.70498886 Ha  T1 0.0160
+      Cl(2P)         -461.00908095 Ha  T1 0.0123
+      sum            -536.71406981 Ha
+      triplet at r = 4.000 A is -0.0277 eV from the fragment sum
+      -> size consistent to better than 50 meV. The triplet surface can be
+         spliced onto the fragment asymptote as water/06_splice.py does.
+
+  wrote hocl_scan.csv
+
+==============================================================================
+== verdict
+==============================================================================
+  TRIPLET T1 above 0.04 at r = 2.20, 2.40, 2.60 A
+  This is the surface the wavepacket moves on, so this is the
+  one that matters. If the flagged points are a contiguous
+  region rather than scattered, the state-specific route needs
+  a multireference patch there -- or the whole triplet surface
+  needs CASSCF/NEVPT2 after all.
+
+  Singlet T1 above 0.02 from r = 2.60 A outward. EXPECTED: the ground state becomes
+  a diradical that RHF cannot represent. Harmless, provided the
+  ground-state surface is built only over the bound region, as
+  water/13_gs_well.py does. Treat min(flagged r) as the outer
+  limit of where V_gs may be trusted.
+
+  cost: 11620 CPU-s for 14 points = 830 CPU-s/point (364 s wall)
+  a 3289-point raster at this rate: 758 CPU-hours = 47 h on 16 cores

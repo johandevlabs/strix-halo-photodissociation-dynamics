@@ -1,0 +1,134 @@
+installing into: /home/johan/miniforge3/envs/qc
+python:          /home/johan/miniforge3/envs/qc/bin/python
+pyscf:           2.14.0
+
+  numpy  2.4.3      USER-SITE  /home/johan/.local/lib/python3.12/site-packages/numpy/__init__.py
+  scipy  1.17.1     USER-SITE  /home/johan/.local/lib/python3.12/site-packages/scipy/__init__.py
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !! numpy, scipy loading from user-site, not /home/johan/miniforge3/envs/qc
+  !! pip wheels bundle their own OpenBLAS -- two copies, two thread
+  !! pools, and the Prescott-kernel failure mode in water/README.md.
+  !! Fix before trusting any timing from this toolchain:
+  !!     export PYTHONNOUSERSITE=1        # per-shell, reversible
+  !!     pip uninstall --user numpy scipy   # permanent
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+--- updating /home/johan/src/socutils
+Already up to date.
+--- locating BLAS in the conda env
+    /home/johan/miniforge3/envs/qc/lib/libopenblas.so.0
+--- locating libcint
+    /home/johan/miniforge3/envs/qc/lib/libcint.so
+    pyscf libs: /home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/lib
+--- locating cint.h
+    /home/johan/miniforge3/envs/qc/include/cint.h
+--- building socutils (bundled x2camf + zquatev)
+make: Entering directory '/home/johan/src/socutils'
+cd lib/build && cmake .. -DCMAKE_BUILD_TYPE=Release -DBLAS_LIBRARIES=/home/johan/miniforge3/envs/qc/lib/libopenblas.so.0                 -DCMAKE_PREFIX_PATH=/home/johan/miniforge3/envs/qc                 -DPYSCF_LIB_DIR=/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/lib                 -DPYSCF_CINT_LIB=/home/johan/miniforge3/envs/qc/lib/libcint.so                 -DCMAKE_C_FLAGS=-I/home/johan/miniforge3/envs/qc/include
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Using user BLAS_LIBRARIES for LAPACK too: /home/johan/miniforge3/envs/qc/lib/libopenblas.so.0
+-- Found OpenMP_C: -fopenmp (found version "4.5") 
+-- Found OpenMP_CXX: -fopenmp (found version "4.5") 
+-- Found OpenMP: TRUE (found version "4.5")  
+-- ao2mo/nrr_opt: linking against pyscf at /home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/lib
+-- Configuring done (0.9s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/johan/src/socutils/lib/build
+cmake --build lib/build -- -j32
+gmake[1]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[1]: warning: -j32 forced in submake: resetting jobserver mode.
+gmake[2]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+gmake[3]: Entering directory '/home/johan/src/socutils/lib/build'
+[  4%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_mat.c.o
+[ 13%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_general.c.o
+[ 13%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_int_sph.c.o
+[ 17%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_int_sph_basic.c.o
+[ 30%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_dhf_sph.c.o
+[ 30%] Building C object ao2mo/CMakeFiles/nrr_opt.dir/nrr_ao2mo_opt.c.o
+[ 26%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_int_sph_gauge.c.o
+[ 34%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_int_sph_gaunt.c.o
+[ 39%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_dhf_sph_pcc.c.o
+[ 43%] Building C object x2camf/CMakeFiles/x2camf_c.dir/csrc/x2c_dhf_sph_ca.c.o
+[ 47%] Building C object x2camf/CMakeFiles/x2camf_c.dir/c_api/x2camf_c.c.o
+[ 52%] Building C object ccsdt/CMakeFiles/ccsdt_clib.dir/ccsdt_asym.c.o
+[ 56%] Building C object ccsdt/CMakeFiles/ccsdt_clib.dir/ccsdt_pack.c.o
+[ 60%] Building CXX object zquatev/CMakeFiles/zquatev.dir/csrc/zquatev.cc.o
+[ 69%] Building CXX object zquatev/CMakeFiles/zquatev.dir/capi/zquatev_capi.cc.o
+[ 69%] Building CXX object zquatev/CMakeFiles/zquatev.dir/csrc/transpose.cc.o
+[ 73%] Building C object ccsdt/CMakeFiles/ccsdt_clib.dir/ccsdt_asym_pack.c.o
+[ 78%] Building CXX object zquatev/CMakeFiles/zquatev.dir/csrc/unblocked.cc.o
+[ 82%] Building CXX object zquatev/CMakeFiles/zquatev.dir/csrc/blocked.cc.o
+/home/johan/src/socutils/lib/ccsdt/ccsdt_asym_pack.c: In function ‘ccsdt_pp_to_pack’:
+/home/johan/src/socutils/lib/ccsdt/ccsdt_asym_pack.c:206:16: warning: unused variable ‘sc’ [-Wunused-variable]
+  206 |     const long sc = 1, sQ = nv, sI = vpair*nv;
+      |                ^~
+[ 86%] Linking C shared library /home/johan/src/socutils/lib/libnrr_opt.so
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+[ 86%] Built target nrr_opt
+[ 91%] Linking C shared library /home/johan/src/socutils/lib/libccsdt_clib.so
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+[ 91%] Built target ccsdt_clib
+[ 95%] Linking C shared library /home/johan/src/socutils/lib/libx2camf_c.so
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+[ 95%] Built target x2camf_c
+[100%] Linking CXX shared library /home/johan/src/socutils/lib/libzquatev.so
+gmake[3]: Leaving directory '/home/johan/src/socutils/lib/build'
+[100%] Built target zquatev
+gmake[2]: Leaving directory '/home/johan/src/socutils/lib/build'
+gmake[1]: Leaving directory '/home/johan/src/socutils/lib/build'
+built lib/libx2camf_c.so
+built lib/libccsdt_clib.so
+built lib/libzquatev.so
+built lib/libnrr_opt.so
+make: Leaving directory '/home/johan/src/socutils'
+--- /home/johan/src/socutils has no packaging; writing /home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/socutils-dev.pth
+    sys.path += /home/johan/src
+--- updating /home/johan/src/prism
+Already up to date.
+--- /home/johan/src/prism has no packaging; writing /home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/prism-dev.pth
+    sys.path += /home/johan/src
+--- linking socutils into prism
+    replaced empty submodule dir with link -> /home/johan/src/socutils
+--- prism dependencies
+    present    psutil
+    present    sympy
+    present    opt_einsum
+    present    h5py
+    present    numpy
+    present    scipy
+
+=== smoke test ===
+  ok      pyscf            2.14.0        /home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/__init__.py
+  ok      socutils         (no __version__)  /home/johan/src/socutils/__init__.py
+  ok      socutils.somf    (no __version__)  /home/johan/src/socutils/somf/__init__.py
+  ok      prism            (no __version__)  /home/johan/src/prism/__init__.py
+  ok      prism.interface  (no __version__)  /home/johan/src/prism/interface.py
+  ok      prism.nevpt      (no __version__)  /home/johan/src/prism/nevpt/__init__.py
+  ok      prism.libsoc.general_somf (no __version__)  /home/johan/src/prism/libsoc/general_somf.py
+  ok      x2camf           (bundled)  /home/johan/src/socutils/x2camf_c/x2camf/__init__.py
+  absent  zquatev / socutils.zquatev  -- 01_soc_probe.py will say whether this matters
+
+=== done. next: python 01_soc_probe.py 2>&1 | tee logs/soc_probe.log ===

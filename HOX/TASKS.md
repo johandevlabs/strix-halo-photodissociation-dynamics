@@ -369,6 +369,34 @@ was only ever needed across the Franck-Condon window."*
       the same active space and SC-NEVPT2, against the multi-state 3.4477 eV
       and dCCSD(T) 3.4142 eV.
 
+      Both are `07_fc_active_space.py`, on a uniform grid r_eq + k x 0.05 A,
+      k = -3..4 (1.54-1.89 A, equilibrium included):
+      1. prints the AVAS projection eigenvalues and the atomic character of
+         the borderline orbitals at each point, to show whether the switch is
+         the 6th occupied orbital drifting through the 0.2 threshold;
+      2. selects FIXED sizes by reimplementing AVAS's projector with an
+         orbital count instead of a threshold, and checks against a real
+         `avas.avas` call at every point that the reimplementation agrees;
+      3. for CAS(10,6) and CAS(12,7), computes singlet (CASSCF + NEVPT2) and
+         triplet (4-root 3A" SA-CASSCF + NEVPT2 on root 0) with identical
+         starting orbitals, and reports convergence, roughness against a smooth
+         quartic, and the equilibrium vertical energy against both references.
+
+      Decision rule: a space is usable only if it converges everywhere in the
+      window without a kink. If both are usable and their equilibrium vertical
+      energies agree within 0.05 eV, take the smaller (cheaper, and already
+      validated to 3.6 A in `06`). If they differ by more, the extra orbital
+      matters and the larger space has to be re-validated along the whole
+      dissociation cut first.
+
+      Checked before sending, on synthetic inputs: the block assembly of the
+      fixed selection, and all four verdict outcomes (agree, spread,
+      unconverged, kink). The first kink test used a ratio of second
+      differences, which flagged every nearly straight curve as kinked because
+      the median is numerical noise. It was replaced with a deviation in meV
+      from a quartic fit. Measured sensitivity: noise gives 0.2-0.4 meV, and a
+      50 meV step gives 13 meV. Steps below ~40 meV would pass unflagged.
+
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI
         object's attributes by reference and its kernel replaces

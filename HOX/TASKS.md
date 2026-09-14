@@ -268,18 +268,55 @@ was only ever needed across the Franck-Condon window."*
       The fragment asymptote also failed under Cs (OH is C∞v, Cl an atom); it
       now always runs without symmetry.
 
-- [ ] **Rerun with `--pin-irrep`.** Pins each spin's equilibrium occupation
-      along the whole scan, and at every point also runs an unconstrained SCF
-      to report whether aufbau would have left that occupation. One run
-      separates the two explanations:
-      - aufbau switches near 2.2-2.8 A **and** the pinned curve is smooth: an
-        A'/A" occupation flip, fixed for free by `irrep_nelec`.
-      - no switch, or still kinked when pinned: a same-symmetry problem (a
-        3A" avoided crossing, or a different local SCF solution) that pinning
-        cannot reach.
-- [ ] If pinning does not fix it, the region genuinely needs a multireference
-      treatment: either patch 2.2-2.8 A with CASSCF/NEVPT2 and splice, or
-      accept the multireference route for the triplet surface as a whole.
+- [x] **Rerun with `--pin-irrep` — no state switch.** Equilibrium triplet
+      occupation {A': (11,10), A": (3,2)} = 3A". Unconstrained aufbau kept it
+      at every point from 1.4 to 4.0 A, and the pinned energies match the
+      unpinned ones to ~1e-7 Ha, kink included. So the kink is not an A'/A"
+      flip. Whatever crowds our state is itself 3A": a 3A' would genuinely
+      cross, aufbau would have jumped to it, and this run would have said so.
+
+- [ ] **Is it an avoided crossing?** Johan's reading of the plots: a higher
+      3A" state appears to come down and meet ours near 2.5 A. It fits
+      everything so far:
+      - same-symmetry states repel rather than cross, and the pin run shows
+        any partner must be 3A";
+      - T1 settles at a *different* level on each side (0.024-0.030 inside,
+        0.014-0.018 outside), like a change of dominant configuration rather
+        than a method steadily failing;
+      - OH(2Pi) + Cl(2P) gives 6 spatial states, singlet and triplet each, so
+        several 3A" states converge on one asymptote.
+
+      Earlier wording in `05` called the drop at 2.60 A "unphysical for a
+      dissociating state". That overstated it: a real avoided crossing can put
+      a hump into the lower adiabat. What `05` shows is that a single
+      determinant cannot follow a change of configuration, not what the true
+      curve does. Reworded.
+
+      `06_triplet_manifold.py` computes several 3A" roots together along the
+      same cut (SA-CASSCF, symmetry forced to A", S = 1, then SC-NEVPT2 per
+      root, AVAS rebuilt per point as in `water/03_tdm_check.py`) and reports
+      three measures that do not depend on active-orbital ordering, which
+      changes along a scan: the root 1 - root 0 gap, a localised dip in each
+      root's dominant-configuration weight, and whether the roots *exchange
+      dipole moments* across the gap minimum. Its verdict logic was checked on
+      synthetic weak, strong and no-crossing cases before being sent to the
+      EVO.
+
+- [ ] **If it is an avoided crossing, what to propagate on.** A fast packet
+      at a narrowly avoided crossing tends to stay diabatic (Landau-Zener).
+      `06` prints a rough 1D Landau-Zener probability from the computed gap,
+      diabatic slopes and the kinetic energy gained falling from the FC
+      region. Large P: propagate on the diabatic continuation, or both states
+      coupled, not the lower adiabat, however well computed. Small P: a single
+      adiabatic surface is right. In between: two coupled states. The sampled
+      gap can only overestimate the true minimum, so the true P is at least the
+      printed one. This also bears on products: the Cl 2P spin-orbit splitting
+      (882 cm-1, 0.11 eV) is the size of the gaps here, so the Cl(2P3/2) vs
+      Cl(2P1/2) branching is plausibly decided in this region.
+
+- [ ] Whatever `06` shows, the region needs a multireference treatment for the
+      surface: patch 2.2-2.8 A with CASSCF/NEVPT2 and splice, or accept it for
+      the triplet surface as a whole.
 - [ ] Cost so far: 830 CPU-s/point averaged over the scan (worse than the
       594 at equilibrium, as expected away from it) = **47 h for 3289 points
       on 16 cores**, against 330 h for the full multi-state route.

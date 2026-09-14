@@ -165,12 +165,15 @@ def fragment_asymptote(basis, verbose=0):
 
 
 def analyse_smoothness(rows, key="e_t"):
-    """Find kinks in a curve that physics says should be smooth.
+    """Find kinks a single-reference curve cannot be trusted through.
 
-    Past its minimum a dissociating state must rise monotonically towards the
-    asymptote. A decrease after that point is not a feature of the potential,
-    it is the reference changing character -- and unlike a T1 spike it shows up
-    directly as a defect in the surface the propagation would use.
+    Past its minimum a dissociating state normally rises monotonically towards
+    the asymptote, so a drop there is suspect. It does NOT by itself prove the
+    true potential is monotonic: an avoided crossing can put a real hump or a
+    second dip into the lower adiabat. What it does show is that this method
+    is not describing the region smoothly -- a single determinant cannot
+    follow a change of dominant configuration -- and 06_triplet_manifold.py is
+    what tells the two cases apart.
 
     Returns (monotonicity violations, worst second difference), both as lists
     of (r, value).
@@ -417,19 +420,22 @@ def main():
              if "t1_s" in r and r["t1_s"] > T1_THRESHOLD_CLOSED]
 
     # A kink in the curve is more damning than a T1 value: T1 warns that the
-    # reference is strained, a non-monotonic tail proves the surface is wrong.
+    # reference is strained, a non-monotonic tail shows the method is not
+    # describing the region smoothly. Neither says what the TRUE curve does.
     viol, kinks = analyse_smoothness(rows, "e_t")
     if viol or kinks:
-        print("  TRIPLET SURFACE IS NOT SMOOTH.")
+        print("  TRIPLET CURVE IS NOT SMOOTH.")
         for r, dv in viol:
             print(f"    r = {r:.2f} A: energy DROPS by {abs(dv):.4f} eV past "
-                  f"the minimum -- unphysical for a dissociating state")
+                  f"the minimum")
         for r, dv in kinks:
             print(f"    r = {r:.2f} A: second difference {dv:+.4f} eV, far "
                   f"above the curve's typical curvature")
-        print("  This is a defect in the potential itself, not a warning about")
-        print("  the reference. A propagation on this surface would scatter the")
-        print("  wavepacket off an artefact.")
+        print("  This method does not describe the region smoothly, so this")
+        print("  curve cannot be propagated on as it stands. It does NOT show")
+        print("  the true potential is monotonic: an avoided crossing can put a")
+        print("  real hump in the lower state. 06_triplet_manifold.py tells the")
+        print("  two apart.")
         print()
 
     # Did the reference change STATE along the scan? Decisive for the repair:
@@ -457,8 +463,8 @@ def main():
                 print("  So the kink is NOT an A'/A\" occupation flip. It is a")
                 print("  same-symmetry problem -- a 3A\" avoided crossing or the")
                 print("  SCF landing in a different local solution of the same")
-                print("  occupation -- which pinning cannot reach. That region")
-                print("  needs a multireference treatment.")
+                print("  occupation -- which pinning cannot reach. Run")
+                print("  06_triplet_manifold.py to see which.")
         print()
     elif sym:
         labels = sorted({r["label_t"] for r in rows

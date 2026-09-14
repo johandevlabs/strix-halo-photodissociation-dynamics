@@ -1,0 +1,48 @@
+==============================================================================
+== HOX Phase 0.5 -- the 3A" manifold along the O-Cl cut
+== 4 roots, AVAS ['Cl 3p', 'O 2p'] (minao ano), def2-tzvp, SC-NEVPT2
+== r = 1.7 to 3.2 A in 16 points
+==============================================================================
+
+     r/A      CAS conv            E0/Ha            E1/Ha            E2/Ha            E3/Ha  gap/eV    w0    w1  |mu0|  |mu1|   t/s
+   1.700   (12,7)  yes    -536.60521135    -536.47223295    -536.40183444    -536.28717643   3.619  0.88  0.78   1.86   1.74    35  
+   1.800   (10,6)  yes    -536.63177939    -536.52713396    -536.46160193    -536.35236149   2.848  0.82  0.71   2.17   1.99    23  
+   1.900   (10,6)  yes    -536.64222036    -536.55973659    -536.50393159    -536.39036809   2.244  0.74  0.62   2.54   2.30    20  
+   2.000   (10,6)  yes    -536.64779694    -536.58342363    -536.53822881    -536.41751985   1.752  0.64  0.54   2.94   2.64    17  
+   2.100   (10,6)  yes    -536.65014509    -536.60051773    -536.56492719    -536.43714273   1.350  0.55  0.45   3.30   2.96    17  
+   2.200   (10,6)  yes    -536.65060399    -536.61279441    -536.58518733    -536.45147632   1.029  0.45  0.37   3.60   3.25    19  
+   2.300   (10,6)  yes    -536.65009369    -536.62156516    -536.60033490    -536.46200918   0.776  0.39  0.35   3.82   3.49    19  
+   2.400   (10,6)  yes    -536.64919938    -536.62779212    -536.61157268    -536.46978982   0.583  0.41  0.39   3.61   3.23    18  
+   2.500   (10,6)  yes    -536.64826330    -536.63221110    -536.61981807    -536.47555400   0.437  0.42  0.42   3.27   2.89    17  
+   2.600   (10,6)  yes    -536.64734404    -536.63526570    -536.62581263    -536.47976352   0.329  0.43  0.45   3.41   3.12    19  
+   2.700   (10,6)  yes    -536.64654938    -536.63738641    -536.63017435    -536.48287515   0.249  0.43  0.47   3.61   3.38    20  
+   2.800   (10,6)  yes    -536.64587144    -536.63885111    -536.63333071    -536.48513879   0.191  0.43  0.48   3.84   3.67    17  
+   2.900   (10,6)  yes    -536.64529256    -536.63983362    -536.63560711    -536.48677636   0.149  0.43  0.50   4.11   3.97    18  
+   3.000   (10,6)  yes    -536.64482023    -536.64049836    -536.63723832    -536.48794791   0.118  0.43  0.51   4.40   4.28    19  
+   3.100   (10,6)  yes    -536.64440754    -536.64092844    -536.63840305    -536.48878691   0.095  0.42  0.52   4.70   4.59    18  
+   3.200   (10,6)  yes    -536.64405217    -536.64119544    -536.63922124    -536.48939002   0.078  0.44  0.53   5.00   4.90    17  
+
+  wrote hocl_triplet_manifold_cas2.csv
+  wrote hocl_triplet_manifold_cas2.png
+
+==============================================================================
+== verdict
+==============================================================================
+  !! AVAS chose different active spaces along the scan: [(np.int64(10), 6), (np.int64(12), 7)]. Energies at points with a different space
+     are not on the same footing; treat the curves as suspect.
+  smallest root 1 - root 0 gap: 0.078 eV at r = 3.20 A  (grid spacing 0.100 A)
+  dipoles: root 0 |mu| 4.40 -> 5.00 D, root 1 4.28 -> 4.90 D across r = 3.00-3.20 A  -> not exchanged
+  dominant-configuration weight dip near the minimum: root 0 0.01, root 1 -0.02 below their scan medians  -> no localised mixing
+  05 UCCSD(T) max T1 at r = 2.60 A, 0.60 A from the gap minimum
+
+  -> INCONCLUSIVE at this resolution. Rerun on a narrow window around 3.20 A,
+     e.g. --rmin 3.00 --rmax 3.40 --npoints 17.
+
+  Landau-Zener estimate of staying DIABATIC: P = 0.22
+     (H12 38.9 meV, dF 0.0045 Ha/bohr, E_kin 1.02 eV, v 1.89e-03 au)
+     Rough, 1D and classical. The sampled gap can only be LARGER than the
+     true minimum on this grid, so the true P is at least this large.
+     Neither limit holds: this region needs the two states propagated
+     together with their coupling.
+
+  cost: 9981 CPU-s over 16 points (624 CPU-s/point, 5.2 min wall)

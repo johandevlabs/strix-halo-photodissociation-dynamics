@@ -254,12 +254,30 @@ was only ever needed across the Franck-Condon window."*
       artefact is precisely the class of quiet wrong answer this repo
       catalogues.
 
-- [ ] **Rerun the scan with `--symmetry Cs`.** The scan above ran with
-      symmetry OFF. If the kink is a 3A"/3A' state-following artefact, forcing
-      the irrep removes it, and this is the cheapest possible test —
-      water/README.md's "force the point group, don't detect it" predicts
-      exactly this failure.
-- [ ] If Cs does not fix it, the region genuinely needs a multireference
+- [x] **Rerun with `--symmetry Cs` — changed nothing, and could not have.**
+      Energies matched the unsymmetric scan to ~3e-7 Ha at every point,
+      including 2.40 and 2.60 A. That is not evidence against a state switch;
+      it shows the test was the wrong one. In water, forcing the point group
+      worked because state-averaged CASSCF *labels its roots*. A state-specific
+      SCF with symmetry on still fills orbitals by aufbau — it only makes them
+      symmetry-pure, and for a planar molecule they already were. What pins a
+      single determinant to 3A" is `irrep_nelec`, the alpha/beta count per
+      irrep. **The water gotcha needs a different mechanism for state-specific
+      references**, and that belongs in the gotchas list once confirmed.
+
+      The fragment asymptote also failed under Cs (OH is C∞v, Cl an atom); it
+      now always runs without symmetry.
+
+- [ ] **Rerun with `--pin-irrep`.** Pins each spin's equilibrium occupation
+      along the whole scan, and at every point also runs an unconstrained SCF
+      to report whether aufbau would have left that occupation. One run
+      separates the two explanations:
+      - aufbau switches near 2.2-2.8 A **and** the pinned curve is smooth: an
+        A'/A" occupation flip, fixed for free by `irrep_nelec`.
+      - no switch, or still kinked when pinned: a same-symmetry problem (a
+        3A" avoided crossing, or a different local SCF solution) that pinning
+        cannot reach.
+- [ ] If pinning does not fix it, the region genuinely needs a multireference
       treatment: either patch 2.2-2.8 A with CASSCF/NEVPT2 and splice, or
       accept the multireference route for the triplet surface as a whole.
 - [ ] Cost so far: 830 CPU-s/point averaged over the scan (worse than the

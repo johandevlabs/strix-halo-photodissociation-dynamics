@@ -86,18 +86,62 @@ def t1_diagnostic(mycc):
     return norm / np.sqrt(nelec) if nelec else float("nan")
 
 
-def run_point(atom, spin, basis, symmetry, verbose=0):
-    """CCSD(T) on the lowest state of this spin. Returns a dict of results."""
+def irrep_occupation(mf):
+    """Electrons per irrep as {irrep: (alpha, beta)}; None without symmetry."""
+    if not mf.mol.symmetry:
+        return None
+    try:
+        raw = mf.get_irrep_nelec()
+    except Exception:
+        return None
+    occ = {}
+    for k, v in raw.items():
+        if isinstance(v, (tuple, list, np.ndarray)):
+            occ[k] = (int(v[0]), int(v[1]))
+        else:                                   # RHF reports the total
+            occ[k] = (int(v) // 2, int(v) // 2)
+    return occ
+
+
+def state_label(occ, spin):
+    """Multiplicity plus overall Cs symmetry, read off the open shells.
+
+    In Cs, A' x A' = A" x A" = A' and A' x A" = A", so the state is A" exactly
+    when an odd number of open-shell electrons sit in a" orbitals.
+    """
+    if occ is None:
+        return "--"
+    n_app = sum(a - b for k, (a, b) in occ.items() if '"' in k)
+    sym = 'A"' if n_app % 2 else "A'"
+    return f"{spin + 1}{sym}"
+
+
+def run_point(atom, spin, basis, symmetry, verbose=0, pin=None, cc_on=True):
+    """CCSD(T) on one state of this spin. Returns a dict of results.
+
+    pin: {irrep: (alpha, beta)} to impose via irrep_nelec. Without it, an SCF
+    fills orbitals by aufbau and can land on a different state at a different
+    geometry. With symmetry on but nothing pinned, the orbitals are merely
+    symmetry-PURE -- which for a planar molecule they already were, and why a
+    bare --symmetry Cs reproduced the unsymmetric scan to 3e-7 Ha.
+    """
     mol = gto.M(atom=atom, basis=basis, spin=spin, charge=0,
                 symmetry=symmetry, unit="Angstrom", verbose=verbose)
     mf = (scf.RHF(mol) if spin == 0 else scf.ROHF(mol)).x2c()
     mf.conv_tol = 1e-11
+    if pin is not None:
+        # RHF wants a total per irrep, ROHF an (alpha, beta) pair.
+        mf.irrep_nelec = {k: (a + b if spin == 0 else (a, b))
+                          for k, (a, b) in pin.items()}
     mf.kernel()
 
+    occ = irrep_occupation(mf)
     out = {"e_scf": mf.e_tot, "scf_conv": bool(mf.converged),
-           "s2": float("nan")}
+           "s2": float("nan"), "occ": occ, "label": state_label(occ, spin)}
     if spin != 0:
         out["s2"] = float(mf.spin_square()[0])
+    if not cc_on:
+        return out
 
     mycc = cc.CCSD(mf)
     mycc.conv_tol = 1e-9
@@ -108,11 +152,15 @@ def run_point(atom, spin, basis, symmetry, verbose=0):
     return out
 
 
-def fragment_asymptote(basis, symmetry, verbose=0):
-    """E(OH) + E(Cl) as separated fragments -- water's 05_oh_diatomic move."""
+def fragment_asymptote(basis, verbose=0):
+    """E(OH) + E(Cl) as separated fragments -- water's 05_oh_diatomic move.
+
+    Always without symmetry: OH is C-infinity-v and Cl is an atom, so asking
+    for Cs raises PointGroupSymmetryError, and the energies do not need it.
+    """
     oh = run_point([["O", (0.0, 0.0, 0.0)], ["H", (0.0, 0.0, R_OH_ANG)]],
-                   1, basis, symmetry, verbose)
-    cl = run_point([["Cl", (0.0, 0.0, 0.0)]], 1, basis, symmetry, verbose)
+                   1, basis, False, verbose)
+    cl = run_point([["Cl", (0.0, 0.0, 0.0)]], 1, basis, False, verbose)
     return oh, cl
 
 
@@ -207,6 +255,11 @@ def main():
     p.add_argument("--rmin", type=float, default=1.4)
     p.add_argument("--rmax", type=float, default=4.0)
     p.add_argument("--npoints", type=int, default=14)
+    p.add_argument("--pin-irrep", action="store_true",
+                   help="hold each spin's EQUILIBRIUM irrep occupation fixed "
+                        "along the scan via irrep_nelec (implies Cs). Also "
+                        "runs an unconstrained SCF at every point and reports "
+                        "whether it would have landed on a different state.")
     p.add_argument("--triplet-only", action="store_true",
                    help="skip the singlet; it is only needed in the bound "
                         "region anyway")
@@ -217,7 +270,28 @@ def main():
     args = p.parse_args()
 
     sym = args.symmetry if args.symmetry else False
+    if args.pin_irrep and not sym:
+        sym = "Cs"
+        print("  --pin-irrep needs a point group; using Cs")
     rs = np.linspace(args.rmin, args.rmax, args.npoints)
+
+    pin_s = pin_t = None
+    if args.pin_irrep:
+        # Take the occupation from EQUILIBRIUM, where 04 showed this reference
+        # reproduces the multi-state a 3A" to 0.034 eV. That is the state we
+        # want to follow; the question is whether aufbau abandons it.
+        eq = geometry(R_OCL_EQ_ANG)
+        t_eq = run_point(eq, 2, args.basis, sym, args.verbose, cc_on=False)
+        pin_t = t_eq["occ"]
+        print(f"  pinned triplet occupation from r = {R_OCL_EQ_ANG} A: "
+              f"{pin_t}  -> {t_eq['label']}")
+        if t_eq["label"] != '3A"':
+            print("  !! the equilibrium triplet reference is NOT 3A\". Pinning"
+                  " it would follow the wrong state; check the geometry.")
+        if not args.triplet_only:
+            s_eq = run_point(eq, 0, args.basis, sym, args.verbose, cc_on=False)
+            pin_s = s_eq["occ"]
+            print(f"  pinned singlet occupation: {pin_s}  -> {s_eq['label']}")
 
     print("=" * 78)
     print("== HOX Phase 0.5 -- dCCSD(T) along the O-Cl dissociation coordinate")
@@ -229,21 +303,38 @@ def main():
     t0, c0 = time.time(), time.process_time()
     rows = []
     print(f"\n  {'r/A':>7}{'E(S)/Ha':>18}{'T1(S)':>8}"
-          f"{'E(T)/Ha':>18}{'T1(T)':>8}{'<S^2>':>8}{'dE/eV':>9}  flags")
+          f"{'E(T)/Ha':>18}{'T1(T)':>8}{'<S^2>':>8}{'state':>7}"
+          f"{'dE/eV':>9}  flags")
     for r in rs:
         atom = geometry(r)
         row = {"r": r}
         flags = []
         try:
             if not args.triplet_only:
-                s = run_point(atom, 0, args.basis, sym, args.verbose)
+                s = run_point(atom, 0, args.basis, sym, args.verbose,
+                              pin=pin_s)
                 row["e_s"], row["t1_s"] = s["e_tot"], s["t1"]
                 if s["t1"] > T1_THRESHOLD_CLOSED:
                     flags.append("S:T1")
                 if not (s["scf_conv"] and s["cc_conv"]):
                     flags.append("S:noconv")
-            t = run_point(atom, 2, args.basis, sym, args.verbose)
+
+            if pin_t is not None:
+                # Where would an unconstrained SCF have gone? SCF alone is
+                # seconds, so asking costs almost nothing next to CCSD(T).
+                free = run_point(atom, 2, args.basis, sym, args.verbose,
+                                 cc_on=False)
+                row["label_free"] = free["label"]
+                if free["occ"] != pin_t:
+                    flags.append(f"T:aufbau->{free['label']}")
+                    row["switch"] = True
+
+            t = run_point(atom, 2, args.basis, sym, args.verbose, pin=pin_t)
             row["e_t"], row["t1_t"], row["s2"] = t["e_tot"], t["t1"], t["s2"]
+            row["label_t"] = t["label"]
+            if pin_t is not None and row.get("switch"):
+                gap = (free["e_scf"] - t["e_scf"]) * HARTREE2EV
+                row["free_minus_pinned_scf_ev"] = gap
             if t["t1"] > T1_THRESHOLD_OPEN:
                 flags.append("T:T1")
             if not (t["scf_conv"] and t["cc_conv"]):
@@ -257,7 +348,8 @@ def main():
             es = f"{row.get('e_s', float('nan')):18.8f}"
             t1s = f"{row.get('t1_s', float('nan')):8.4f}"
             print(f"  {r:7.3f}{es}{t1s}{row['e_t']:18.8f}{row['t1_t']:8.4f}"
-                  f"{row['s2']:8.4f}{de:9.4f}  {' '.join(flags)}")
+                  f"{row['s2']:8.4f}{row['label_t']:>7}{de:9.4f}  "
+                  f"{' '.join(flags)}")
         except Exception as exc:
             print(f"  {r:7.3f}  FAILED: {type(exc).__name__}: {exc}")
             traceback.print_exc()
@@ -268,7 +360,7 @@ def main():
     if not args.no_asymptote:
         print("\n  --- separated fragments (size-consistency check)")
         try:
-            oh, cl = fragment_asymptote(args.basis, sym, args.verbose)
+            oh, cl = fragment_asymptote(args.basis, args.verbose)
             e_inf = oh["e_tot"] + cl["e_tot"]
             print(f"      OH(2Pi)   {oh['e_tot']:18.8f} Ha  "
                   f"T1 {oh['t1']:.4f}")
@@ -296,7 +388,8 @@ def main():
     # ------------------------------------------------------------------ csv
     if rows:
         import csv
-        keys = ["r", "e_s", "t1_s", "e_t", "t1_t", "s2", "de"]
+        keys = ["r", "e_s", "t1_s", "e_t", "t1_t", "s2", "de",
+                "label_t", "label_free", "free_minus_pinned_scf_ev"]
         with open(args.csv, "w", newline="") as fh:
             w = csv.DictWriter(fh, fieldnames=keys, extrasaction="ignore")
             w.writeheader()
@@ -337,6 +430,40 @@ def main():
         print("  This is a defect in the potential itself, not a warning about")
         print("  the reference. A propagation on this surface would scatter the")
         print("  wavepacket off an artefact.")
+        print()
+
+    # Did the reference change STATE along the scan? Decisive for the repair:
+    # an occupation flip is fixed by pinning; a same-symmetry problem is not.
+    switches = [r for r in rows if r.get("switch")]
+    if args.pin_irrep:
+        if switches:
+            where = ", ".join(f"{r['r']:.2f} ({r['label_free']}, "
+                              f"{r.get('free_minus_pinned_scf_ev', 0):+.3f} eV)"
+                              for r in switches)
+            print(f"  STATE SWITCH: unconstrained aufbau left the equilibrium "
+                  f"occupation at r = {where}")
+            print("  (the eV figure is SCF(free) - SCF(pinned); negative means")
+            print("  aufbau found a LOWER determinant of different occupation.)")
+            if viol or kinks:
+                print("  The pinned curve is STILL kinked, so the occupation flip")
+                print("  is not the whole story -- see the T1 values below.")
+            else:
+                print("  The pinned curve is smooth. The kink was the SCF")
+                print("  changing state, and irrep_nelec repairs it cheaply.")
+        else:
+            print("  No state switch: unconstrained aufbau kept the equilibrium")
+            print("  occupation at every point.")
+            if viol or kinks:
+                print("  So the kink is NOT an A'/A\" occupation flip. It is a")
+                print("  same-symmetry problem -- a 3A\" avoided crossing or the")
+                print("  SCF landing in a different local solution of the same")
+                print("  occupation -- which pinning cannot reach. That region")
+                print("  needs a multireference treatment.")
+        print()
+    elif sym:
+        labels = sorted({r["label_t"] for r in rows
+                         if r.get("label_t") not in (None, "--")})
+        print(f"  triplet state labels along the scan: {', '.join(labels)}")
         print()
 
     if bad_t:

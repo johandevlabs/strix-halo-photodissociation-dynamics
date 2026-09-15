@@ -837,6 +837,86 @@ was only ever needed across the Franck-Condon window."*
         treatment with SOC, and it is optional scope, not a blocker for the
         band.
 
+      **Decision, 2026-09-15: band first.** The crossing is left for product
+      branching.
+
+- [x] **1D scoping model, `10_band_1d.py`.** Built from data already in the
+      repo, NumPy only, 13 s on the laptop. V_S from CCSD(T); V_T from
+      E_CCSD(T) + omega(EOM-CCSD) to 2.29 A, anchored at 1.40 A by UCCSD(T)
+      (moved onto EOM's scale, +16 meV); three tails beyond 2.29 A (06's
+      3A" NEVPT2 shifted, flat, linear). Split-operator propagation and
+      `water/09_propagate.py`'s cross-section formula. Condon.
+
+      **Result: the band depends on V_T only out to ~2 A.** Positive controls
+      pass, so the test can detect sensitivity:
+
+      | change | band change |
+      | --- | --- |
+      | absorber from 1.6 A (inside chi_0) | **13.2%** |
+      | absorber from 1.7 A | 1.5% |
+      | absorber from 1.8 A | 0.05% |
+      | absorber from 1.9 to 2.6 A | 0.00% |
+      | V_T flattened beyond 1.78 A | **99%** |
+      | V_T flattened beyond 1.85 A | 11.3% |
+      | V_T flattened beyond 1.95 A | 0.7% |
+      | V_T flattened beyond 2.10 A | 0.1% |
+      | any tail, absorber strength or ramp length, from 2.3 A out | < 0.02% |
+
+      CCSD(T) + EOM-CCSD, trusted to 2.29 A, covers the part of the surface
+      the band depends on with ~0.3 A to spare. The 3A'/3A" crossing near
+      2.4 A does not reach the band in this model.
+
+      Orientation, not results:
+      - 1D ground well: minimum 1.6986 A, O-Cl stretch **736 cm-1** (v=1<-0)
+        against ~725 cm-1 measured (quoted from memory, verify). A useful
+        check on the ground surface and the reduced mass.
+      - Band peak **373 nm**, FWHM 0.72 eV, against the measured ~380 nm.
+      - Peak sigma 2.5e-22 cm2 against ~4e-21 measured: **16x low**, in line
+        with the earlier estimate that `03`'s f is 10-25x too small. Absolute
+        intensity is the weakest number here.
+      - **Temperature dependence, O-Cl stretch hot bands only:**
+        sigma(298 K)/sigma(200 K) = 0.98 at 380 nm, 1.01 at 420 nm, **1.12 at
+        450 nm, 1.42 at 480 nm**. Negligible at the peak, and growing into
+        the red tail. That is the kind of effect HOX is after for HOBr at
+        440-500 nm, but 1D omits the bend (~1240 cm-1) and OH hot bands
+        entirely, so the size must come from 3D.
+
+      Three mistakes caught on the way, all in the test rather than the
+      physics:
+      - The first absorber ramped as the cube over the whole remaining grid,
+        so an absorber "from 2.0 A" was at 1e-4 of its strength 0.1 A later
+        and really absorbed from ~2.6 A. Replaced with a fixed 0.4 A ramp.
+      - The first "positive control", an absorber from 1.8 A, was not one: it
+        sits outside chi_0, so it changed the band by 0.05%, and the verdict
+        correctly refused to conclude. Real controls are an absorber inside
+        chi_0 (1.6 A) and cutting the surface on the Franck-Condon slope
+        (1.78 A).
+      - A plot scaled each chi by max() rather than |chi|.max(); eigenvector
+        signs are arbitrary, so a negative chi got divided by ~1e-10 tail
+        noise and showed a spurious jag. The wavefunctions were checked
+        directly (amplitude beyond 2.25 A <= 4e-10 of peak), and no number was
+        affected.
+
+- [ ] **Phase 1 proper, for the band:**
+      - [ ] **First, check EOM-CCSD across the other two coordinates** in the
+            Franck-Condon region, the O-H stretch and the bend: T1(S), the gap
+            to the next triplet, and smoothness. The 1D model only
+            established the O-Cl direction. Cheap, and a 3D raster depends on
+            it.
+      - [ ] 3D raster of CCSD(T) + EOM-CCSD over r(O-Cl) <= ~2.4 A and the
+            bound range of r(O-H) and the angle; one calculation gives both
+            surfaces. At ~570 CPU-s per point, a grid of roughly
+            21 x 7 x 11 points is ~16 h on 16 cores (rough).
+      - [ ] Jacobi transform, relaxation and propagation from `water/`, with
+            an absorber from ~2.3 A along the dissociation coordinate, and
+            the absorber-position check repeated in 3D.
+      - [ ] Transition dipole: Condon first; then mu_SOC over the
+            Franck-Condon window from `03`'s machinery, with
+            `water/10_mu_sensitivity.py`'s test of how much its variation
+            matters.
+      - [ ] sigma(lambda, T) with bend and O-H hot bands included, against
+            the measured 380 nm band.
+
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI
         object's attributes by reference and its kernel replaces

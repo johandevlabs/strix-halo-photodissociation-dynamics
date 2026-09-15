@@ -1,0 +1,80 @@
+==============================================================================
+== HOX Phase 1 scoping -- 1D a 3A" band along r(O-Cl)
+==============================================================================
+  singlet points 19 over 1.400-2.400 A;  triplet points 13 over 1.400-2.289 A
+  UCCSD(T) -> EOM scale offset +16.0 meV (median over the shared fine grid)
+  NEVPT2 tail points 37 over 1.800-3.600 A
+  reduced mass OH-Cl 11.440 amu
+
+  1D ground well: minimum 1.6986 A, v=0->1 736 cm-1, v=1->2 726 cm-1
+  (HOCl's O-Cl stretch is ~725 cm-1 experimentally -- quoted from memory, verify;
+   a 1D cut with OH and the angle frozen is not expected to match it exactly)
+
+  grid 1024 points 1.4-3.6 A, dt 1.0 au, 6000 steps = 145 fs, resolution 28 meV
+  Condon |mu| = 3.250e-03 au from 03's f = 8.92e-07
+
+  absorber: ramp of power 3 from onset to full strength over the ramp length, flat beyond
+     tail  join/A  onset  full    eta  peak/eV  peak/nm  FWHM/eV   sigma/cm2  max dev  norm left
+   nevpt2   2.289   3.00  3.40  0.050    3.325    372.9    0.722   2.464e-22    0.00%    5.8e-04
+   nevpt2   2.289   2.60  3.00  0.050    3.325    372.9    0.722   2.465e-22    0.00%    8.9e-05
+   nevpt2   2.289   2.30  2.70  0.050    3.325    372.9    0.722   2.464e-22    0.00%    2.6e-06
+   nevpt2   2.289   2.20  2.60  0.050    3.325    372.9    0.722   2.465e-22    0.00%    2.2e-07
+   nevpt2   2.289   2.10  2.50  0.050    3.325    372.9    0.722   2.464e-22    0.00%    9.0e-09
+   nevpt2   2.289   2.00  2.40  0.050    3.325    372.9    0.722   2.465e-22    0.00%    1.7e-12
+   nevpt2   2.289   1.90  2.30  0.050    3.325    372.9    0.722   2.464e-22    0.00%    3.0e-20
+   nevpt2   2.289   1.80  2.20  0.050    3.325    372.9    0.722   2.464e-22    0.05%    1.2e-34
+   nevpt2   2.289   1.70  2.10  0.050    3.321    373.3    0.714   2.480e-22    1.49%    4.6e-58
+   nevpt2   2.289   1.60  2.00  0.050    3.371    367.8    0.692   2.428e-22   13.19%    1.7e-67
+     flat   2.289   2.30  2.70  0.050    3.325    372.9    0.722   2.464e-22    0.01%    6.1e-07
+   linear   2.289   2.30  2.70  0.050    3.323    373.1    0.722   2.465e-22    0.01%    1.9e-06
+   nevpt2   2.289   2.30  2.70  0.020    3.323    373.1    0.722   2.464e-22    0.02%    3.6e-06
+   nevpt2   2.289   2.30  2.70  0.200    3.325    372.9    0.722   2.464e-22    0.01%    1.8e-06
+   nevpt2   2.289   2.30  3.10  0.050    3.325    372.9    0.722   2.465e-22    0.00%    5.1e-06
+     flat   2.100   3.00  3.40  0.050    3.321    373.3    0.722   2.464e-22    0.10%    7.6e-06
+     flat   1.950   3.00  3.40  0.050    3.331    372.2    0.716   2.475e-22    0.73%    4.5e-03
+     flat   1.850   3.00  3.40  0.050    3.321    373.3    0.632   2.629e-22   11.33%    1.4e-01
+     flat   1.780   3.00  3.40  0.050    2.907    426.5    0.282   3.295e-22   99.32%    2.9e-01
+  max dev = largest change in sigma over the band (sigma > 10% of peak), relative to
+  the peak of the reference setting (first row); norm left = unabsorbed fraction at the end.
+
+  temperature dependence (O-Cl stretch hot bands only), reference setting:
+      200 K  v=1 pop 0.498%  peak  373.3 nm  FWHM 0.706 eV
+      250 K  v=1 pop 1.424%  peak  373.3 nm  FWHM 0.712 eV
+      298 K  v=1 pop 2.777%  peak  372.9 nm  FWHM 0.722 eV
+    sigma(298 K) / sigma(200 K) at 340 nm: 1.005, 380 nm: 0.977, 420 nm: 1.009, 450 nm: 1.118, 480 nm: 1.415
+
+==============================================================================
+== verdict
+==============================================================================
+  Largest band change with the EOM surface intact to 2.29 A and an absorber from
+  2.3 A outward, over all tails, strengths and ramp lengths: 0.02%
+
+  band change against absorber onset (EOM surface intact):
+    onset 2.6 A, full strength at 3.0 A:   0.00%
+    onset 2.3 A, full strength at 2.7 A:   0.00%
+    onset 2.2 A, full strength at 2.6 A:   0.00%
+    onset 2.1 A, full strength at 2.5 A:   0.00%
+    onset 2.0 A, full strength at 2.4 A:   0.00%
+    onset 1.9 A, full strength at 2.3 A:   0.00%
+    onset 1.8 A, full strength at 2.2 A:   0.05%
+    onset 1.7 A, full strength at 2.1 A:   1.49%
+    onset 1.6 A, full strength at 2.0 A:  13.19%
+  band change against where the surface is cut (flat beyond):
+    V_T flattened beyond 2.10 A:   0.10%
+    V_T flattened beyond 1.95 A:   0.73%
+    V_T flattened beyond 1.85 A:  11.33%
+    V_T flattened beyond 1.78 A:  99.32%
+
+  Positive controls pass: absorber from 1.6 A changes the band 13%,
+  flattening beyond 1.78 A changes it 99%. The test can see sensitivity.
+  The band starts to respond (>= 1%) to an absorber from 1.7 A and to a surface
+  cut at 1.85 A.
+  -> The band does not depend on the surface beyond ~2.3 A in this model. CCSD(T) +
+     EOM-CCSD out to 2.3 A with an absorber beyond is enough for sigma(lambda, T);
+     the 3A'/3A" crossing belongs to product branching.
+
+  Orientation only: 1D peak 373 nm against the measured ~380 nm. Frozen OH and bend,
+  Condon, and an absolute sigma sized from 03's f, which is itself uncertain.
+
+  wrote hocl_band_1d.csv
+  wrote hocl_band_1d.png

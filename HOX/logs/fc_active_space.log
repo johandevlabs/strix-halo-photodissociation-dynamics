@@ -1,0 +1,74 @@
+==============================================================================
+== HOX Phase 0.5 -- one active space through the Franck-Condon window
+== def2-tzvp, AVAS ['Cl 3p', 'O 2p'] (minao ano), spaces CAS(10,6), CAS(12,7)
+== r = 1.5391 to 1.8891 A, step 0.05, equilibrium 1.6891 A; triplet SA over 4 3A" roots, singlet 1
+==============================================================================
+
+  1. AVAS projection eigenvalues (occupied top 8 | virtual top 3)
+     AVAS keeps those above 0.2. 'mine' is the count from these eigenvalues,
+     'pyscf' a real avas.avas call; they must agree.
+
+  1.5391  1.00 1.00 0.99 0.97 0.91 0.34 0.00 0.00 | 0.66 0.09 0.03   mine CAS(12, 7) pyscf CAS(12, 7)
+  1.5891  1.00 1.00 0.99 0.98 0.91 0.31 0.00 0.00 | 0.69 0.09 0.02   mine CAS(12, 7) pyscf CAS(12, 7)
+  1.6391  1.00 1.00 0.99 0.98 0.91 0.27 0.00 0.00 | 0.73 0.09 0.02   mine CAS(12, 7) pyscf CAS(12, 7)
+  1.6891  1.00 1.00 0.99 0.98 0.91 0.24 0.00 0.00 | 0.76 0.09 0.02   mine CAS(12, 7) pyscf CAS(12, 7)
+  1.7391  1.00 1.00 0.99 0.98 0.91 0.21 0.00 0.00 | 0.79 0.08 0.02   mine CAS(12, 7) pyscf CAS(12, 7)
+  1.7891  1.00 1.00 0.99 0.98 0.92 0.19 0.00 0.00 | 0.81 0.08 0.02   mine CAS(10, 6) pyscf CAS(10, 6)
+  1.8391  1.00 1.00 0.99 0.99 0.92 0.16 0.00 0.00 | 0.84 0.08 0.01   mine CAS(10, 6) pyscf CAS(10, 6)
+  1.8891  1.00 1.00 0.99 0.99 0.92 0.14 0.00 0.00 | 0.86 0.08 0.01   mine CAS(10, 6) pyscf CAS(10, 6)
+
+     character of occupied #6 and virtual #1 (against the full minao basis):
+  1.5391  occ #6: O 2s 0.53, Cl 3s 0.35, Cl 3p 0.05   vir #1: Cl 3p 0.65, O 2p 0.33, Cl 3s 0.07
+  1.5891  occ #6: O 2s 0.52, Cl 3s 0.36, Cl 3p 0.05   vir #1: Cl 3p 0.64, O 2p 0.35, Cl 3s 0.06
+  1.6391  occ #6: O 2s 0.52, Cl 3s 0.37, Cl 3p 0.04   vir #1: Cl 3p 0.63, O 2p 0.37, Cl 3s 0.05
+  1.6891  occ #6: O 2s 0.51, Cl 3s 0.38, Cl 3p 0.03   vir #1: Cl 3p 0.62, O 2p 0.39, Cl 3s 0.05
+  1.7391  occ #6: O 2s 0.51, Cl 3s 0.39, Cl 3p 0.03   vir #1: Cl 3p 0.60, O 2p 0.41, Cl 3s 0.04
+  1.7891  occ #6: O 2s 0.50, Cl 3s 0.40, Cl 3p 0.03   vir #1: Cl 3p 0.59, O 2p 0.42, Cl 3s 0.04
+  1.8391  occ #6: O 2s 0.50, Cl 3s 0.40, Cl 3p 0.02   vir #1: Cl 3p 0.58, O 2p 0.44, Cl 3s 0.03
+  1.8891  occ #6: O 2s 0.50, Cl 3s 0.41, Cl 3p 0.02   vir #1: Cl 3p 0.57, O 2p 0.45, Cl 3s 0.03
+
+  CAS(10,6): 5 occupied + 1 virtual active
+      r/A conv S/T      E(S) NEV/Ha      E(T) NEV/Ha  dE CAS  dE NEV     nm   t/s
+   1.5391      y/y    -536.72613290    -536.56888797   5.199   4.279  289.8   148
+   1.5891      y/y    -536.73555774    -536.58591793   4.841   4.072  304.5   196
+   1.6391      y/y    -536.74081431    -536.60032700   4.450   3.823  324.3   153
+   1.6891      y/y    -536.74284703    -536.61238225   4.049   3.550  349.2   183
+   1.7391      y/y    -536.74244343    -536.62229142   3.655   3.270  379.2   123
+   1.7891      y/y    -536.74015806    -536.63027350   3.278   2.990  414.6   188
+   1.8391      y/y    -536.73651244    -536.63655088   2.924   2.720  455.8   195
+   1.8891      y/y    -536.73190235    -536.64134927   2.597   2.464  503.2   182
+
+  CAS(12,7): 6 occupied + 1 virtual active
+      r/A conv S/T      E(S) NEV/Ha      E(T) NEV/Ha  dE CAS  dE NEV     nm   t/s
+   1.5391      y/N    -536.71644853    -536.55796607   5.200   4.313  287.5   287
+   1.5891      y/y    -536.72654574    -536.57552648   4.842   4.109  301.7   289
+   1.6391      y/y    -536.73225295    -536.59038483   4.451   3.860  321.2   238
+   1.6891      y/N    -536.73457655    -536.60281549   4.051   3.585  345.8   304
+   1.7391      y/y    -536.73423893    -536.61299253   3.657   3.299  375.8   208
+   1.7891      y/y    -536.73194236    -536.62118044   3.280   3.014  411.4   230
+   1.8391      y/N    -536.72828301    -536.62759084   2.926   2.740  452.5   255
+   1.8891      y/N    -536.72362248    -536.63249746   2.600   2.480  500.0   308
+
+  wrote hocl_fc_active_space.csv
+  wrote hocl_fc_active_space.png
+
+==============================================================================
+== verdict
+==============================================================================
+  AVAS switches between [(10, 6), (12, 7)] in this window. Occupied #6 eigenvalue: 1.54->0.34, 1.59->0.31, 1.64->0.27, 1.69->0.24, 1.74->0.21, 1.79->0.19, 1.84->0.16, 1.89->0.14
+  against a threshold of 0.2: a threshold crossing, not a change in the physics.
+
+     space  converged  rough E(T)  rough dE  dE eq NEV   vs 03   vs 04  CPU-s/pt
+    (10,6)        8/8         0.2       0.4     3.5501  +0.102  +0.136      5430
+    (12,7)        4/8         0.3       0.4     3.5854  +0.138  +0.171      8406
+  rough = largest deviation in meV from a smooth quartic through the window;
+  above 10 meV is treated as a kink.
+
+  -> Use CAS(10,6): the only space that converges everywhere in the window
+     without a kink.
+
+  References are not exact: 03 and 04 differ from each other by 0.034 eV.
+  The triplet is state-averaged and the singlet is not, which biases the vertical
+  energy slightly upward; rerun with --nroots-singlet 4 to see how much.
+
+  total wall 58.2 min

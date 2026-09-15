@@ -758,7 +758,7 @@ was only ever needed across the Franck-Condon window."*
         CAS(10,6) is the one `06` validated to 3.6 A.
       - Splice them where both are valid, water's `06_splice.py` pattern.
 
-- [ ] **Next: find the splice window.** Both scripts already accept a grid,
+- [x] **Next: find the splice window.** Both scripts already accept a grid,
       so no new code, on the same outward grid r_eq + 0.1k A, k = 1..11
       (1.79-2.79 A):
       - `09 --step 0.1 --kmin 1 --kmax 11`: where does EOM-CCSD stop
@@ -770,6 +770,72 @@ was only ever needed across the Franck-Condon window."*
       what gets compared. `08`'s same-state check will also stop any point
       where the lowest C1 triplet stops being 3A", which marks where the
       3A'/3A" near-degeneracy begins.
+
+      **Result, 2026-09-15.**
+
+      *EOM-CCSD is reliable through 2.29 A and breaks at 2.39 A.*
+
+      | r / A | T1(S) | omega0 / eV | gap to next triplet | 2nd diff of V_T, meV |
+      | --- | --- | --- | --- | --- |
+      | 1.89 | 0.009 | 2.198 | 0.936 | 159 |
+      | 1.99 | 0.010 | 1.710 | 0.853 | 109 |
+      | 2.09 | 0.012 | 1.312 | 0.740 | 68 |
+      | 2.19 | 0.013 | 0.995 | 0.577 | 36 |
+      | 2.29 | 0.015 | 0.747 | 0.332 | 13 |
+      | 2.39 | 0.017 | 0.555 | **0.055** | **−206** |
+      | 2.49 | 0.020 | 0.205 | 0.204 | −33 |
+      | 2.59 | 0.022 | **−0.132** | 0.431 | 18 |
+
+      Up to 2.29 A, V_T is smooth and passes through the shallow minimum near
+      2.2 A that `05` and `06` also found. At 2.39 A the gap to the next EOM
+      triplet collapses to 55 meV and V_T kinks. Beyond it, root 0 falls by
+      ~0.2 eV per 0.1 A and drops below the singlet from 2.59 A, where T1(S)
+      also passes 0.02. **A second triplet crosses the lowest one at about
+      2.35-2.4 A.** `06`'s 3A"-only NEVPT2 has its root 1-root 0 gap at
+      0.58 eV at 2.4 A and no such state, so the crossing state is most
+      likely **3A'**, which Cs allows to cross. That identification is
+      inference, not a calculation.
+
+      *Full-valence NEVPT2 agrees where it passes, and is not robust.* Only
+      3 of 11 points passed `08`'s same-state check:
+
+      | r / A | SC vertical | FIC vertical | EOM omega0 |
+      | --- | --- | --- | --- |
+      | 1.79 | 2.850 | 2.821 | 2.779 |
+      | 1.89 | 2.264 | 2.241 | 2.198 |
+      | 2.29 | 0.748 | 0.748 | **0.747** |
+
+      - From 2.39 A outward the C1 triplet lies 6-15 mHa (0.16-0.41 eV) below
+        the symmetry-forced 3A" root: consistent with the same crossing
+        state.
+      - At 1.99-2.19 A it lies **24-36 mHa (0.65-0.97 eV) below**, and that is
+        not physics. EOM-CCSD's lowest triplet there continues smoothly from
+        the equilibrium region, where it matched UCCSD(T) to ±2 meV, with the
+        next triplet 0.6-0.85 eV above, not below. The likely reading is that
+        the full-valence SA-CASSCF lands on a different orbital solution at
+        those points; 2.29 A passing between failures fits that. Full valence
+        is not usable for a raster as it stands.
+
+      Both built-in verdicts are meaningless for these off-equilibrium grids,
+      as expected (09 reports a −9.6 eV/A "slope" by extrapolating a fit).
+
+- [ ] **Scope decision the result forces.** The triplet surfaces are sound out
+      to ~2.3 A with CCSD(T) + EOM-CCSD, and the region beyond holds a
+      probable 3A'/3A" crossing near 2.4 A that needs a multistate treatment,
+      plus SOC wherever the triplets are within the Cl 882 cm-1 splitting.
+      - **For the absorption band sigma(lambda, T)**, which is the HOX
+        contribution, the surface beyond ~2.3 A may not matter. The
+        autocorrelation decays as the packet leaves the Franck-Condon region.
+        With ~1 eV of kinetic energy and mu(OH-Cl) = 11.4 amu, the packet
+        needs of order 10-20 fs to reach 2.3 A, by which point S(t) should
+        already be gone. An absorbing potential from ~2.3 A would then remove
+        the flux before the crossing, and CCSD(T) + EOM-CCSD is enough. This
+        is an estimate, and has to be checked by varying where the absorber
+        starts, as `water/09_propagate.py`'s R_abs allows.
+      - **For product branching**, Cl(2P3/2) vs Cl(2P1/2), the crossing
+        region is exactly where it is decided. That needs the multistate
+        treatment with SOC, and it is optional scope, not a blocker for the
+        band.
 
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI

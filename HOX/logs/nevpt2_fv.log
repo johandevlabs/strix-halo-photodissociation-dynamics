@@ -1,0 +1,37 @@
+==============================================================================
+== HOX Phase 0.5 -- SC vs FIC NEVPT2 on identical references
+== CAS(14,9), def2-tzvp, triplet orbitals from a 4-root 3A" SA-CASSCF
+== r = 1.6391, 1.6891, 1.7391 A
+==============================================================================
+
+      r/A   dE CAS    dE SC   dE FIC   FIC-SC  same-state  prism ref   t/s
+   1.6391   3.8831   3.8401   3.7992  -0.0409     9.0e-11    0.0e+00    52
+           stages/s: orbitals 28, C1 copies 3, CASCI 4, FIC 13, SC 3
+   1.6891   3.5441   3.5055   3.4690  -0.0365     2.1e-10    0.0e+00    56
+           stages/s: orbitals 34, C1 copies 2, CASCI 4, FIC 13, SC 3
+   1.7391   3.2000   3.1729   3.1388  -0.0340     3.8e-10    0.0e+00    57
+           stages/s: orbitals 34, C1 copies 2, CASCI 4, FIC 13, SC 3
+
+  wrote hocl_nevpt2_fv.csv
+
+==============================================================================
+== verdict
+==============================================================================
+
+  OFFSET at equilibrium (vertical a 3A" <- X 1A'):
+    CASCI      3.5441 eV
+    SC-NEVPT2  3.5055 eV   (07, own singlet CASSCF: 3.5502)
+    FIC-NEVPT2 3.4690 eV
+    references 03 3.4477, 04 3.4142, mean 3.4310 eV
+    SC +0.075 eV and FIC +0.038 eV from the reference mean; FIC - SC = -0.036 eV
+    -> The contraction accounts for part of it: FIC moves towards the references
+       but the remainder has another source.
+
+  SLOPE of the triplet energy over 1.639-1.739 A (band width scales with it):
+    SC  -6.610 eV/A    FIC -6.339 eV/A    FIC/SC = 0.959
+    (vertical-energy slope: SC -6.673, FIC -6.604 eV/A)
+    -> Shapes differ by 4.1%, beyond 3%. A band computed on the SC
+       surface would be that much too wide or narrow: the surface itself needs FIC.
+
+  COST per geometry, wall: orbitals 32 s, FIC 13 s (two states), SC 3 s (two states)
+  For a raster only the triplet is needed per point, so roughly half of each NEVPT2 figure.

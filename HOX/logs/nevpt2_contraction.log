@@ -1,0 +1,37 @@
+==============================================================================
+== HOX Phase 0.5 -- SC vs FIC NEVPT2 on identical references
+== CAS(10,6), def2-tzvp, triplet orbitals from a 4-root 3A" SA-CASSCF
+== r = 1.6391, 1.6891, 1.7391 A
+==============================================================================
+
+      r/A   dE CAS    dE SC   dE FIC   FIC-SC  same-state  prism ref   t/s
+   1.6391   3.8359   3.8099   3.7982  -0.0117     2.6e-12    0.0e+00    41
+           stages/s: orbitals 29, C1 copies 3, CASCI 3, FIC 3, SC 2
+   1.6891   3.4796   3.4946   3.4827  -0.0120     0.0e+00    0.0e+00    36
+           stages/s: orbitals 25, C1 copies 3, CASCI 3, FIC 3, SC 2
+   1.7391   3.1256   3.1764   3.1652  -0.0113     1.1e-13    0.0e+00    26
+           stages/s: orbitals 16, C1 copies 3, CASCI 3, FIC 3, SC 2
+
+  wrote hocl_nevpt2_contraction.csv
+
+==============================================================================
+== verdict
+==============================================================================
+
+  OFFSET at equilibrium (vertical a 3A" <- X 1A'):
+    CASCI      3.4796 eV
+    SC-NEVPT2  3.4946 eV   (07, own singlet CASSCF: 3.5502)
+    FIC-NEVPT2 3.4827 eV
+    references 03 3.4477, 04 3.4142, mean 3.4310 eV
+    SC +0.064 eV and FIC +0.052 eV from the reference mean; FIC - SC = -0.012 eV
+    -> The contraction does NOT explain it: SC and FIC agree, so the offset comes
+       from the reference (active space, orbitals) rather than the perturbation theory.
+
+  SLOPE of the triplet energy over 1.639-1.739 A (band width scales with it):
+    SC  -5.977 eV/A    FIC -5.912 eV/A    FIC/SC = 0.989
+    (vertical-energy slope: SC -6.335, FIC -6.330 eV/A)
+    -> Same shape within 3%. The SC surface is fine for the band width;
+       only its absolute position needs correcting (dCCSD(T) splice or a shift).
+
+  COST per geometry, wall: orbitals 23 s, FIC 3 s (two states), SC 2 s (two states)
+  For a raster only the triplet is needed per point, so roughly half of each NEVPT2 figure.

@@ -526,6 +526,78 @@ was only ever needed across the Franck-Condon window."*
       per-stage cost. Verdicts checked on synthetic data: offset explained,
       not explained, partial, and slopes differing by 10%.
 
+      **Result, 2026-09-15: the contraction is not the explanation.** All three
+      checks passed at all three geometries (same-state deviation <= 3e-12 Ha,
+      Prism reference deviation 0), triplets converged, ~35 s per geometry.
+
+      | r / A | dE CASCI | dE SC | dE FIC | FIC - SC |
+      | --- | --- | --- | --- | --- |
+      | 1.6391 | 3.8359 | 3.8099 | 3.7982 | −11.7 meV |
+      | 1.6891 | 3.4796 | 3.4946 | 3.4827 | −12.0 meV |
+      | 1.7391 | 3.1256 | 3.1764 | 3.1652 | −11.3 meV |
+
+      - **SC and FIC differ by a constant 12 meV** and their triplet slopes
+        agree to 1.1% (−5.977 vs −5.912 eV/A). PySCF's SC-NEVPT2 is fine; the
+        raster does not need Prism.
+      - **56 meV of the offset was the singlet's orbitals.** The same SC-NEVPT2
+        gives 3.5502 eV with the singlet on its own CASSCF orbitals (`07`) and
+        3.4946 eV as a CASCI on the triplet's. On common orbitals the CASCI
+        vertical, 3.480 eV, is already within 15 meV of NEVPT2. So the
+        −0.50 eV NEVPT2 correction in `07` was mostly repairing the orbital
+        imbalance between two separately optimised states.
+      - Remaining gap to the references: FIC +0.035 eV from `03`, +0.069 eV
+        from `04`.
+      - Cost is small: FIC 3 s and SC 2 s for both states at a geometry.
+
+- [ ] **The offset was the wrong target; the slope is the right one.**
+      Two things came out of looking at these numbers against `05` and `07`:
+
+      *The geometry is not the minimum.* The CCSD(T) ground state has a slope of
+      −0.81 eV/A at the "equilibrium" 1.6891 A, which was quoted from memory.
+      Fits to `05`'s 0.2 A grid put the CCSD(T)/def2-TZVP O-Cl minimum at
+      1.70-1.72 A along this cut (cubic and quartic fits disagree; the grid is
+      too coarse to say better), with OH and the angle still fixed. The
+      vertical energy falls at ~6.7 eV/A, so a 0.03 A geometry error alone
+      moves it 0.2 eV, more than every method difference chased in `07` and
+      `08`. A vertical energy at a fixed, unoptimised geometry cannot be
+      compared to 0.05 eV. The pipeline does not need to: the band centre
+      comes from chi_0 on the method's own ground-state surface.
+
+      *The triplet slopes disagree between methods.* The slope at 1.6891 A
+      sets the band width by the reflection principle, and unlike an offset
+      it cannot be fixed by a shift or a splice:
+
+      | method | d(E_triplet)/dr at 1.6891 A |
+      | --- | --- |
+      | SC-NEVPT2, `07` quartic over 8 points | −5.954 eV/A |
+      | SC-NEVPT2, `08` over ±0.05 A | −5.977 eV/A |
+      | FIC-NEVPT2, `08` over ±0.05 A | −5.912 eV/A |
+      | UCCSD(T), `05`, cubic / quartic on the 0.2 A grid | −6.931 / −6.960 eV/A |
+
+      NEVPT2 is internally consistent to 1%, while UCCSD(T) is **~16%
+      steeper**. The vertical-energy slopes differ less (−6.74 dCCSD(T) vs
+      −6.33 SC-NEVPT2, 6%), because the ground states also disagree in slope
+      there (CCSD(T) −0.81, NEVPT2 −0.38 or +0.36 depending on orbitals).
+      That pattern fits the two methods placing the O-Cl bond ~0.02-0.03 A
+      apart, rather than one of them being badly wrong. `06` found the two
+      methods' relative curves agreeing to 3 meV from 2.0 to 2.2 A, so the
+      disagreement sits at the Franck-Condon region, which is the part that
+      matters for the band.
+
+      A 16% slope difference would be a ~16% difference in band width. For
+      scale, water's computed band width matched measurement to 1.4%, using
+      the same mix of methods: CCSD(T) ground state, NEVPT2 excited state.
+
+- [ ] **Next: pin the UCCSD(T) slopes on the same fine grid.** The 16% rests
+      on a 0.2 A grid. No new code is needed; `05` on `07`'s grid:
+      `python 05_triplet_scan.py --rmin 1.5391 --rmax 1.8891 --npoints 8
+      --no-asymptote --csv hocl_scan_fc.csv --png hocl_scan_fc.png`.
+      That gives both methods' V_S, V_T and dE slopes, and both minima, at
+      identical points. If the slope gap survives, the band width becomes the
+      main Phase 1 uncertainty. Measurement is the natural referee, as it was
+      for water, but HOCl's triplet band sits on the tail of the 300 nm
+      singlet band, which will make its width harder to extract.
+
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI
         object's attributes by reference and its kernel replaces

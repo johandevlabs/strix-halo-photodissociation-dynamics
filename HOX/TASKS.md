@@ -505,6 +505,27 @@ was only ever needed across the Franck-Condon window."*
         splice. If the slope differs too, the surface needs FIC, and its cost
         per point has to be measured before a raster.
 
+      Written as `08_nevpt2_contraction.py`. Prism's own
+      `examples/nevpt/04-nevpt2_sc_vs_fic.py` does the same comparison: FIC
+      from Prism, SC from `pyscf.mrpt.NEVPT`, same orbitals. Design choices,
+      each from something already learned in this project:
+      - one set of orbitals for both states, the 4-root 3A" SA-CASSCF from
+        `07`'s pipeline; the singlet is a CASCI on them, which skips the
+        103 s singlet CASSCF and keeps orbital relaxation out of the SC/FIC
+        difference;
+      - Cs only for optimising the orbitals. Every Prism example runs without
+        symmetry and its symmetry handling could not be inspected, so the
+        CASCI references both NEVPT2 variants read are rebuilt on a C1 copy of
+        the molecule. Three fatal checks: the AO overlaps match, the C1 triplet
+        root 0 reproduces the symmetry-forced 3A" root 0 to 1e-6 Ha, and
+        Prism's reference energy reproduces the CASCI it was given;
+      - separate CASCI objects for Prism and PySCF, since PySCF's NEVPT
+        rewrites the CI vector in place (the `06` dipole bug).
+      Reports the equilibrium offset for CASCI, SC and FIC; the triplet-energy
+      slope over r_eq ± 0.05 A with a 3% tolerance for "same shape"; and
+      per-stage cost. Verdicts checked on synthetic data: offset explained,
+      not explained, partial, and slopes differing by 10%.
+
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI
         object's attributes by reference and its kernel replaces

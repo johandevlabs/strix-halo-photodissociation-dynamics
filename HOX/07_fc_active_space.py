@@ -74,7 +74,8 @@ import numpy as np
 from scipy import linalg
 
 from pyscf import gto, scf, mcscf, mrpt, fci, symm
-from pyscf.mcscf import avas
+from pyscf.lib import logger
+from pyscf.mcscf import avas, dmet_cas
 
 HARTREE2EV = 27.211386245988
 NM_PER_EV = 1239.841984
@@ -188,6 +189,36 @@ def select_fixed(mf, proj, n_occ, n_vir):
     return mo, ncore, n_occ + n_vir, 2 * n_occ
 
 
+def canonicalize_like_avas(mol, mf, mo, ncore, ncas):
+    """Semicanonicalise each block exactly as pyscf.mcscf.avas does by default.
+
+    The projection eigenvectors that pick the active space are arbitrary
+    rotations inside the near-null part of the projector, so without this the
+    "core" orbitals are mixtures of deep Cl 1s/2p levels and valence orbitals.
+    CASSCF energies do not care, but its orbital optimiser preconditions with
+    orbital energies and converges far more slowly from such a start. The
+    first run of this script skipped the step: the same CAS(10,6) that cost
+    624 CPU-s per point in 06 (which used AVAS itself) cost 5430 here.
+
+    Code follows avas.py: build the Fock matrix in each block from the mean
+    field orbital energies, diagonalise it, then dmet_cas.symmetrize, which
+    keeps degenerate pairs symmetry-pure.
+    """
+    ovlp = mf.get_ovlp()
+    log = logger.new_logger(mol, 0)
+    out = mo.copy()
+    for sl in (slice(0, ncore), slice(ncore, ncore + ncas),
+               slice(ncore + ncas, mo.shape[1])):
+        c = out[:, sl]
+        if c.shape[1] == 0:
+            continue
+        csc = c.T @ ovlp @ mf.mo_coeff
+        fock = (csc * mf.mo_energy) @ csc.T
+        e, u = linalg.eigh(fock)
+        out[:, sl] = dmet_cas.symmetrize(mol, e, c @ u, ovlp, log)
+    return out
+
+
 def diagnose(r, args):
     """RHF, projection eigenvalues, AVAS's own choice. Returns (ctx, diag)."""
     mol = build_mol(r, 0, args.basis, args.verbose)
@@ -223,10 +254,24 @@ def solve_space(r, ctx, n_occ, n_vir, args):
     mol_s, mf_s, proj = ctx["mol"], ctx["mf"], ctx["proj"]
     mo, ncore, ncas, nelecas = select_fixed(mf_s, proj, n_occ, n_vir)
     row = {"r": r, "space": f"({nelecas},{ncas})"}
+    # Same pipeline 06 ran fast with: AVAS-style canonicalisation, then the
+    # block symmetrisation.
+    try:
+        mo = canonicalize_like_avas(mol_s, mf_s, mo, ncore, ncas)
+    except Exception as exc:
+        row["note"] = f"canonicalize failed: {exc}"
     try:
         mo = symmetrize_blocks(mol_s, mo, mf_s.get_ovlp(), ncore, ncas)
     except Exception as exc:
-        row["note"] = f"symmetrize failed: {exc}"
+        row["note"] = (row.get("note", "") + f" symmetrize failed: {exc}").strip()
+
+    # Wall time per stage, so a slow point says WHERE it was slow.
+    stage = {"t": time.time()}
+
+    def lap(name):
+        now = time.time()
+        row[f"t_{name}"] = now - stage["t"]
+        stage["t"] = now
 
     # ---- singlet X 1A'
     ns = args.nroots_singlet
@@ -239,6 +284,7 @@ def solve_space(r, ctx, n_occ, n_vir, args):
     mc_s.conv_tol, mc_s.max_cycle_macro, mc_s.verbose = 1e-8, args.max_cycle, 0
     mc_s.kernel(mo)
     row["conv_s"] = bool(mc_s.converged)
+    lap("s_cas")
     if ns > 1:
         mci_s = mcscf.CASCI(mf_s, ncas, nelecas)
         sol = fci.direct_spin0_symm.FCI(mol_s)
@@ -251,6 +297,7 @@ def solve_space(r, ctx, n_occ, n_vir, args):
     else:
         row["e_cas_s"] = float(mc_s.e_tot)
         row["e_nev_s"] = row["e_cas_s"] + float(mrpt.NEVPT(mc_s).kernel())
+    lap("s_nev")
 
     # ---- triplet a 3A", root 0 of an SA over 3A" roots (06's recipe)
     mol_t = build_mol(r, 2, args.basis, args.verbose)
@@ -259,6 +306,7 @@ def solve_space(r, ctx, n_occ, n_vir, args):
     mf_t = scf.ROHF(mol_t).x2c()
     mf_t.conv_tol = 1e-10
     mf_t.kernel()
+    lap("t_scf")
     nt = args.nroots_triplet
     mc_t = mcscf.CASSCF(mf_t, ncas, nelecas)
     mc_t.fcisolver = triplet_solver(mol_t, nt)
@@ -266,11 +314,13 @@ def solve_space(r, ctx, n_occ, n_vir, args):
     mc_t.conv_tol, mc_t.max_cycle_macro, mc_t.verbose = 1e-8, args.max_cycle, 0
     mc_t.kernel(mo)
     row["conv_t"] = bool(mc_t.converged)
+    lap("t_cas")
     mci_t = mcscf.CASCI(mf_t, ncas, nelecas)
     mci_t.fcisolver, mci_t.verbose = triplet_solver(mol_t, nt), 0
     mci_t.kernel(mc_t.mo_coeff)
     row["e_cas_t"] = float(np.atleast_1d(mci_t.e_tot)[0])
     row["e_nev_t"] = row["e_cas_t"] + float(mrpt.NEVPT(mci_t, root=0).kernel())
+    lap("t_nev")
 
     row["de_cas"] = (row["e_cas_t"] - row["e_cas_s"]) * HARTREE2EV
     row["de_nev"] = (row["e_nev_t"] - row["e_nev_s"]) * HARTREE2EV
@@ -434,15 +484,20 @@ def main():
             results[sp].append(row)
             conv = (f"{'y' if row['conv_s'] else 'N'}/"
                     f"{'y' if row['conv_t'] else 'N'}")
-            flag = "  sym!" if row.get("note") else ""
+            flag = f"  !! {row['note']}" if row.get("note") else ""
             print(f"  {r:7.4f}{conv:>9}{row['e_nev_s']:17.8f}"
                   f"{row['e_nev_t']:17.8f}{row['de_cas']:8.3f}"
                   f"{row['de_nev']:8.3f}{NM_PER_EV / row['de_nev']:7.1f}"
                   f"{row['wall']:6.0f}{flag}")
+            print(f"  {'':7}  stages/s: singlet CASSCF {row['t_s_cas']:.0f}, "
+                  f"NEVPT2 {row['t_s_nev']:.0f} | triplet SCF "
+                  f"{row['t_t_scf']:.0f}, SA-CASSCF {row['t_t_cas']:.0f}, "
+                  f"CASCI+NEVPT2 {row['t_t_nev']:.0f}")
 
     # ------------------------------------------------------------ outputs
     cols = ["space", "r", "conv_s", "conv_t", "e_cas_s", "e_nev_s",
-            "e_cas_t", "e_nev_t", "de_cas", "de_nev", "wall", "cpu", "note"]
+            "e_cas_t", "e_nev_t", "de_cas", "de_nev", "wall", "cpu",
+            "t_s_cas", "t_s_nev", "t_t_scf", "t_t_cas", "t_t_nev", "note"]
     with open(args.csv, "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
@@ -495,8 +550,11 @@ def main():
         eq = next((x for x in rows if abs(x["r"] - R_OCL_EQ_ANG) < 1e-6), None)
         de = eq["de_nev"] if eq else float("nan")
         cpu = float(np.mean([x["cpu"] for x in rows]))
+        # Roughness needs enough points for the quartic to be over-determined;
+        # a short run (e.g. equilibrium only) is judged on convergence alone.
+        rough_ok = len(rs) < 6 or (rt < ROUGH_MEV and rd < ROUGH_MEV)
         usable = (complete and n_ok == len(rows) and eq is not None
-                  and rt < ROUGH_MEV and rd < ROUGH_MEV)
+                  and rough_ok)
         ncas = int(sp.strip("()").split(",")[1])
         summary[sp] = {"usable": usable, "de": de, "ncas": ncas}
         print(f"  {sp:>8}{f'{n_ok}/{len(rs)}':>11}{rt:12.1f}{rd:10.1f}"
@@ -504,6 +562,9 @@ def main():
               f"{cpu:10.0f}")
     print(f"  rough = largest deviation in meV from a smooth quartic through "
           f"the window;\n  above {ROUGH_MEV:.0f} meV is treated as a kink.")
+    if len(rs) < 6:
+        print(f"  (only {len(rs)} point(s): too few for a roughness check, so "
+              f"judged on convergence only)")
 
     usable = [s for s in spaces if summary.get(s, {}).get("usable")]
     print()

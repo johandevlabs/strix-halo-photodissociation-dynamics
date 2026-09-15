@@ -397,6 +397,65 @@ was only ever needed across the Franck-Condon window."*
       from a quartic fit. Measured sensitivity: noise gives 0.2-0.4 meV, and a
       50 meV step gives 13 meV. Steps below ~40 meV would pass unflagged.
 
+      **Result, 2026-09-15 — use CAS(10,6).** 58 min wall (estimated 6; see
+      cost below).
+
+      *Why AVAS switches.* Occupied #6's projection eigenvalue falls steadily
+      through the window: 0.34, 0.31, 0.27, 0.24 at equilibrium, 0.21, then
+      0.19 at 1.79 A, crossing the 0.2 threshold between 1.74 and 1.79 A. Its
+      character is **O 2s 0.50-0.53 + Cl 3s 0.35-0.41**, with Cl 3p only
+      0.02-0.05: an s-type lone-pair combination that is barely one of the
+      requested orbitals at all. A threshold artefact, not physics. Virtual #1
+      is sigma*(O-Cl), Cl 3p 0.6 + O 2p 0.4. The fixed-count selection matched
+      a real `avas.avas` call at all 8 points.
+
+      *The extra orbital is a spectator.* At equilibrium, adding it lowers the
+      CASSCF energies by only 6.3 meV (singlet) and 4.9 meV (triplet): it is
+      essentially doubly occupied. The CASSCF vertical energy moves by
+      1.4 meV and the NEVPT2 vertical by 35 meV, below the 0.05 eV threshold.
+      (NEVPT2 *totals* shift by 0.23-0.26 eV, because moving an orbital from
+      core to active changes how NEVPT2 partitions the correlation, but that
+      cancels in the difference.)
+
+      | space | converged | roughness E(T) / dE, meV | dE eq NEVPT2 | vs 03 | vs 04 |
+      | --- | --- | --- | --- | --- | --- |
+      | (10,6) | 8/8 | 0.2 / 0.4 | 3.5501 eV | +0.102 | +0.136 |
+      | (12,7) | 4/8 (triplet) | 0.3 / 0.4 | 3.5854 eV | +0.138 | +0.171 |
+
+      CAS(10,6) converges everywhere, is smooth, and is the space `06`
+      validated out to 3.6 A. **Decision: CAS(10,6) for the triplet surface.**
+
+      **Two open problems from this run.**
+
+- [ ] **The cost was mostly my bug.** CAS(10,6) cost 5430 CPU-s per point
+      here against 624 in `06` for the same space. That would be the
+      difference between ~310 h and ~36 h for a raster. `06` used PySCF's AVAS,
+      which by default semicanonicalises each orbital block (Fock matrix per
+      block, then `dmet_cas.symmetrize`); confirmed from `avas.py`. My fixed
+      selection did not, so the "core" orbitals were arbitrary mixtures of deep
+      Cl 1s/2p and valence orbitals, and CASSCF's orbital optimiser, which
+      preconditions with orbital energies, had to work much harder. The four
+      unconverged CAS(12,7) triplets may share that cause, though the extra
+      orbital is also nearly doubly occupied, a known source of flat rotations.
+      Fixed by copying AVAS's canonicalisation (tested: off-diagonal Fock
+      elements drop from O(1) to 1e-15 per block, spans unchanged). Per-stage
+      timings are now recorded so a slow point shows where it was slow.
+      **Not yet confirmed on the EVO.**
+
+- [ ] **The vertical energy is 0.10-0.14 eV above both references.**
+      CAS(10,6) SC-NEVPT2 gives 3.5501 eV (349 nm) against 3.4477 (03) and
+      3.4142 (04). NEVPT2 is doing a lot of work here, lowering the CASSCF
+      4.049 eV by 0.50 eV. Candidate causes, cheapest to test first:
+      - state-averaging imbalance, triplet over 4 roots and singlet over 1,
+        which biases the vertical energy upward. Test by varying the triplet
+        root count at equilibrium: 4, 2, 1.
+      - SC-NEVPT2 against 03's QD-NEVPT2; a method difference, not a bug.
+      If the imbalance does not account for it, a hybrid is natural and has
+      precedent in `water/06_splice.py`: the triplet is single-reference in
+      the FC window (T1 0.024-0.030) where dCCSD(T) is good, and needs NEVPT2
+      only beyond ~2.1 A. `06` showed the two methods agree in shape from 2.0
+      to 2.2 A to 3 meV, which is exactly where a splice would blend them.
+
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI
         object's attributes by reference and its kernel replaces

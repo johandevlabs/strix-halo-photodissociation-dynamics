@@ -1,0 +1,93 @@
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 3.56e-02 Ha from the 3A" root 0: a different state, not comparable
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 2.96e-02 Ha from the 3A" root 0: a different state, not comparable
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 2.40e-02 Ha from the 3A" root 0: a different state, not comparable
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 1.49e-02 Ha from the 3A" root 0: a different state, not comparable
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 1.17e-02 Ha from the 3A" root 0: a different state, not comparable
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 9.20e-03 Ha from the 3A" root 0: a different state, not comparable
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 7.25e-03 Ha from the 3A" root 0: a different state, not comparable
+Traceback (most recent call last):
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 357, in main
+    row = run_geometry(r, args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/08_nevpt2_contraction.py", line 195, in run_geometry
+    raise RuntimeError(
+RuntimeError: unsymmetric triplet root 0 is 5.79e-03 Ha from the 3A" root 0: a different state, not comparable
+==============================================================================
+== HOX Phase 0.5 -- SC vs FIC NEVPT2 on identical references
+== CAS(14,9), def2-tzvp, triplet orbitals from a 4-root 3A" SA-CASSCF
+== r = 1.7891, 1.8891, 1.9891, 2.0891, 2.1891, 2.2891, 2.3891, 2.4891, 2.5891, 2.6891, 2.7891 A
+==============================================================================
+
+      r/A   dE CAS    dE SC   dE FIC   FIC-SC  same-state  prism ref   t/s
+   1.7891   2.8652   2.8502   2.8211  -0.0290     5.2e-10    0.0e+00    60
+           stages/s: orbitals 38, C1 copies 3, CASCI 3, FIC 13, SC 3
+   1.8891   2.2110   2.2643   2.2411  -0.0233     1.6e-09    0.0e+00    58
+           stages/s: orbitals 37, C1 copies 3, CASCI 4, FIC 13, SC 3
+   1.9891  FAILED: RuntimeError: unsymmetric triplet root 0 is 3.56e-02 Ha from the 3A" root 0: a different state, not comparable
+   2.0891  FAILED: RuntimeError: unsymmetric triplet root 0 is 2.96e-02 Ha from the 3A" root 0: a different state, not comparable
+   2.1891  FAILED: RuntimeError: unsymmetric triplet root 0 is 2.40e-02 Ha from the 3A" root 0: a different state, not comparable
+   2.2891   0.7112   0.7479   0.7482  +0.0003     2.9e-09    0.0e+00    65
+           stages/s: orbitals 42, C1 copies 3, CASCI 4, FIC 13, SC 3
+   2.3891  FAILED: RuntimeError: unsymmetric triplet root 0 is 1.49e-02 Ha from the 3A" root 0: a different state, not comparable
+   2.4891  FAILED: RuntimeError: unsymmetric triplet root 0 is 1.17e-02 Ha from the 3A" root 0: a different state, not comparable
+   2.5891  FAILED: RuntimeError: unsymmetric triplet root 0 is 9.20e-03 Ha from the 3A" root 0: a different state, not comparable
+   2.6891  FAILED: RuntimeError: unsymmetric triplet root 0 is 7.25e-03 Ha from the 3A" root 0: a different state, not comparable
+   2.7891  FAILED: RuntimeError: unsymmetric triplet root 0 is 5.79e-03 Ha from the 3A" root 0: a different state, not comparable
+
+  wrote hocl_nevpt2_fv_outer.csv
+
+==============================================================================
+== verdict
+==============================================================================
+
+  SLOPE of the triplet energy over 1.789-2.289 A (band width scales with it):
+    SC  -1.289 eV/A    FIC -1.083 eV/A    FIC/SC = 0.840
+    (vertical-energy slope: SC -4.086, FIC -4.028 eV/A)
+    -> Shapes differ by 16.0%, beyond 3%. The contraction affects the band
+       width here. That alone does not say which is right; compare both
+       with an external referee (09's EOM-CCSD, or UCCSD(T)).
+
+  COST per geometry, wall: orbitals 39 s, FIC 13 s (two states), SC 3 s (two states)
+  For a raster only the triplet is needed per point, so roughly half of each NEVPT2 figure.

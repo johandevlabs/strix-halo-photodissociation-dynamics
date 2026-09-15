@@ -310,7 +310,11 @@ def solve_space(r, ctx, n_occ, n_vir, args):
     nt = args.nroots_triplet
     mc_t = mcscf.CASSCF(mf_t, ncas, nelecas)
     mc_t.fcisolver = triplet_solver(mol_t, nt)
-    mc_t = mc_t.state_average_(np.ones(nt) / nt)
+    # PySCF's state-average wrapper assumes more than one root: with one, the
+    # solver returns a scalar energy and the wrapper's einsum('i,i->') fails.
+    # A single root is just a state-specific CASSCF, so skip the wrapper.
+    if nt > 1:
+        mc_t = mc_t.state_average_(np.ones(nt) / nt)
     mc_t.conv_tol, mc_t.max_cycle_macro, mc_t.verbose = 1e-8, args.max_cycle, 0
     mc_t.kernel(mo)
     row["conv_t"] = bool(mc_t.converged)

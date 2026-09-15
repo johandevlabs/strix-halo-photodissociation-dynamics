@@ -427,7 +427,7 @@ was only ever needed across the Franck-Condon window."*
 
       **Two open problems from this run.**
 
-- [ ] **The cost was mostly my bug.** CAS(10,6) cost 5430 CPU-s per point
+- [x] **The cost was mostly my bug — no, it was the singlet.** CAS(10,6) cost 5430 CPU-s per point
       here against 624 in `06` for the same space. That would be the
       difference between ~310 h and ~36 h for a raster. `06` used PySCF's AVAS,
       which by default semicanonicalises each orbital block (Fock matrix per
@@ -440,7 +440,28 @@ was only ever needed across the Franck-Condon window."*
       Fixed by copying AVAS's canonicalisation (tested: off-diagonal Fock
       elements drop from O(1) to 1e-15 per block, spans unchanged). Per-stage
       timings are now recorded so a slow point shows where it was slow.
-      **Not yet confirmed on the EVO.**
+
+      **Checked on the EVO, equilibrium only, and the hypothesis was wrong.**
+      Per-stage wall time with 4 triplet roots: singlet CASSCF **103 s**,
+      singlet NEVPT2 1 s, triplet SCF 2 s, triplet SA-CASSCF 24 s, CASCI +
+      NEVPT2 2 s, total 131 s. With 2 roots: 105 s of 153 s. The cost is the
+      closed-shell singlet CASSCF, which `06` never ran. Its active space is
+      five nearly doubly occupied orbitals plus a nearly empty sigma*, which
+      gives flat core/active rotations and slow convergence; it does converge,
+      slowly. Canonicalisation did not change a single energy (triplet NEVPT2
+      -536.61238216 vs -536.61238225 before). Whether it sped up the triplet
+      cannot be told, because the first run recorded no per-stage times.
+
+      **It does not block the raster.** The ground-state surface is CCSD(T)
+      over the bound region, not CASSCF, so the triplet surface costs what
+      its own stages cost here: about 28 s wall, roughly 900 CPU-s per point
+      at the observed ~32x parallel factor, so ~50 h on 16 cores for 3289
+      points. That is one geometry, so treat it as rough.
+
+      `--nroots-triplet 1` crashed. PySCF's state-average wrapper assumes
+      more than one root: with one, the solver returns a scalar and the
+      wrapper's `einsum('i,i->')` fails. The singlet path was guarded for
+      this and the triplet path was not. Fixed.
 
 - [ ] **The vertical energy is 0.10-0.14 eV above both references.**
       CAS(10,6) SC-NEVPT2 gives 3.5501 eV (349 nm) against 3.4477 (03) and
@@ -455,6 +476,34 @@ was only ever needed across the Franck-Condon window."*
       the FC window (T1 0.024-0.030) where dCCSD(T) is good, and needs NEVPT2
       only beyond ~2.1 A. `06` showed the two methods agree in shape from 2.0
       to 2.2 A to 3 meV, which is exactly where a splice would blend them.
+
+      **Imbalance ruled out.** At equilibrium, 4 -> 2 triplet roots: the
+      CASSCF vertical energy drops 57 meV (4.049 -> 3.992 eV), as expected
+      when the orbitals serve fewer states, but the NEVPT2 vertical energy
+      *rises* by 15 meV (3.5502 -> 3.5650 eV). That is the wrong direction
+      for the imbalance explanation and a tenth of the size of the gap. The
+      1-root run crashed (above), but these two points already rule it out.
+
+- [ ] **Leading explanation: how NEVPT2 is contracted.** PySCF's
+      `mrpt.NEVPT`, used in `06` and `07`, is strongly contracted (SC).
+      Prism, used in `03`, is fully internally contracted (its log: "Internal
+      contraction: Full (= Partial)"). The two independent references agree
+      with each other (FIC QD-NEVPT2 3.4477, dCCSD(T) 3.4142, 34 meV apart),
+      and SC-NEVPT2 is the outlier: 3.5502 in CAS(10,6), and 3.5854 in the
+      same CAS(12,7) that `03` used. SC-NEVPT2 being less accurate than the
+      partially/fully contracted variants for excitation energies is known
+      behaviour, but `03` also differed in other ways (QD, six roots, mixed
+      spin), so this is not yet a controlled comparison.
+
+      Controlled test: Prism SC vs FIC NEVPT2 on *identical* CAS(10,6)
+      references (Prism ships `examples/nevpt/04-nevpt2_sc_vs_fic.py`), at
+      equilibrium and at ±0.05 A. That answers two things at once:
+      - the offset: does FIC land near 3.41-3.45 eV?
+      - the slope across the FC window, which sets the band *width*. If SC
+        and FIC differ only by a constant there, SC-NEVPT2 is fine for the
+        surface shape, and the absolute position can come from a dCCSD(T)
+        splice. If the slope differs too, the surface needs FIC, and its cost
+        per point has to be measured before a raster.
 
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI

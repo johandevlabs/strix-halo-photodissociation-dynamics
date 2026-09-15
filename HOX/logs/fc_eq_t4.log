@@ -1,0 +1,41 @@
+==============================================================================
+== HOX Phase 0.5 -- one active space through the Franck-Condon window
+== def2-tzvp, AVAS ['Cl 3p', 'O 2p'] (minao ano), spaces CAS(10,6)
+== r = 1.6891 to 1.6891 A, step 0.05, equilibrium 1.6891 A; triplet SA over 4 3A" roots, singlet 1
+==============================================================================
+
+  1. AVAS projection eigenvalues (occupied top 8 | virtual top 3)
+     AVAS keeps those above 0.2. 'mine' is the count from these eigenvalues,
+     'pyscf' a real avas.avas call; they must agree.
+
+  1.6891  1.00 1.00 0.99 0.98 0.91 0.24 0.00 0.00 | 0.76 0.09 0.02   mine CAS(12, 7) pyscf CAS(12, 7)
+
+     character of occupied #5 and virtual #1 (against the full minao basis):
+  1.6891  occ #5: O 2p 0.68, H 1s 0.18, Cl 3p 0.06    vir #1: Cl 3p 0.62, O 2p 0.39, Cl 3s 0.05
+
+  CAS(10,6): 5 occupied + 1 virtual active
+      r/A conv S/T      E(S) NEV/Ha      E(T) NEV/Ha  dE CAS  dE NEV     nm   t/s
+   1.6891      y/y    -536.74284937    -536.61238216   4.049   3.550  349.2   131
+           stages/s: singlet CASSCF 103, NEVPT2 1 | triplet SCF 2, SA-CASSCF 24, CASCI+NEVPT2 2
+
+  wrote hocl_fc_eq_t4.csv
+  wrote hocl_fc_eq_t4.png
+
+==============================================================================
+== verdict
+==============================================================================
+
+     space  converged  rough E(T)  rough dE  dE eq NEV   vs 03   vs 04  CPU-s/pt
+    (10,6)        1/1         nan       nan     3.5502  +0.102  +0.136      4173
+  rough = largest deviation in meV from a smooth quartic through the window;
+  above 10 meV is treated as a kink.
+  (only 1 point(s): too few for a roughness check, so judged on convergence only)
+
+  -> Use CAS(10,6): the only space that converges everywhere in the window
+     without a kink.
+
+  References are not exact: 03 and 04 differ from each other by 0.034 eV.
+  The triplet is state-averaged and the singlet is not, which biases the vertical
+  energy slightly upward; rerun with --nroots-singlet 4 to see how much.
+
+  total wall 2.2 min

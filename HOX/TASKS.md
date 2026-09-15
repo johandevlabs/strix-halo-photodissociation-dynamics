@@ -678,7 +678,7 @@ was only ever needed across the Franck-Condon window."*
       suggestive of active-space incompleteness in NEVPT2, but two points are
       not a trend.
 
-- [ ] **Two runs to settle the slope.**
+- [x] **Two runs to settle the slope.**
       - *Full-valence NEVPT2, CAS(14,9)*: every valence orbital including
         O 2s, Cl 3s and sigma/sigma*(O-H). The natural end of the active-space
         series; `08` supports it without new code:
@@ -696,6 +696,80 @@ was only ever needed across the Franck-Condon window."*
         comparison CSVs: it reproduces −6.999, −5.954 and −6.152, and gives
         the right verdict for EOM siding with UCCSD(T), with NEVPT2, and
         landing between them.
+
+      **Result, 2026-09-15: settled. Coupled cluster has the right slope, and
+      NEVPT2 converges to it as the active space grows.**
+
+      | method | triplet slope at 1.6891 A | gap to UCCSD(T) |
+      | --- | --- | --- |
+      | SC-NEVPT2 CAS(10,6) | −5.954 eV/A | 14.9% |
+      | SC-NEVPT2 CAS(12,7) | −6.152 eV/A | 12.1% |
+      | SC-NEVPT2 CAS(14,9), full valence | −6.610 eV/A | 5.6% |
+      | FIC-NEVPT2 CAS(14,9) | −6.339 eV/A | 9.4% |
+      | EOM-CCSD triplet on the CCSD(T) ground state | −6.965 eV/A | 0.5% |
+      | UCCSD(T), state-specific | −6.999 eV/A | — |
+
+      (Earlier entries quoted the gap as 18%, i.e. as a fraction of the NEVPT2
+      slope. Here it is a fraction of the UCCSD(T) slope, which is the
+      referee.)
+
+      - **Two routes to the triplet agree**: UCCSD(T) from an ROHF triplet
+        reference, and EOM-CCSD from the closed-shell ground state, within
+        0.5%. The vertical-energy slopes agree too: EOM −6.748, dCCSD(T)
+        −6.783 eV/A.
+      - **NEVPT2 converges towards them with the active space**, 15% → 12% →
+        6%, and its vertical-energy slope at full valence (SC −6.673, FIC
+        −6.604) is within 1-2.5% of coupled cluster. Independent corroboration:
+        the earlier NEVPT2 slope was active-space incompleteness, not a
+        coupled-cluster artefact.
+      - **The ground-state correlation level matters for V_T's slope.** EOM on
+        the CCSD ground state gives −6.670; on the CCSD(T) ground state
+        −6.965. The (T) correction accounts for 4%.
+      - **EOM-CCSD gives the cleanest FC-region triplet.** Roughness against a
+        quartic is 0.1 meV, against UCCSD(T)'s 4.2 meV, and its second
+        differences fall smoothly (75, 71, 66, 60, 53, 46 meV). EOM V_T minus
+        UCCSD(T) is constant to ±2 meV across the window except at 1.6391 A,
+        where UCCSD(T) is 8 meV off: the point where its T1 jumped to 0.035.
+        So the UCCSD(T) wobble is a single glitch, located.
+      - Lowest-triplet assignment is safe: 0.94-1.06 eV to the next EOM
+        triplet throughout.
+      - EOM-CCSD vertical energy at 1.6891 A: **3.432 eV**, between `03`
+        (3.448) and `04` (3.414). Full-valence NEVPT2: SC 3.506, FIC 3.469.
+      - In full valence SC and FIC slopes differ by 4%, and SC is the closer
+        to coupled cluster. `08`'s verdict said "the surface needs FIC" there;
+        that rule compared the two contractions only with each other, and the
+        wording now asks for an external referee instead.
+      - Cost: EOM-CCSD ~18 s wall per point for the singlet CCSD(T) and the
+        triplet together. Full-valence NEVPT2 ~55 s per geometry (orbitals
+        32 s, FIC 13 s, SC 3 s).
+
+- [ ] **Surface recipe this points to (proposal, not yet validated):**
+      - V_S: CCSD(T) over the bound region, as planned.
+      - V_T near equilibrium: **E_CCSD(T) + omega(EOM-CCSD triplet)**. It
+        comes out of the same calculation as V_S at ~570 CPU-s per point, has
+        the coupled-cluster slope, and has neither the ROHF wobble nor an
+        active space to choose.
+      - V_T at longer range: EOM-CCSD from a closed-shell reference degrades
+        as the ground state turns diradical (T1(S) 0.018 at 2.4 A, above 0.02
+        by 2.6 A). Beyond that, multireference NEVPT2, which `06` showed smooth
+        and which also gives the neighbouring 3A" states. Full valence is the
+        better candidate (6% from coupled cluster in the FC window, against
+        15% for CAS(10,6)), but it is untested at dissociation, where
+        CAS(10,6) is the one `06` validated to 3.6 A.
+      - Splice them where both are valid, water's `06_splice.py` pattern.
+
+- [ ] **Next: find the splice window.** Both scripts already accept a grid,
+      so no new code, on the same outward grid r_eq + 0.1k A, k = 1..11
+      (1.79-2.79 A):
+      - `09 --step 0.1 --kmin 1 --kmax 11`: where does EOM-CCSD stop
+        tracking? Watch T1(S) and the smoothness of V_T.
+      - `08` full valence, same grid: does CAS(14,9) stay converged and smooth
+        at dissociation, and where do its shape and EOM's agree?
+      The built-in verdicts of both scripts assume the grid includes
+      equilibrium, so they are not meaningful for these runs; the CSVs are
+      what gets compared. `08`'s same-state check will also stop any point
+      where the lowest C1 triplet stops being 3A", which marks where the
+      3A'/3A" near-degeneracy begins.
 
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI

@@ -298,10 +298,15 @@ def verdict(rows, args):
                   f"is fine for the band width;\n       only its absolute "
                   f"position needs correcting (dCCSD(T) splice or a shift).")
         else:
+            # Not "use FIC": this compares the two contractions with each
+            # other, not with the truth. In full-valence CAS(14,9) they
+            # differ by 4% and SC is the one closer to both coupled-cluster
+            # slopes (09), so the rule's old advice was backwards there.
             print(f"    -> Shapes differ by {abs(ratio - 1.0):.1%}, beyond "
-                  f"{SLOPE_TOL:.0%}. A band computed on the SC\n       surface "
-                  f"would be that much too wide or narrow: the surface "
-                  f"itself needs FIC.")
+                  f"{SLOPE_TOL:.0%}. The contraction affects the band\n       "
+                  f"width here. That alone does not say which is right; "
+                  f"compare both\n       with an external referee (09's "
+                  f"EOM-CCSD, or UCCSD(T)).")
     else:
         print("\n  SLOPE: needs at least two geometries (use the default "
               "kmin/kmax).")

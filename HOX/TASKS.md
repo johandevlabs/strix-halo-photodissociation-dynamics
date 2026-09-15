@@ -903,6 +903,21 @@ was only ever needed across the Franck-Condon window."*
             to the next triplet, and smoothness. The 1D model only
             established the O-Cl direction. Cheap, and a 3D raster depends on
             it.
+
+            `11_eom_coordinates.py`: O-H stretch 0.75-1.25 A, bend 75-135 deg,
+            and 8 corner points combining all three coordinates, in Cs. Every
+            EOM root is labelled by the irrep of its dominant single
+            excitation, so the surface value is the lowest **3A"**, not merely
+            the lowest triplet: along the bend a 3A' could drop below with a
+            comfortable gap and 09's rule would not notice. If labelling
+            fails, it falls back to 09's lowest-root rule and says so.
+            Verdict gates: convergence, T1(S) < 0.02, next 3A" > 0.3 eV above,
+            V_T within 10 meV of a quartic along each cut, and reproducing
+            09's 3.4320 eV at the shared geometry. A 3A' below the 3A" is
+            reported but not disqualifying in Cs without SOC. Verdict checked
+            on synthetic cuts: clean, a 30 meV bend step (flagged at 11.9 meV,
+            so steps under ~25 meV would pass), T1 reaching 0.023, and a 3A'
+            dropping below at wide angles.
       - [ ] 3D raster of CCSD(T) + EOM-CCSD over r(O-Cl) <= ~2.4 A and the
             bound range of r(O-H) and the angle; one calculation gives both
             surfaces. At ~570 CPU-s per point, a grid of roughly

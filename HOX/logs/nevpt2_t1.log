@@ -1,0 +1,38 @@
+==============================================================================
+== HOX Phase 0.5 -- SC vs FIC NEVPT2 on identical references
+== CAS(10,6), def2-tzvp, triplet orbitals from a 1-root 3A" SA-CASSCF
+== r = 1.6391, 1.6891, 1.7391 A
+==============================================================================
+
+      r/A   dE CAS    dE SC   dE FIC   FIC-SC  same-state  prism ref   t/s
+   1.6391   3.7806   2.2152   3.8035  +1.5883     8.1e-12    0.0e+00   143
+           stages/s: orbitals 132, C1 copies 3, CASCI 3, FIC 3, SC 2   !! triplet SA-CASSCF unconverged
+   1.6891   3.3901   2.3444   3.4961  +1.1517     8.6e-12    0.0e+00   143
+           stages/s: orbitals 132, C1 copies 3, CASCI 3, FIC 3, SC 2   !! triplet SA-CASSCF unconverged
+   1.7391   3.0109   1.8033   3.1753  +1.3720     2.5e-12    0.0e+00    69
+           stages/s: orbitals 59, C1 copies 3, CASCI 3, FIC 3, SC 2
+
+  wrote hocl_nevpt2_t1.csv
+
+==============================================================================
+== verdict
+==============================================================================
+  !! triplet SA-CASSCF unconverged at r = 1.6391, 1.6891 A
+
+  OFFSET at equilibrium (vertical a 3A" <- X 1A'):
+    CASCI      3.3901 eV
+    SC-NEVPT2  2.3444 eV   (07, own singlet CASSCF: 3.5502)
+    FIC-NEVPT2 3.4961 eV
+    references 03 3.4477, 04 3.4142, mean 3.4310 eV
+    SC -1.087 eV and FIC +0.065 eV from the reference mean; FIC - SC = +1.152 eV
+    -> The contraction accounts for part of it: FIC moves towards the references
+       but the remainder has another source.
+
+  SLOPE of the triplet energy over 1.639-1.739 A (band width scales with it):
+    SC  -5.681 eV/A    FIC -15.486 eV/A    FIC/SC = 2.726
+    (vertical-energy slope: SC -4.119, FIC -6.282 eV/A)
+    -> Shapes differ by 172.6%, beyond 3%. A band computed on the SC
+       surface would be that much too wide or narrow: the surface itself needs FIC.
+
+  COST per geometry, wall: orbitals 108 s, FIC 3 s (two states), SC 2 s (two states)
+  For a raster only the triplet is needed per point, so roughly half of each NEVPT2 figure.

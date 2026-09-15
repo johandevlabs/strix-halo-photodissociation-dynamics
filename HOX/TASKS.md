@@ -588,7 +588,7 @@ was only ever needed across the Franck-Condon window."*
       scale, water's computed band width matched measurement to 1.4%, using
       the same mix of methods: CCSD(T) ground state, NEVPT2 excited state.
 
-- [ ] **Next: pin the UCCSD(T) slopes on the same fine grid.** The 16% rests
+- [x] **Next: pin the UCCSD(T) slopes on the same fine grid.** The 16% rests
       on a 0.2 A grid. No new code is needed; `05` on `07`'s grid:
       `python 05_triplet_scan.py --rmin 1.5391 --rmax 1.8891 --npoints 8
       --no-asymptote --csv hocl_scan_fc.csv --png hocl_scan_fc.png`.
@@ -597,6 +597,55 @@ was only ever needed across the Franck-Condon window."*
       main Phase 1 uncertainty. Measurement is the natural referee, as it was
       for water, but HOCl's triplet band sits on the tail of the 300 nm
       singlet band, which will make its width harder to extract.
+
+      **Result, 2026-09-15: the gap is real, and it is not the bond length.**
+      Identical 8-point grid (1.5391-1.8891 A), CCSD(T)/UCCSD(T) from `05`
+      against CAS(10,6) SC-NEVPT2 from `07` (singlet on its own orbitals):
+
+      | | dV_T/dr at 1.6891 | dV_S/dr | d(dE)/dr | singlet r_min | k_S, eV/A^2 | dE at r_min |
+      | --- | --- | --- | --- | --- | --- | --- |
+      | CCSD(T) | **−6.999** | −0.217 | −6.783 | 1.6981 A | 23.5 | 3.355 eV |
+      | NEVPT2 | **−5.954** | −0.375 | −5.579 | 1.7037 A | 24.6 | 3.469 eV |
+
+      - **Triplet slope ratio 1.18 at 1.6891 A, and 1.20 with each method at
+        its own minimum.** Robust: CCSD(T) gives −6.97 to −7.06 eV/A across a
+        central difference, fits of degree 3-5 and leave-one-out; NEVPT2 gives
+        −5.95 to −5.98.
+      - **The ground states agree.** Minima 6 mA apart, curvatures within 5%.
+        So last round's explanation, the two methods placing the O-Cl bond
+        0.02-0.03 A apart, is **wrong**: the disagreement is in the triplet
+        surface itself. The 6% vertical-slope figure quoted there was also
+        wrong, because it compared `08`'s CASCI-singlet vertical against
+        dCCSD(T); on a consistent footing the vertical-slope ratio is 1.22.
+      - The CCSD(T)/def2-TZVP O-Cl minimum along this cut is **1.698 A**, not
+        1.6891 (still with OH and the angle fixed at the from-memory values).
+      - **The UCCSD(T) triplet is slightly uneven near equilibrium.** T1 goes
+        0.030, 0.035 at 1.639, then 0.018 at 1.689 A. The curve is 20x rougher
+        than NEVPT2's (4.2 vs 0.2 meV from a quartic), with second differences
+        zigzagging 83, 57, 73 meV where NEVPT2's fall smoothly, 71, 64, 58.
+        That is a 10-15 meV wobble, likely a small shift in the ROHF reference.
+        It cannot account for the gap, which adds up to 105 meV over 0.1 A.
+
+      **Which slope is right is now the main open question for the band
+      width**, and the difference is ~18%. One data point is already in hand:
+      07's CAS(12,7), using only its converged points at 1.6391 and 1.7391 A,
+      gives a NEVPT2 triplet slope of **−6.15 eV/A**, 3% steeper than
+      CAS(10,6) and in the direction of CCSD(T). So the NEVPT2 slope is not
+      converged in active space.
+
+- [ ] **Does the NEVPT2 slope move towards CCSD(T) with a better reference?**
+      Two runs of `08`, no new code, three geometries each:
+      - `--nroots-triplet 1`: a state-specific triplet, the like-for-like
+        counterpart of state-specific UCCSD(T). Tests whether averaging the
+        orbitals over four 3A" roots flattens the slope.
+      - `--n-occ 6`: CAS(12,7) with `08`'s cleaner setup (canonicalised
+        orbitals, singlet as a CASCI, so no singlet convergence problem).
+      If the slope moves towards −7 eV/A, the reference was the limitation:
+      trust CCSD(T) in the Franck-Condon window, which is the splice design
+      anyway (CCSD(T) inside ~2.1 A, NEVPT2 outside). If it stays at −6, it is
+      a genuine method disagreement, and needs a third, independent method
+      (EOM-CCSD triplet energies, as `water/12_vertical.py` used) or the
+      measured band.
 
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI

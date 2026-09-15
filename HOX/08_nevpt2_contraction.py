@@ -238,8 +238,22 @@ def verdict(rows, args):
               "are not comparable.")
     unconv = [x["r"] for x in rows if not x["conv_t"]]
     if unconv:
-        print(f"  !! triplet SA-CASSCF unconverged at r = "
-              f"{', '.join(f'{v:.4f}' for v in unconv)} A")
+        print(f"  !! triplet CASSCF unconverged at r = "
+              f"{', '.join(f'{v:.4f}' for v in unconv)} A -- EXCLUDED below")
+    # SC and FIC read the same reference, so a large disagreement means the
+    # reference is pathological, not that one contraction is right. Seen with
+    # an unconverged single-root triplet: SC-NEVPT2 fell 1.2-1.6 eV below FIC
+    # while FIC stayed sensible, and the unguarded verdict then reported a
+    # 173% slope difference from those points.
+    wild = [x["r"] for x in rows if abs(x["de_fic"] - x["de_sc"]) > 0.2]
+    if wild:
+        print(f"  !! SC and FIC disagree by more than 0.2 eV at r = "
+              f"{', '.join(f'{v:.4f}' for v in wild)} A -- EXCLUDED below; "
+              f"the reference is not fit for perturbation theory there")
+    rows = [x for x in rows if x["conv_t"] and x["r"] not in wild]
+    if not rows:
+        print("\n  no usable geometry left: nothing to conclude")
+        return
 
     eq = next((x for x in rows if abs(x["r"] - R_OCL_EQ_ANG) < 1e-6), None)
     if eq is not None:

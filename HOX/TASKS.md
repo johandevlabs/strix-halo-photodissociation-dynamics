@@ -633,7 +633,7 @@ was only ever needed across the Franck-Condon window."*
       CAS(10,6) and in the direction of CCSD(T). So the NEVPT2 slope is not
       converged in active space.
 
-- [ ] **Does the NEVPT2 slope move towards CCSD(T) with a better reference?**
+- [x] **Does the NEVPT2 slope move towards CCSD(T) with a better reference?**
       Two runs of `08`, no new code, three geometries each:
       - `--nroots-triplet 1`: a state-specific triplet, the like-for-like
         counterpart of state-specific UCCSD(T). Tests whether averaging the
@@ -646,6 +646,56 @@ was only ever needed across the Franck-Condon window."*
       a genuine method disagreement, and needs a third, independent method
       (EOM-CCSD triplet energies, as `water/12_vertical.py` used) or the
       measured band.
+
+      **Result, 2026-09-15.**
+
+      *State-specific triplet (`--nroots-triplet 1`): unusable.* The CASSCF
+      failed to converge at 1.639 and 1.689 A (132 s each), as the single-root
+      triplet did in `04`, even with canonicalised starting orbitals. On those
+      references SC-NEVPT2 broke down: vertical energies 2.22, 2.34, 1.80 eV,
+      non-monotonic and 1.2-1.6 eV below FIC on the *same* reference, while
+      FIC stayed sensible (3.80, 3.50, 3.18). Even the converged point at
+      1.739 A had SC and FIC 1.37 eV apart, so a single-root reference is not
+      safe for SC-NEVPT2 here whether or not it converges. `08`'s verdict
+      accepted these points and reported a 173% slope difference; it now
+      excludes unconverged points and any point where SC and FIC differ by
+      more than 0.2 eV. Replayed on this run it reports "no usable geometry".
+
+      *CAS(12,7): clean, and the slope moves.* All three triplets converged
+      this time; `07`'s CAS(12,7) failures at these geometries came before the
+      canonicalisation fix. Consistent with that fix mattering for this space,
+      though not proof. Triplet slope **SC −6.152, FIC −6.185 eV/A** (FIC/SC
+      1.005), matching the −6.15 estimated from `07`'s converged points
+      exactly.
+
+      | method | triplet slope at 1.6891 A |
+      | --- | --- |
+      | SC-NEVPT2 CAS(10,6) | −5.95 eV/A |
+      | SC-NEVPT2 CAS(12,7) | −6.15 eV/A |
+      | UCCSD(T) | −7.00 eV/A |
+
+      The gap narrows from 18% to ~13% after adding one orbital, which is
+      suggestive of active-space incompleteness in NEVPT2, but two points are
+      not a trend.
+
+- [ ] **Two runs to settle the slope.**
+      - *Full-valence NEVPT2, CAS(14,9)*: every valence orbital including
+        O 2s, Cl 3s and sigma/sigma*(O-H). The natural end of the active-space
+        series; `08` supports it without new code:
+        `python 08_nevpt2_contraction.py --avas-aos "Cl 3s" "Cl 3p" "O 2s"
+        "O 2p" "H 1s" --n-occ 7 --n-vir 2 --csv hocl_nevpt2_fv.csv`
+      - *EOM-CCSD triplet*, `09_eom_triplet.py`, on `07`'s 8-point grid. It
+        reaches the triplet from the closed-shell CCSD ground state (T1(S)
+        ~0.008), so there is no ROHF triplet reference to wobble and no active
+        space to choose. That removes the suspect on each side. It is still
+        coupled cluster, so agreement with UCCSD(T) is less independent than
+        agreement with NEVPT2 would be. Reports the slope of
+        E_CCSD(T) + omega_T against UCCSD(T) and both NEVPT2 spaces read from
+        their CSVs, and checks the lowest-triplet assignment through the gap
+        to the next root. Tested on synthetic EOM data with the real
+        comparison CSVs: it reproduces −6.999, −5.954 and −6.152, and gives
+        the right verdict for EOM siding with UCCSD(T), with NEVPT2, and
+        landing between them.
 
       **Three bugs in `06`, found in these runs and fixed:**
       - *Dipoles after NEVPT2 were wrong.* PySCF's `NEVPT` copies the CASCI

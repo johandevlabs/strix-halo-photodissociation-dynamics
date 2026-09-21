@@ -32,7 +32,8 @@ VERDICT, per cut and overall. EOM-CCSD is usable for the raster where:
   - everything converged;
   - T1(S) < 0.02, the conventional closed-shell threshold;
   - the lowest 3A" is identified, with the next 3A" > 0.3 eV above;
-  - omega and V_T are smooth along each uniform cut (< 10 meV from a quartic).
+  - omega and V_T are smooth along each cut (< 5 meV from a degree-5 fit;
+    see roughness_mev for why not a quartic).
 A 3A' below the 3A" is reported but not disqualifying on its own: in Cs, and
 without SOC, it does not couple to the 3A" surface the band is computed on.
 
@@ -56,7 +57,7 @@ HARTREE2EV = 27.211386245988
 
 R_OCL_ANG, R_OH_ANG, ANGLE_DEG = 1.6891, 0.9644, 102.96
 REF_09_EV = 3.4320
-T1_MAX, GAP_MIN_EV, ROUGH_MEV = 0.02, 0.3, 10.0
+T1_MAX, GAP_MIN_EV, ROUGH_MEV = 0.02, 0.3, 5.0
 
 
 def geometry(r_ocl, r_oh, angle):
@@ -137,7 +138,18 @@ def run_point(cut, r_ocl, r_oh, angle, args):
     return row
 
 
-def roughness_mev(x, y, deg=4):
+def roughness_mev(x, y, deg=5):
+    """Largest deviation from a smooth degree-5 polynomial, in meV.
+
+    Degree 5, not 4. The O-H cut spans ~2 eV of a Morse-shaped curve over
+    0.5 A, and a quartic cannot follow that to better than ~9 meV, which
+    nearly tripped the 10 meV threshold on a surface whose second differences
+    were perfectly smooth (same sign, monotone). Calibrated on a synthetic
+    Morse curve on this grid: degree 5 leaves 0.4 meV on a smooth curve and
+    10.3 meV when a 30 meV step is injected, so with the threshold at 5 meV
+    this catches steps of roughly 15 meV and up while accepting real
+    curvature.
+    """
     x, y = np.asarray(x, float), np.asarray(y, float)
     if x.size < deg + 2 or np.any(~np.isfinite(y)):
         return float("nan")

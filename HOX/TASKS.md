@@ -898,7 +898,7 @@ was only ever needed across the Franck-Condon window."*
         affected.
 
 - [ ] **Phase 1 proper, for the band:**
-      - [ ] **First, check EOM-CCSD across the other two coordinates** in the
+      - [x] **First, check EOM-CCSD across the other two coordinates** in the
             Franck-Condon region, the O-H stretch and the bend: T1(S), the gap
             to the next triplet, and smoothness. The 1D model only
             established the O-Cl direction. Cheap, and a 3D raster depends on
@@ -918,6 +918,35 @@ was only ever needed across the Franck-Condon window."*
             on synthetic cuts: clean, a 30 meV bend step (flagged at 11.9 meV,
             so steps under ~25 meV would pass), T1 reaching 0.023, and a 3A'
             dropping below at wide angles.
+
+            **Result, 2026-09-21: cleared.** 34 points, ~25 s each, all
+            converged.
+
+            | cut | max T1(S) | min gap to next 3A" | roughness omega / V_T |
+            | --- | --- | --- | --- |
+            | O-H stretch, 0.75-1.25 A | 0.0091 | 2.06 eV | 0.1 / 1.4 meV |
+            | bend, 75-135 deg | 0.0083 | 3.52 eV | 0.1 / 0.2 meV |
+            | 8 corners | 0.0100 | 2.38 eV | - |
+
+            The lowest triplet is **3A" at every one of the 34 geometries**,
+            so no 3A' drops below anywhere in the Franck-Condon region; the
+            gap to the nearest root of any symmetry narrows to 0.67 eV only at
+            135 deg. T1(S) stays at or below 0.010 everywhere, half the
+            threshold. omega at the shared geometry reproduces 09's 3.4320 eV
+            exactly. Single excitations carry 94-95% of each root.
+
+            The roughness check needed fixing, not the surface. At degree 4 it
+            reported 9.5 meV on the O-H cut against a 10 meV threshold -- a
+            near-miss that was a fitting artefact: that cut spans 2.06 eV of a
+            Morse-shaped curve, and its second differences are perfectly
+            smooth (384, 275, 198, 142, 101, 70, 47, 29, 16 meV, same sign,
+            monotone). Degree 5 gives 1.4 meV, degree 6 gives 0.2. Calibrated
+            on a synthetic Morse curve on this grid: degree 5 leaves 0.4 meV
+            when smooth and 10.3 meV with a 30 meV step injected, so the check
+            is now degree 5 against a 5 meV threshold, which catches steps of
+            ~15 meV and up while accepting real curvature -- strictly better
+            than the quartic, which both flagged smooth curvature and would
+            have missed that step.
       - [ ] 3D raster of CCSD(T) + EOM-CCSD over r(O-Cl) <= ~2.4 A and the
             bound range of r(O-H) and the angle; one calculation gives both
             surfaces. At ~570 CPU-s per point, a grid of roughly

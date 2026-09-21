@@ -951,6 +951,36 @@ was only ever needed across the Franck-Condon window."*
             bound range of r(O-H) and the angle; one calculation gives both
             surfaces. At ~570 CPU-s per point, a grid of roughly
             21 x 7 x 11 points is ~16 h on 16 cores (rough).
+
+            `12_pes_raster.py`. Grid r(O-Cl) 1.40-2.40 A, r(O-H) 0.80-1.25 A,
+            angle 75-135 deg, steps 0.05 A and 5 deg: **2730 points, ~432
+            CPU-hours, ~14 h on 30 workers** at the measured 570 CPU-s/point.
+            `--rocl-max 2.30` trims it to 2470 points and ~13 h; `10` showed
+            the band needs the surface only to ~2.0-2.3 A, and the extra
+            0.1 A is margin for the Jacobi transform.
+
+            Built on `water/04_pes_grid.py`: environment variables set before
+            numpy and pyscf load, OpenMP pinning cleared (water's first
+            gotcha), one single-threaded process per geometry, per-worker CPU
+            affinity, and rows appended as they finish so an interrupt costs
+            nothing. `--pilot N` runs N points spread over the grid plus
+            equilibrium **into the same CSV**, so the pilot's points count
+            towards the full raster instead of being thrown away, and it
+            reports the measured CPU-s/point for a corrected estimate.
+
+            Every root is labelled A' or A" as in `11`, so what is stored is
+            the lowest **3A"**, not merely the lowest triplet; the labelling
+            is duplicated rather than imported, since a worker process should
+            not depend on another script's import side effects. Status per
+            row separates ok / warn (T1 >= 0.02, unconverged EOM) / fail.
+
+            Tested locally without pyscf on a fake calculation: pilot then
+            full then a third run gives 6 + 66 + 0 points, 72 unique rows, no
+            duplicates, header intact. That test also showed the pool needs
+            an explicit fork context -- fork is the default on the EVO's
+            Python 3.12, but 3.14 defaults to forkserver, where each worker
+            re-imports the module and re-runs the thread-limiting environment
+            setup this design depends on.
       - [ ] Jacobi transform, relaxation and propagation from `water/`, with
             an absorber from ~2.3 A along the dissociation coordinate, and
             the absorber-position check repeated in 3D.

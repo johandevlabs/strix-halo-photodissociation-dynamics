@@ -8,8 +8,9 @@ measured or computed for any hypohalous acid band.
 
 **Status.** Phase 0 (premise) and Phase 0.5 (toolchain) are done. HOCl — the
 validation case, where a measured band exists at 380 nm — has its ã 3A"
-surface built and spliced to the asymptote. Propagation and σ(λ, T) are still
-to come, and HOBr has not been started.
+surface built and spliced to the asymptote; propagation and σ(λ, T) are still
+to come. HOBr has started, at the two things that gate it: the Br basis, and
+the geometry and force field.
 
 ## Layout
 
@@ -18,9 +19,9 @@ to come, and HOBr has not been started.
 | [`TASKS.md`](TASKS.md) | the running record: plan, every result, every bug and why it mattered. Read this before the code. |
 | [`toolchain/`](toolchain/) | the SOC stack (Prism + socutils) and its validation against atomic fine structure. Shared by every halogen. |
 | [`HOCl/`](HOCl/) | the HOCl work, by approach: method selection, the 1D band model, the surfaces. |
+| [`HOBr/`](HOBr/) | the actual target. What HOCl's method decisions do and do not carry over, and why the Br basis is the first gate. |
 | [`docs/deep-review-claude.md`](docs/deep-review-claude.md) | literature review with citations |
 
-`HOBr/` will appear alongside `HOCl/` and reuse `toolchain/` unchanged.
 
 ## How this repo is run
 

@@ -1179,12 +1179,27 @@ was only ever needed across the Franck-Condon window."*
                   surface is E(Cl) + V_OH by construction.
 
                   So the bend is weak in the EXIT CHANNEL and not weak where
-                  the band is decided. Consequences: the frozen-bend
-                  assumption in `10` is a real approximation, not a harmless
-                  one, and since the bend is the soft mode that carries
-                  thermal population at 200-300 K, this is the coordinate
-                  sigma(lambda, T) is most likely to depend on. Worth a
-                  sensitivity test before the 3D propagation is trusted.
+                  the band is decided. The frozen-bend assumption in `10` is
+                  therefore a real approximation: chi_0 spans 85-120 deg and
+                  V_T moves 0.26 eV across that. Worth a sensitivity test
+                  before the 3D propagation is trusted.
+
+                  **Correction.** That was first written up as "the bend is
+                  the soft mode that carries thermal population at 200-300 K,
+                  so it is the coordinate sigma(lambda, T) most depends on".
+                  Wrong: the fundamentals listed under Phase 2 say the O-X
+                  STRETCH is the soft mode by an order of magnitude.
+
+                  | mode | HOCl | v=1 at 220 K | at 298 K | HOBr | at 220 K | at 298 K |
+                  | --- | --- | --- | --- | --- | --- | --- |
+                  | nu3, O-X stretch | 724 | 0.9% | 3.0% | 620 | 1.7% | 5.0% |
+                  | nu2, bend | 1239 | 0.03% | 0.25% | 1163 | 0.05% | 0.37% |
+                  | nu1, O-H stretch | 3609 | ~0 | ~0 | 3615 | ~0 | ~0 |
+
+                  The stretch IS the dissociation coordinate, so `10` already
+                  treats the mode that carries the temperature dependence.
+                  The bend question is about zero-point spread distorting the
+                  band SHAPE, which is a different and smaller worry.
       - [ ] Jacobi transform, relaxation and propagation from `water/`, with
             an absorber from ~2.3 A along the dissociation coordinate, and
             the absorber-position check repeated in 3D.
@@ -1297,6 +1312,36 @@ needed before touching HOBr.
 ---
 
 ## Phase 2 — HOBr, the contribution
+
+Started 2026-09-22. See `HOBr/README.md` for what HOCl's method decisions do
+and do not carry over; the short version is that anything depending on the
+halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
+
+- [ ] **Gate 1, the basis.** `toolchain/02_soc_atoms.py --sweep --atoms Br
+      --soc DKH1 breit-pauli`, over 12 candidate all-electron sets. def2-TZVP
+      is 16.6% low and decontracting it gives -7.6%; the band exists only
+      through SOC borrowing, so this error is an intensity error. Running
+      both SOC Hamiltonians on the same basis separates basis error from
+      operator error. Everything downstream takes `--basis`.
+- [ ] **Gate 2, the geometry and force field.** `HOBr/01_method/01_geometry.py`:
+      CCSD(T)/x2c on a 3x3x3 grid, full quadratic fit, frequencies from
+      B^T H B with B finite-differenced from the coordinate definition rather
+      than written out.
+
+      Two reasons this is not a detail. HOCl's geometry came from the
+      literature; HOBr's numbers here are RECALLED and need replacing with
+      computed ones. And sigma(lambda, T) is a Boltzmann average whose
+      populations are exponential in the frequencies -- a frequency 10% off
+      moves the population carrying the whole temperature effect by ~15% of
+      itself.
+
+      Validation is `--molecule HOCl` first, against known fundamentals.
+      Offline tests in `HOBr/01_method/tests/`: the fit recovers a known force
+      field exactly, and the frequencies are checked against a direct
+      Cartesian finite-difference Hessian of the same analytic surface -- a
+      route sharing no code with the first. That caught two unit-conversion
+      errors in the first draft, one off by 1e7, both of which would have
+      produced entirely plausible-looking frequencies.
 
 - [ ] Repeat Phase 1 for HOBr. Scalar-relativistic treatment required
       (ECP or x2c/DKH; aug-cc-pVnZ-PP or ANO-RCC basis).

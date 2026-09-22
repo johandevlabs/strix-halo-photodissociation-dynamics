@@ -121,11 +121,30 @@ Plotting the deviation V_T(angle) − V_T(105°) on its own scale gives:
 | past 3.60 Å | 0 | 0 (the surface *is* E(Cl) + V_OH there) |
 
 The bend is weak in the **exit channel** and not weak where the band is
-decided. Two consequences: `02_band_model/10`'s frozen bend is a real
-approximation rather than a harmless one, and since the bend is the soft mode
-that carries thermal population at 200-300 K, it is the coordinate σ(λ, T) is
-most likely to depend on. That deserves a sensitivity test before the 3D
-propagation is trusted.
+decided. So `02_band_model/10`'s frozen bend is a real approximation rather
+than a harmless one: χ₀ spans 85-120° and V_T moves 0.26 eV across that, which
+is a real fraction of the band width. It deserves a sensitivity test before
+the 3D propagation is trusted.
+
+That is a **zero-point** argument, not a thermal one. An earlier version of
+this note called the bend "the soft mode that carries thermal population at
+200-300 K" and made it the coordinate σ(λ, T) would most depend on. The
+fundamentals say otherwise — the O-X stretch is the soft mode by a wide
+margin:
+
+| mode | HOCl | v=1 at 220 K | at 298 K | HOBr | at 220 K | at 298 K |
+| --- | --- | --- | --- | --- | --- | --- |
+| ν3, O-X stretch | 724 cm-1 | 0.9% | 3.0% | 620 cm-1 | 1.7% | **5.0%** |
+| ν2, bend | 1239 | 0.03% | 0.25% | 1163 | 0.05% | 0.37% |
+| ν1, O-H stretch | 3609 | ~0 | ~0 | 3615 | ~0 | ~0 |
+
+The stretch carries an order of magnitude more population than the bend at
+every temperature in range. Since the stretch *is* the dissociation
+coordinate, the 1D model already treats the mode that carries the temperature
+dependence — which is reassuring for σ(λ, T), and is a separate question from
+whether freezing the bend distorts the band shape. (Fundamentals from the
+NIST WebBook via `TASKS.md`; they are quoted from memory there and carry that
+file's standing caveat.)
 
 `16` also reproduces the vertical excitation as a check on the assembled
 surface: 3.353 eV at the grid minimum (1.700 Å), against `09`'s 3.432 eV at

@@ -1099,9 +1099,24 @@ was only ever needed across the Franck-Condon window."*
                   rebuilt per point. `--retry-failed` drops failed rows
                   (keeping a `.bak`) so a rerun recomputes exactly those
                   points; tested offline, it preserves ok and ok:newton rows.
+            - [x] Outer shell retry: all 41 recovered, and recorded as
+                  plain `ok`, so seeding the triplet SCF from the
+                  closed-shell density fixed them outright without needing the
+                  second-order fallback. **Shell complete: 1050/1050, no
+                  duplicates.**
             - [ ] `14_fragments.py`: V_OH(r) and E(Cl) in both methods, as
                   `water/05_oh_diatomic.py` did -- two unrelated methods on
                   the diatomic was what made water's splice trustworthy.
+                  Two adaptations: **x2c everywhere**, or the fragments sit on
+                  a different energy scale from the surfaces they anchor
+                  (water did not need it), and the leaving atom is Cl. No
+                  point group for the diatomic, water's note: PySCF's Abelian
+                  subgroup of C-inf-v splits the degenerate 2Pi across irreps.
+                  Prints re, omega_e and the well depth against the measured
+                  OH radical, and the NEVPT2 - UCCSD(T) difference across the
+                  curve, whose **constancy** is what the splice needs. The
+                  harmonic-frequency extraction was checked against a
+                  synthetic curve of known omega_e.
             - [ ] `15_splice.py`: align the shell to the raster by the
                   constant offset over 2.20-2.40 A (**check it is constant
                   across r(O-H) and angle** -- water's held to 13 meV), blend

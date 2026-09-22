@@ -1016,6 +1016,32 @@ was only ever needed across the Franck-Condon window."*
             Surface construction should drop or replace the warned corner
             points rather than interpolate through them; they lie inside the
             absorber, so nothing the band depends on is lost.
+
+            **Full raster, 2026-09-22: done. 2730 points, 149 min on 30
+            workers, 0 failures, 101 CPU-s/point.** 2549 ok, 181 warned
+            (58 T1 only, 112 3A'-below only, 11 both).
+
+            Warnings are confined to the outer edge: none below r(O-Cl) =
+            2.25 A, 173 of 181 at >= 2.30 A. Within the band-relevant region
+            (<= 2.30 A) only 36 of 2470 points are warned, 1.5%, and the worst
+            T1 there is 0.0233.
+
+            **The surface is smooth.** Largest deviation of any point from a
+            cubic through its four neighbours along each axis:
+
+            | r(O-Cl) band | along O-Cl | along O-H | along angle |
+            | --- | --- | --- | --- |
+            | 1.40-1.80 A | 10.1 meV | 3.6 | 0.7 |
+            | 1.80-2.10 A | 1.1 | 3.6 | 0.6 |
+            | 2.10-2.30 A | 0.1 | 3.6 | 0.3 |
+            | 2.30-2.45 A | 0.1 | 3.6 | 0.2 |
+
+            No point exceeds 20 meV on any axis. Both non-trivial numbers are
+            curvature rather than scatter: 10.1 meV is on the steep repulsive
+            wall at short O-Cl, where a 4-point cubic cannot follow an
+            exponential, and the 3.6 meV along O-H is identical in every band,
+            which is what a fixed interpolation error on Morse curvature looks
+            like.
       - [ ] Jacobi transform, relaxation and propagation from `water/`, with
             an absorber from ~2.3 A along the dissociation coordinate, and
             the absorber-position check repeated in 3D.

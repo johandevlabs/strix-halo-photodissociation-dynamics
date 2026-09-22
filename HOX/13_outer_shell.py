@@ -112,9 +112,23 @@ def compute_point(task):
 
         mol_t = gto.M(atom=atom, basis=basis, spin=2, charge=0, symmetry="Cs",
                       unit="Angstrom", verbose=0, max_memory=mem)
+        # Seed the triplet SCF from the converged closed-shell density of the
+        # same geometry, and fall back to a second-order solver. Plain ROHF
+        # from the default guess failed at 41 of 1050 points, all at
+        # r(O-Cl) >= 2.4 A where the fragments become two open-shell radicals
+        # and the default guess is poor. This is a local guess, not orbitals
+        # chained from a neighbouring geometry -- water/README.md's warning is
+        # about propagating an ACTIVE SPACE along a scan, which AVAS still
+        # rebuilds per point here.
         mf_t = scf.ROHF(mol_t).x2c()
         mf_t.conv_tol = 1e-10
-        mf_t.kernel()
+        mf_t.max_cycle = 100
+        mf_t.kernel(dm0=mf_s.make_rdm1())
+        if not mf_t.converged:
+            mf_t = mf_t.newton()
+            mf_t.kernel(mf_t.mo_coeff, mf_t.mo_occ)
+            if mf_t.converged:
+                row["status"] = "ok:newton"
         if not mf_t.converged:
             row["status"] = "fail:rohf"
             return _stamp(row, t0)
@@ -212,6 +226,9 @@ def main():
                    help="single-threaded CPU-s per point; a guess until the "
                         "pilot measures it. 08 saw ~600 CPU-s under threading, "
                         "and 12's pilot showed that overstates serial work ~5x")
+    p.add_argument("--retry-failed", action="store_true",
+                   help="drop rows whose status is fail (keeping a .bak) "
+                        "so this run recomputes exactly those points")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--csv", default="hocl_outer_shell.csv")
     args = p.parse_args()
@@ -245,6 +262,24 @@ def main():
         points = [points[i] for i in idx]
         print(f"  PILOT: {len(points)} points spread over the shell; same CSV")
 
+    if args.retry_failed and os.path.exists(args.csv):
+        keep, dropped = [], 0
+        with open(args.csv, newline="") as fh:
+            for row in csv.DictReader(fh):
+                if row.get("status", "").startswith("fail"):
+                    dropped += 1
+                else:
+                    keep.append(row)
+        if dropped:
+            os.replace(args.csv, args.csv + ".bak")
+            with open(args.csv, "w", newline="") as fh:
+                w = csv.DictWriter(fh, fieldnames=FIELDS)
+                w.writeheader()
+                for row in keep:
+                    w.writerow({k: row.get(k, "") for k in FIELDS})
+            print(f"  --retry-failed: dropped {dropped} failed rows "
+                  f"(old file kept as {args.csv}.bak)")
+
     done = load_done(args.csv)
     todo = [t for t in points if key(*t) not in done]
     print(f"  {len(done)} already in {args.csv}, {len(todo)} to run\n")
@@ -270,7 +305,7 @@ def main():
                     pool.imap_unordered(compute_point, tasks, chunksize=1), 1):
                 w.writerow({k: row.get(k, "") for k in FIELDS})
                 st = row["status"]
-                n_ok += st == "ok"
+                n_ok += st.startswith("ok")
                 n_warn += st.startswith("warn")
                 n_bad += st.startswith("fail")
                 if i % 10 == 0 or i == len(tasks):

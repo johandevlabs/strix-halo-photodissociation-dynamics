@@ -1074,6 +1074,31 @@ was only ever needed across the Franck-Condon window."*
                   r(O-H) keeps 0.05 A because it carries the asymptotic shape.
                   1050 points, ~1.9 h on 30 workers at a guessed 200 CPU-s.
                   Active-space helpers imported from `07` rather than copied.
+
+                  **Run, 2026-09-22: 1050 points in 2.3 min, 4 CPU-s/point.**
+                  Not 200: SA-CASSCF(10,6) + SC-NEVPT2 on 74 basis functions
+                  really is seconds of serial work, in family with water's
+                  22 CPU-s/point for a comparable calculation. `08`'s ~600
+                  CPU-s was 32 threads thrashing on matrices far too small to
+                  parallelise -- water's job-array finding again, and more
+                  extreme than in `12`.
+
+                  1009 ok, 0 warned, **41 `fail:rohf`**: the triplet ROHF not
+                  converging, all at r(O-Cl) >= 2.4 A where the fragments
+                  become two open-shell radicals and the default guess is
+                  poor. The converged points are sound -- `<S^2>` = 2.0000
+                  everywhere, energies rising smoothly to a near-plateau
+                  (−536.6499 at 2.30 A to −536.6427 at 3.60 A, still creeping
+                  by ~5 meV per 0.1 A, the van der Waals tail).
+
+                  Fixed by seeding the triplet SCF with the converged
+                  closed-shell density of the SAME geometry and falling back
+                  to a second-order solver, recorded as `ok:newton`. This is a
+                  local guess, not orbitals chained along a scan -- water's
+                  warning is about propagating an ACTIVE SPACE, which is still
+                  rebuilt per point. `--retry-failed` drops failed rows
+                  (keeping a `.bak`) so a rerun recomputes exactly those
+                  points; tested offline, it preserves ok and ok:newton rows.
             - [ ] `14_fragments.py`: V_OH(r) and E(Cl) in both methods, as
                   `water/05_oh_diatomic.py` did -- two unrelated methods on
                   the diatomic was what made water's splice trustworthy.

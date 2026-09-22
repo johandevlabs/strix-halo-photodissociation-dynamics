@@ -2,55 +2,61 @@
 ========================================================================
 == Br: basis sweep against 3685.24 cm-1 observed
 ========================================================================
-  def2-tzvp [pyscf] DKH1                   nao   48    3072.71 cm-1   -16.6%    10.1 s
-  def2-tzvp [pyscf] breit-pauli            nao   48    3246.77 cm-1   -11.9%     8.3 s
-  unc-def2-tzvp [pyscf] DKH1               nao  103    3405.53 cm-1    -7.6%    15.2 s
-  unc-def2-tzvp [pyscf] breit-pauli        nao  103    3623.31 cm-1    -1.7%    13.6 s
-  def2-qzvp [pyscf] DKH1                   nao   75    3091.50 cm-1   -16.1%    19.6 s
-  def2-qzvp [pyscf] breit-pauli            nao   75    3269.33 cm-1   -11.3%    14.9 s
+  def2-tzvp [pyscf] DKH1                   nao   48    3072.71 cm-1   -16.6%     9.8 s
+  def2-tzvp [pyscf] breit-pauli            nao   48    3246.77 cm-1   -11.9%     8.8 s
+  unc-def2-tzvp [pyscf] DKH1               nao  103    3405.53 cm-1    -7.6%    16.1 s
+  unc-def2-tzvp [pyscf] breit-pauli        nao  103    3623.31 cm-1    -1.7%    11.8 s
+  def2-qzvp [pyscf] DKH1                   nao   75    3091.50 cm-1   -16.1%    20.1 s
+  def2-qzvp [pyscf] breit-pauli            nao   75    3269.33 cm-1   -11.3%    15.2 s
   unc-def2-qzvp [pyscf] DKH1               FAILED ValueError: could not broadcast input array from shape (152,152) into shape (157,157)
-/home/johan/miniforge3/envs/qc/lib/python3.12/site-packages/pyscf/gto/basis/__init__.py:689: UserWarning: Basis may be available in basis-set-exchange. It is recommended to install basis-set-exchange: pip install basis-set-exchange
-  warnings.warn(
   unc-def2-qzvp [pyscf] breit-pauli        FAILED ValueError: could not broadcast input array from shape (152,152) into shape (157,157)
-  x2c-tzvpall          unavailable: not in pyscf (BasisNotFoundError) and basis-set-exchange is not installed (pip install basis-set-exchange)
-  x2c-qzvpall          unavailable: not in pyscf (BasisNotFoundError) and basis-set-exchange is not installed (pip install basis-set-exchange)
-  cc-pvtz-dk [pyscf] DKH1                  nao   43    3423.26 cm-1    -7.1%    11.5 s
-  cc-pvtz-dk [pyscf] breit-pauli           nao   43    3660.97 cm-1    -0.7%     8.9 s
-  aug-cc-pvtz-dk [pyscf] DKH1              nao   59    3419.76 cm-1    -7.2%    13.7 s
-  aug-cc-pvtz-dk [pyscf] breit-pauli       nao   59    3657.23 cm-1    -0.8%    12.7 s
-  sapporo-dkh3-tzp     unavailable: not in pyscf (BasisNotFoundError) and basis-set-exchange is not installed (pip install basis-set-exchange)
-  ano-rcc [pyscf] DKH1                     nao  109    3427.85 cm-1    -7.0%    31.1 s
-  ano-rcc [pyscf] breit-pauli              nao  109    3684.68 cm-1    -0.0%    24.0 s
-  dyall-v3z [pyscf] DKH1                   nao  128    3423.80 cm-1    -7.1%    23.2 s
-  dyall-v3z [pyscf] breit-pauli            nao  128    3675.98 cm-1    -0.3%    19.6 s
-  jorge-tzp-dkh        unavailable: not in pyscf (BasisNotFoundError) and basis-set-exchange is not installed (pip install basis-set-exchange)
+  x2c-tzvpall [pyscf] DKH1                 nao   48    3504.81 cm-1    -4.9%    10.4 s
+  x2c-tzvpall [pyscf] breit-pauli          nao   48    3738.01 cm-1    +1.4%     9.0 s
+  x2c-qzvpall [pyscf] DKH1                 nao   83    3418.02 cm-1    -7.3%    21.2 s
+  x2c-qzvpall [pyscf] breit-pauli          nao   83    3668.62 cm-1    -0.5%    16.0 s
+  cc-pvtz-dk [pyscf] DKH1                  nao   43    3423.26 cm-1    -7.1%    10.4 s
+  cc-pvtz-dk [pyscf] breit-pauli           nao   43    3660.97 cm-1    -0.7%    10.4 s
+  aug-cc-pvtz-dk [pyscf] DKH1              nao   59    3419.76 cm-1    -7.2%    14.3 s
+  aug-cc-pvtz-dk [pyscf] breit-pauli       nao   59    3657.23 cm-1    -0.8%    11.7 s
+  sapporo-dkh3-tzp [pyscf] DKH1            nao   43    3492.99 cm-1    -5.2%    12.8 s
+  sapporo-dkh3-tzp [pyscf] breit-pauli     nao   43    3741.06 cm-1    +1.5%    11.4 s
+  ano-rcc [pyscf] DKH1                     nao  109    3427.85 cm-1    -7.0%    31.0 s
+  ano-rcc [pyscf] breit-pauli              nao  109    3684.68 cm-1    -0.0%    27.1 s
+  dyall-v3z [pyscf] DKH1                   nao  128    3423.80 cm-1    -7.1%    23.3 s
+  dyall-v3z [pyscf] breit-pauli            nao  128    3675.98 cm-1    -0.3%    19.9 s
+  jorge-tzp-dkh [pyscf] DKH1               nao   65    3600.11 cm-1    -2.3%    10.8 s
+  jorge-tzp-dkh [pyscf] breit-pauli        nao   65    3866.75 cm-1    +4.9%     8.9 s
 
 ========================================================================
 == sweep summary, ranked by |error|
 ========================================================================
  atom              basis          soc   nao   calc/cm-1      err   wall/s
-   Br            ano-rcc  breit-pauli   109     3684.68    -0.0%     24.0
-   Br          dyall-v3z  breit-pauli   128     3675.98    -0.3%     19.6
-   Br         cc-pvtz-dk  breit-pauli    43     3660.97    -0.7%      8.9
-   Br     aug-cc-pvtz-dk  breit-pauli    59     3657.23    -0.8%     12.7
-   Br      unc-def2-tzvp  breit-pauli   103     3623.31    -1.7%     13.6
-   Br            ano-rcc         DKH1   109     3427.85    -7.0%     31.1
-   Br          dyall-v3z         DKH1   128     3423.80    -7.1%     23.2
-   Br         cc-pvtz-dk         DKH1    43     3423.26    -7.1%     11.5
-   Br     aug-cc-pvtz-dk         DKH1    59     3419.76    -7.2%     13.7
-   Br      unc-def2-tzvp         DKH1   103     3405.53    -7.6%     15.2
-   Br          def2-qzvp  breit-pauli    75     3269.33   -11.3%     14.9
-   Br          def2-tzvp  breit-pauli    48     3246.77   -11.9%      8.3
-   Br          def2-qzvp         DKH1    75     3091.50   -16.1%     19.6
-   Br          def2-tzvp         DKH1    48     3072.71   -16.6%     10.1
+   Br            ano-rcc  breit-pauli   109     3684.68    -0.0%     27.1
+   Br          dyall-v3z  breit-pauli   128     3675.98    -0.3%     19.9
+   Br        x2c-qzvpall  breit-pauli    83     3668.62    -0.5%     16.0
+   Br         cc-pvtz-dk  breit-pauli    43     3660.97    -0.7%     10.4
+   Br     aug-cc-pvtz-dk  breit-pauli    59     3657.23    -0.8%     11.7
+   Br        x2c-tzvpall  breit-pauli    48     3738.01    +1.4%      9.0
+   Br   sapporo-dkh3-tzp  breit-pauli    43     3741.06    +1.5%     11.4
+   Br      unc-def2-tzvp  breit-pauli   103     3623.31    -1.7%     11.8
+   Br      jorge-tzp-dkh         DKH1    65     3600.11    -2.3%     10.8
+   Br        x2c-tzvpall         DKH1    48     3504.81    -4.9%     10.4
+   Br      jorge-tzp-dkh  breit-pauli    65     3866.75    +4.9%      8.9
+   Br   sapporo-dkh3-tzp         DKH1    43     3492.99    -5.2%     12.8
+   Br            ano-rcc         DKH1   109     3427.85    -7.0%     31.0
+   Br          dyall-v3z         DKH1   128     3423.80    -7.1%     23.3
+   Br         cc-pvtz-dk         DKH1    43     3423.26    -7.1%     10.4
+   Br     aug-cc-pvtz-dk         DKH1    59     3419.76    -7.2%     14.3
+   Br        x2c-qzvpall         DKH1    83     3418.02    -7.3%     21.2
+   Br      unc-def2-tzvp         DKH1   103     3405.53    -7.6%     16.1
+   Br          def2-qzvp  breit-pauli    75     3269.33   -11.3%     15.2
+   Br          def2-tzvp  breit-pauli    48     3246.77   -11.9%      8.8
+   Br          def2-qzvp         DKH1    75     3091.50   -16.1%     20.1
+   Br          def2-tzvp         DKH1    48     3072.71   -16.6%      9.8
 
   not usable:
      Br unc-def2-qzvp        DKH1         fail:ValueError
      Br unc-def2-qzvp        breit-pauli  fail:ValueError
-     Br x2c-tzvpall          None         unavailable
-     Br x2c-qzvpall          None         unavailable
-     Br sapporo-dkh3-tzp     None         unavailable
-     Br jorge-tzp-dkh        None         unavailable
 
 Choosing from this table. The winner is not simply the smallest error: the
 basis has to be affordable in the MOLECULE, where nao roughly triples (H + O

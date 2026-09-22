@@ -1,0 +1,70 @@
+
+========================================================================
+== Cl: basis sweep against 882.35 cm-1 observed
+========================================================================
+  def2-tzvp [pyscf] DKH1                   nao   37     844.54 cm-1    -4.3%     5.4 s
+  def2-tzvp [pyscf] breit-pauli            nao   37     854.96 cm-1    -3.1%     5.0 s
+  unc-def2-tzvp [pyscf] DKH1               nao   63     825.08 cm-1    -6.5%     5.5 s
+  unc-def2-tzvp [pyscf] breit-pauli        nao   63     835.16 cm-1    -5.3%     5.4 s
+  def2-qzvp [pyscf] DKH1                   nao   70     824.27 cm-1    -6.6%    10.2 s
+  def2-qzvp [pyscf] breit-pauli            nao   70     835.02 cm-1    -5.4%     9.0 s
+  unc-def2-qzvp [pyscf] DKH1               FAILED ValueError: could not broadcast input array from shape (104,104) into shape (105,105)
+  unc-def2-qzvp [pyscf] breit-pauli        FAILED ValueError: could not broadcast input array from shape (104,104) into shape (105,105)
+  x2c-tzvpall [pyscf] DKH1                 nao   37     849.26 cm-1    -3.8%     5.5 s
+  x2c-tzvpall [pyscf] breit-pauli          nao   37     860.21 cm-1    -2.5%     4.4 s
+  x2c-qzvpall [pyscf] DKH1                 nao   70     830.49 cm-1    -5.9%    10.8 s
+  x2c-qzvpall [pyscf] breit-pauli          nao   70     842.34 cm-1    -4.5%     9.2 s
+  cc-pvtz-dk [pyscf] DKH1                  nao   34     824.95 cm-1    -6.5%     5.1 s
+  cc-pvtz-dk [pyscf] breit-pauli           nao   34     835.03 cm-1    -5.4%     5.0 s
+  aug-cc-pvtz-dk [pyscf] DKH1              nao   50     823.67 cm-1    -6.7%     5.9 s
+  aug-cc-pvtz-dk [pyscf] breit-pauli       nao   50     833.73 cm-1    -5.5%     5.7 s
+  sapporo-dkh3-tzp     unavailable: pyscf: BasisNotFoundError; bse: KeyError: 'Element cl (Z=17) not found in basis sapporo-dkh3-tzp version 1'
+  ano-rcc [pyscf] DKH1                     nao  100     826.90 cm-1    -6.3%    16.9 s
+  ano-rcc [pyscf] breit-pauli              nao  100     837.71 cm-1    -5.1%    13.3 s
+  dyall-v3z [pyscf] DKH1                   nao   68     827.54 cm-1    -6.2%     5.3 s
+  dyall-v3z [pyscf] breit-pauli            nao   68     838.73 cm-1    -4.9%     5.1 s
+  jorge-tzp-dkh [pyscf] DKH1               nao   40     864.17 cm-1    -2.1%     5.1 s
+  jorge-tzp-dkh [pyscf] breit-pauli        nao   40     875.60 cm-1    -0.8%     5.0 s
+
+========================================================================
+== sweep summary, ranked by |error|
+========================================================================
+ atom              basis          soc   nao   calc/cm-1      err   wall/s
+   Cl      jorge-tzp-dkh  breit-pauli    40      875.60    -0.8%      5.0
+   Cl      jorge-tzp-dkh         DKH1    40      864.17    -2.1%      5.1
+   Cl        x2c-tzvpall  breit-pauli    37      860.21    -2.5%      4.4
+   Cl          def2-tzvp  breit-pauli    37      854.96    -3.1%      5.0
+   Cl        x2c-tzvpall         DKH1    37      849.26    -3.8%      5.5
+   Cl          def2-tzvp         DKH1    37      844.54    -4.3%      5.4
+   Cl        x2c-qzvpall  breit-pauli    70      842.34    -4.5%      9.2
+   Cl          dyall-v3z  breit-pauli    68      838.73    -4.9%      5.1
+   Cl            ano-rcc  breit-pauli   100      837.71    -5.1%     13.3
+   Cl      unc-def2-tzvp  breit-pauli    63      835.16    -5.3%      5.4
+   Cl         cc-pvtz-dk  breit-pauli    34      835.03    -5.4%      5.0
+   Cl          def2-qzvp  breit-pauli    70      835.02    -5.4%      9.0
+   Cl     aug-cc-pvtz-dk  breit-pauli    50      833.73    -5.5%      5.7
+   Cl        x2c-qzvpall         DKH1    70      830.49    -5.9%     10.8
+   Cl          dyall-v3z         DKH1    68      827.54    -6.2%      5.3
+   Cl            ano-rcc         DKH1   100      826.90    -6.3%     16.9
+   Cl      unc-def2-tzvp         DKH1    63      825.08    -6.5%      5.5
+   Cl         cc-pvtz-dk         DKH1    34      824.95    -6.5%      5.1
+   Cl          def2-qzvp         DKH1    70      824.27    -6.6%     10.2
+   Cl     aug-cc-pvtz-dk         DKH1    50      823.67    -6.7%      5.9
+
+  not usable:
+     Cl unc-def2-qzvp        DKH1         fail:ValueError
+     Cl unc-def2-qzvp        breit-pauli  fail:ValueError
+     Cl sapporo-dkh3-tzp     None         unavailable
+
+Choosing from this table. The winner is not simply the smallest error: the
+basis has to be affordable in the MOLECULE, where nao roughly triples (H + O
+on top of the halogen) and the raster is thousands of points. A set that is
+2% better and 4x more expensive is the wrong trade for a band whose intensity
+is already uncertain by an order of magnitude (03's f was 10-25x low for
+HOCl). Take the cheapest basis inside a few percent, and record the rest as
+the error bar on the SOC.
+
+Comparing DKH1 against breit-pauli on the SAME basis separates the two error
+sources: if they agree, the residual belongs to the basis, and a better basis
+is the only way forward. If they differ by as much as the error itself, the
+SOC operator is also in play.

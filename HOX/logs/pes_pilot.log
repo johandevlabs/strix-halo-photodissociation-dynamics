@@ -1,0 +1,23 @@
+==============================================================================
+== HOX Phase 1 -- 3D CCSD(T) + EOM-CCSD raster for HOCl
+==============================================================================
+  r(O-Cl) 1.4-2.4 A, 21 points
+  r(O-H)  0.8-1.25 A, 10 points
+  angle   75.0-135.0 deg, 13 points
+  total   2730 geometries, def2-tzvp, 4 EOM roots
+  estimate 432 CPU-hours = 14.4 h on 30 workers at 570 s/point
+  PILOT: 60 points spread over the grid, plus equilibrium; same CSV, so they count later
+  0 already in hocl_pes_raster.csv, 60 to run
+
+  10/60  ok=10 warn=0 bad=0  368 pts/h  eta 8.2 min
+  20/60  ok=20 warn=0 bad=0  667 pts/h  eta 3.6 min
+  30/60  ok=30 warn=0 bad=0  773 pts/h  eta 2.3 min
+  40/60  ok=40 warn=0 bad=0  767 pts/h  eta 1.6 min
+  50/60  ok=50 warn=0 bad=0  868 pts/h  eta 0.7 min
+  60/60  ok=57 warn=3 bad=0  975 pts/h  eta 0.0 min
+
+done: 57 ok, 3 warned, 0 failed, 3.7 min
+measured 111 CPU-s per point (was assuming 570)
+-> the full 2730-point raster is 84 CPU-hours = 2.8 h on 30 workers
+
+inspect: awk -F, 'NR==1||$14!="ok"' hocl_pes_raster.csv | head -30

@@ -10,6 +10,7 @@ The matching stdout for each run is in [`../logs/`](../logs/).
 | file | from | contents |
 | --- | --- | --- |
 | `hocl_surfaces.npz` `.png` | `03_surfaces/15` | **the product**: V_S over the bound region, V_T on 1.40-6.00 Å × 0.80-1.25 Å × 75-135° |
+| `hocl_excited_pes.png` | `03_surfaces/16` | the ã 3A" alone: dissociation plane, bend sensitivity, cuts, and the vertical gap |
 | `hocl_pes_raster.csv` | `03_surfaces/12` | 2730 pts, CCSD(T) + EOM-CCSD, r(O-Cl) ≤ 2.40 Å |
 | `hocl_outer_shell.csv` | `03_surfaces/13` | 1050 pts, SA-CASSCF + SC-NEVPT2, 2.20-3.60 Å |
 | `hocl_fragments.csv` | `03_surfaces/14` | V_OH(r) and E(Cl) in both method families |

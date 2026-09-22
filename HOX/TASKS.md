@@ -1161,10 +1161,30 @@ was only ever needed across the Franck-Condon window."*
 
                   Output `hocl_surfaces.npz` (V_S over the bound region for
                   chi_0; V_T on 1.40-6.00 A x 0.80-1.25 A x 75-135 deg) and
-                  `hocl_surfaces.png`: the a 3A" surface is weakly dependent
-                  on angle and steeply repulsive in O-Cl, as an n -> sigma*
-                  should be; the ground state's well sits at r(O-Cl) 1.70,
-                  r(O-H) 0.97; and the cut through both seams shows no kink.
+                  `hocl_surfaces.png`: the a 3A" surface is steeply repulsive
+                  in O-Cl, as an n -> sigma* should be; the ground state's well
+                  sits at r(O-Cl) 1.70, r(O-H) 0.97; and the cut through both
+                  seams shows no kink.
+
+                  That figure ALSO said the surface is "weakly dependent on
+                  angle", and it is not. Its angular panel shares a colour
+                  scale with the 5 eV repulsive wall, so it renders blank
+                  whatever the surface does, and the blank was read as
+                  flatness. `16_plot_excited.py`, which plots the deviation
+                  V_T(angle) - V_T(105 deg) on its own scale, gives the real
+                  numbers: **0.26 eV across the angles chi_0 samples**
+                  (85-120 deg at the Franck-Condon radius), 0.59 eV across the
+                  full 75-135 deg grid there, falling to 0.15 eV at 2.5 A and
+                  0.08 eV at 3.0 A, and exactly zero past 3.6 A where the
+                  surface is E(Cl) + V_OH by construction.
+
+                  So the bend is weak in the EXIT CHANNEL and not weak where
+                  the band is decided. Consequences: the frozen-bend
+                  assumption in `10` is a real approximation, not a harmless
+                  one, and since the bend is the soft mode that carries
+                  thermal population at 200-300 K, this is the coordinate
+                  sigma(lambda, T) is most likely to depend on. Worth a
+                  sensitivity test before the 3D propagation is trusted.
       - [ ] Jacobi transform, relaxation and propagation from `water/`, with
             an absorber from ~2.3 A along the dissociation coordinate, and
             the absorber-position check repeated in 3D.

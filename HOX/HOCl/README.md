@@ -38,6 +38,10 @@ from three sources with checks that can genuinely fail (see `03_surfaces/`).
   slope within 0.5% of UCCSD(T), roughness 0.1 meV against 4.2
 - the lowest triplet is 3A" everywhere in the Franck-Condon region, and 3A'
   arrives only past ~2.3 Å at wide angles, inside where the absorber will sit
+- the bend is **not** a spectator where the band is decided: V_T moves 0.26 eV
+  across the angles χ₀ samples, falling to 0.08 eV by 3 Å (see
+  `03_surfaces/README.md` — this corrects an earlier claim read off a
+  badly scaled plot)
 
 ## What is left
 

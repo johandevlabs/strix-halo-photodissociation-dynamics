@@ -12,6 +12,7 @@ diradical; and the exact fragment asymptote beyond that.
 | `13_outer_shell.py` | 2.20-3.60 Å | SA-CASSCF(10,6)/4 roots + SC-NEVPT2 | 1050 pts, 2.3 min |
 | `14_fragments.py` | asymptote | V_OH(r) and E(Cl) in two method families | minutes |
 | `15_splice.py` | all | joins them; local, no PySCF | seconds |
+| `16_plot_excited.py` | — | the excited state plotted on its own; local | seconds |
 
 The shell **starts at 2.20 Å, inside the raster**. NEVPT2 and CCSD(T)+EOM sit
 on different absolute energy scales, and an overlap is the only thing that can
@@ -97,7 +98,36 @@ setup the design depends on.
 
 `../data/hocl_surfaces.npz` — V_S over the bound region (for χ₀) and V_T on
 r(O-Cl) 1.40-6.00 Å × r(O-H) 0.80-1.25 Å × 75-135°.
-`../data/hocl_surfaces.png` — contours: the ã 3A" surface is weakly dependent
-on angle and steeply repulsive along O-Cl, as an n → σ* should be; the ground
-state's well sits at r(O-Cl) 1.70, r(O-H) 0.97; and the cut through both seams
-shows no kink.
+`../data/hocl_surfaces.png` — 15's own figure: the ã 3A" surface is steeply
+repulsive along O-Cl, as an n → σ* should be; the ground state's well sits at
+r(O-Cl) 1.70, r(O-H) 0.97; and the cut through both seams shows no kink.
+`../data/hocl_excited_pes.png` — `16`'s figure, the excited state alone.
+
+## 16, and a claim it overturned
+
+`16_plot_excited.py` plots only the ã 3A", with a scale per panel, because
+15's figure shares one colour scale between the angular dependence and a 5 eV
+repulsive wall. Its angular panel therefore renders blank whatever the surface
+does — and that blank was written up here, and in `TASKS.md`, as the surface
+being "weakly dependent on angle". It is not.
+
+Plotting the deviation V_T(angle) − V_T(105°) on its own scale gives:
+
+| where | spread over the angles χ₀ samples | over the full 75-135° grid |
+| --- | --- | --- |
+| Franck-Condon radius, 1.70 Å | **0.26 eV** | 0.59 eV |
+| 2.50 Å | | 0.15 eV |
+| 3.00 Å | | 0.08 eV |
+| past 3.60 Å | 0 | 0 (the surface *is* E(Cl) + V_OH there) |
+
+The bend is weak in the **exit channel** and not weak where the band is
+decided. Two consequences: `02_band_model/10`'s frozen bend is a real
+approximation rather than a harmless one, and since the bend is the soft mode
+that carries thermal population at 200-300 K, it is the coordinate σ(λ, T) is
+most likely to depend on. That deserves a sensitivity test before the 3D
+propagation is trusted.
+
+`16` also reproduces the vertical excitation as a check on the assembled
+surface: 3.353 eV at the grid minimum (1.700 Å), against `09`'s 3.432 eV at
+the true equilibrium (1.6891 Å). The 0.011 Å between those geometries is worth
+72 meV at −6.63 eV/Å, which is the whole difference.

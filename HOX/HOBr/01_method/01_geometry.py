@@ -383,6 +383,10 @@ def main():
 
     spec = MOLECULES[args.molecule]
     csv_path = args.csv or str(DATA / f"{args.molecule.lower()}_geometry.csv")
+    # git does not track empty directories, so HOBr/data/ does not exist on a
+    # fresh clone and the first append dies at the very end of the first round
+    # -- after every point has been computed. Make it rather than assume it.
+    os.makedirs(os.path.dirname(os.path.abspath(csv_path)), exist_ok=True)
     center = list(args.center) if args.center else list(spec["start"])
 
     print("=" * 72)

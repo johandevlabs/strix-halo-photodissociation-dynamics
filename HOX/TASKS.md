@@ -1317,13 +1317,88 @@ Started 2026-09-22. See `HOBr/README.md` for what HOCl's method decisions do
 and do not carry over; the short version is that anything depending on the
 halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
 
-- [ ] **Gate 1, the basis.** `toolchain/02_soc_atoms.py --sweep --atoms Br
+- [x] **Gate 1, the basis.** `toolchain/02_soc_atoms.py --sweep --atoms Br
       --soc DKH1 breit-pauli`, over 12 candidate all-electron sets. def2-TZVP
       is 16.6% low and decontracting it gives -7.6%; the band exists only
       through SOC borrowing, so this error is an intensity error. Running
       both SOC Hamiltonians on the same basis separates basis error from
       operator error. Everything downstream takes `--basis`.
+
+      **Result, 2026-09-22. Two independent error sources, and the second one
+      Phase 0.5 missed entirely.** 14 usable (basis, SOC) combinations,
+      8-31 s each.
+
+      | basis | nao | contraction | DKH1 | breit-pauli |
+      | --- | --- | --- | --- | --- |
+      | def2-tzvp | 48 | non-relativistic | -16.6% | -11.9% |
+      | def2-qzvp | 75 | non-relativistic | -16.1% | -11.3% |
+      | unc-def2-tzvp | 103 | decontracted | -7.6% | -1.7% |
+      | **cc-pvtz-dk** | **43** | **DK** | **-7.1%** | **-0.7%** |
+      | aug-cc-pvtz-dk | 59 | DK | -7.2% | -0.8% |
+      | ano-rcc | 109 | relativistic ANO | -7.0% | -0.0% |
+      | dyall-v3z | 128 | relativistic | -7.1% | -0.3% |
+
+      **1. Contraction, not size -- now with a control.** Phase 0.5 inferred
+      this from one decontraction; the sweep separates the two properly.
+      Going def2-TZVP -> def2-QZVP adds 27 functions and buys **0.5 points**.
+      Decontracting def2-TZVP, the SAME functions, buys **9.0 points**. Size
+      is nearly irrelevant; what the contraction does near the nucleus is
+      everything.
+
+      **2. `cc-pvtz-dk` is the pick: nao 43, the SMALLEST basis in the
+      sweep**, smaller than the def2-TZVP that is 16.6% wrong, and it matches
+      the 128-function dyall set to 0.1 points. A relativistically contracted
+      basis at triple zeta beats a non-relativistically contracted one at
+      quadruple zeta by 9 points while costing less. `aug-` adds nothing
+      (-0.8 vs -0.7), so diffuse functions are not where this lives.
+
+      **3. The SOC OPERATOR is a second error source, and Phase 0.5's "the
+      SOC treatment was never the problem" was wrong.** It was true of the
+      def2 contraction error, and false in general -- the operator error was
+      hidden underneath it. Across the five relativistically contracted bases,
+      a 3x range in size, DKH1 sits at **-7.0 to -7.6%: converged, and
+      wrong**. Breit-Pauli on the same bases sits at -0.0 to -1.7%. Basis
+      convergence cannot fix DKH1, because DKH1 is already converged.
+
+      **Do NOT adopt breit-pauli on this evidence alone.** Better agreement is
+      not the same as more correct. ano-rcc/breit-pauli lands 0.56 cm-1 from
+      experiment, 0.015%, which is far better than CAS(5,3) + QD-NEVPT2
+      deserves and must be partly cancellation. Breit-Pauli is a first-order
+      reduction generally held to be LESS reliable than DKH/X2C as Z grows,
+      so it winning at Br is the kind of result that wants a second,
+      independent test before it becomes a decision.
+
+      **The test, and a falsifiable prediction.** Rerun the sweep on Cl, where
+      there is an independent anchor: `02` gave Cl/def2-TZVP/DKH1 = -4.3%. If
+      the two effects above are real and general, Cl should show the same
+      pattern, smaller -- cc-pvtz-dk better than def2-tzvp, and breit-pauli
+      better again, both landing inside ~2%. If instead breit-pauli OVERSHOOTS
+      on Cl (a positive error), then the Br agreement is cancellation, and the
+      right choice is DKH1 with a known -7% carried as an explicit error bar
+      on the intensity.
+
+      **This does not rescue HOCl's intensity.** f scales as |H_SO|^2, so even
+      a 7% SOC error is only 14% in f. HOCl's f was 10-25x low against the
+      measured band; that discrepancy is somewhere else entirely and should
+      not be chased here.
+
+      Two things left untested. `unc-def2-qzvp` failed with `could not
+      broadcast (152,152) into (157,157)` -- 5 functions short of nao,
+      consistent with the SCF dropping near-linear-dependent functions by
+      canonical orthogonalisation while the SOC integral code still expects
+      the full nao. Not worth chasing, since cc-pvtz-dk is better and a third
+      the size. And `x2c-tzvpall`, `x2c-qzvpall`, `sapporo-dkh3-tzp` and
+      `jorge-tzp-dkh` need `pip install basis-set-exchange`; x2c-*all is the
+      basis contracted FOR the Hamiltonian being run, so it is the one
+      theoretically-motivated gap, but at -0.7% for 43 functions the
+      remaining headroom is small.
 - [ ] **Gate 2, the geometry and force field.** `HOBr/01_method/01_geometry.py`:
+      *First run, 2026-09-22: crashed after computing all 27 points.* `HOBr/data/`
+      does not exist on a fresh clone -- git does not track empty directories --
+      and the CSV is only opened once the round finishes, so every calculation
+      was done and then thrown away. The script now makes the directory, and a
+      `.gitkeep` is committed. Cheap here; the same bug in front of the 3D
+      raster would have cost hours.
       CCSD(T)/x2c on a 3x3x3 grid, full quadratic fit, frequencies from
       B^T H B with B finite-differenced from the coordinate definition rather
       than written out.

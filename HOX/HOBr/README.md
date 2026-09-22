@@ -25,16 +25,54 @@ anything that depends on the halogen being light:
 | raster + NEVPT2 shell + fragment asymptote, spliced | yes — the recipe, not the numbers |
 | def2-TZVP | **no** — see below |
 
-**The basis is the first gate.** def2-TZVP underestimates the Br 2P splitting
-by 16.6%; decontracting it recovers more than half (−7.6%). It is
-all-electron for Br but non-relativistically contracted, and the SOC operator
-samples exactly the near-nuclear region that contraction gets wrong. Since the
-HOBr band exists *only* through SOC borrowing, that error goes straight into
-the intensity. Settle it at the atom:
+## The basis: settled, 2026-09-22
 
-```
-python ../toolchain/02_soc_atoms.py --sweep --atoms Br --soc DKH1 breit-pauli
-```
+Run at the atom, where it costs seconds
+(`../toolchain/02_soc_atoms.py --sweep --atoms Br --soc DKH1 breit-pauli`,
+log in [`logs/br_basis_sweep.log`](logs/br_basis_sweep.log)). Against the
+observed Br 2P splitting of 3685.24 cm⁻¹:
+
+| basis | nao | contraction | DKH1 | breit-pauli |
+| --- | --- | --- | --- | --- |
+| def2-tzvp | 48 | non-relativistic | −16.6% | −11.9% |
+| def2-qzvp | 75 | non-relativistic | −16.1% | −11.3% |
+| unc-def2-tzvp | 103 | decontracted | −7.6% | −1.7% |
+| **cc-pvtz-dk** | **43** | **DK** | **−7.1%** | **−0.7%** |
+| aug-cc-pvtz-dk | 59 | DK | −7.2% | −0.8% |
+| ano-rcc | 109 | relativistic ANO | −7.0% | −0.0% |
+| dyall-v3z | 128 | relativistic | −7.1% | −0.3% |
+
+**Use `cc-pvtz-dk`.** It is the *smallest* basis in the sweep — smaller than
+the def2-TZVP that is 16.6% wrong — and it matches the 128-function dyall set
+to 0.1 points. `aug-` adds nothing (−0.8 against −0.7), so diffuse functions
+are not where this lives.
+
+**Contraction, not size.** def2-TZVP → def2-QZVP adds 27 functions and buys
+0.5 points. Decontracting def2-TZVP — the same functions — buys 9.0 points.
+What the contraction does near the nucleus is everything; how many functions
+there are is almost irrelevant.
+
+**The SOC operator is a second, independent error.** Across the five
+relativistically contracted bases, spanning a 3× range in size, DKH1 sits at
+−7.0 to −7.6%: converged, and wrong. Breit-Pauli on the same bases sits at
+−0.0 to −1.7%. So basis convergence cannot fix DKH1 — it is already
+converged. Phase 0.5 concluded "the SOC treatment was never the problem";
+that was true of the def2 contraction error and false in general, and the
+operator error was hidden underneath it.
+
+**Breit-Pauli is not adopted yet.** Better agreement is not the same as more
+correct: ano-rcc/BP lands 0.56 cm⁻¹ from experiment, which is far better than
+CAS(5,3) + QD-NEVPT2 deserves and must be partly cancellation, and BP is a
+first-order reduction generally held to be *less* reliable than DKH/X2C as Z
+grows. The test is Cl, where `02` gives an independent anchor of −4.3% on
+def2-TZVP/DKH1. Prediction: Cl shows the same pattern, smaller — cc-pvtz-dk
+better than def2-tzvp, BP better again, both inside ~2%. If BP instead
+*overshoots* on Cl, the Br agreement is cancellation and the right choice is
+DKH1 carrying an explicit −7% error bar on the intensity.
+
+**None of this rescues HOCl's intensity.** f scales as |H_SO|², so even a 7%
+SOC error is 14% in f, against the 10-25× by which HOCl's f fell short of
+measurement. That discrepancy is elsewhere.
 
 ## Layout
 
@@ -51,12 +89,17 @@ from.
 
 ## Order of work
 
-- [ ] **Br basis**, at the atom, via `toolchain/02_soc_atoms.py --sweep`.
-      Gates everything: every script below takes `--basis`.
+- [x] **Br basis**, at the atom. Settled: `cc-pvtz-dk`. See above.
+- [ ] **The Cl cross-check**, which decides DKH1 vs breit-pauli:
+      `python ../toolchain/02_soc_atoms.py --sweep --atoms Cl --soc DKH1 breit-pauli`
 - [ ] `01_method/01_geometry.py` — equilibrium geometry and harmonic force
       field from CCSD(T). Run `--molecule HOCl` first: its fundamentals are
       known, so it validates the whole chain against measurement before HOBr
-      is asked for a number nobody can check.
+      is asked for a number nobody can check. Worth running it under both
+      `--basis def2-tzvp` (like-for-like with the HOCl surface work) and
+      `--basis cc-pvtz-dk`, since that also tests whether the basis chosen for
+      SOC is equally good for a force field, which the atomic sweep cannot
+      say.
 - [ ] **Molecular SOC and the borrowed intensity**, the analogue of
       `HOCl/01_method/03`. This is where the basis choice is confirmed on a
       molecule rather than a free atom, and where f is compared with Ingham's

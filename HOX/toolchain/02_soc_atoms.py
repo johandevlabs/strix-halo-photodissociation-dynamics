@@ -34,6 +34,8 @@ Usage:
     python 02_soc_atoms.py --atoms Cl              # fastest single check
     python 02_soc_atoms.py --atoms Cl --no-nevpt2  # CASSCF-level SOC only
     python 02_soc_atoms.py --soc breit-pauli
+    python 02_soc_atoms.py --sweep --atoms Br          # which basis for HOBr
+    python 02_soc_atoms.py --sweep --atoms Br --soc DKH1 breit-pauli
 """
 import argparse
 import time
@@ -61,6 +63,72 @@ FINE_STRUCTURE_CM = {
 # which X2CAMF cannot use because the SOC integrals need the core; the run
 # checks mol.has_ecp() rather than trusting the basis name.
 DEFAULT_BASIS = "def2-tzvp"
+
+# Candidates for the sweep, in rough order of expected cost. The Phase 0.5
+# finding is that def2-TZVP is all-electron for Br but NON-RELATIVISTICALLY
+# CONTRACTED, and the SOC operator samples precisely the near-nuclear region
+# that contraction gets wrong -- decontracting it recovered more than half the
+# error. So the sweep is mostly about what a basis does near the nucleus:
+#
+#   unc-*            the same functions, contraction removed (the 7.6% fix)
+#   x2c-*all         Pollak-Weigend, contracted FOR an x2c Hamiltonian, which
+#                    is the one we actually run
+#   *-dk / *-dkh     contracted for Douglas-Kroll-Hess
+#   ano-rcc, dyall   built for relativistic all-electron work from the start
+#
+# Availability differs between PySCF's bundled library and basis-set-exchange,
+# and neither is worth guessing at from a laptop -- the sweep probes each name
+# and reports where it came from, so one run on the EVO settles it.
+CANDIDATE_BASES = [
+    "def2-tzvp",            # the baseline, and what every Prism example uses
+    "unc-def2-tzvp",        # Phase 0.5: -16.6% -> -7.6%
+    "def2-qzvp",
+    "unc-def2-qzvp",
+    "x2c-tzvpall",
+    "x2c-qzvpall",
+    "cc-pvtz-dk",
+    "aug-cc-pvtz-dk",
+    "sapporo-dkh3-tzp",
+    "ano-rcc",
+    "dyall-v3z",
+    "jorge-tzp-dkh",
+]
+
+
+class BasisUnavailable(Exception):
+    """The name is not in PySCF's library and basis-set-exchange cannot help."""
+
+
+def resolve_basis(atom, name):
+    """Return (basis_for_gto, where_it_came_from).
+
+    PySCF's bundled library first, then basis-set-exchange if installed.
+    Raises BasisUnavailable rather than letting a sweep die on one name.
+    """
+    try:
+        gto.M(atom=f"{atom} 0 0 0", basis=name, spin=1, verbose=0)
+        return name, "pyscf"
+    except BasisUnavailable:
+        raise
+    except Exception as exc:
+        first = exc
+
+    try:
+        import basis_set_exchange as bse
+    except ImportError:
+        raise BasisUnavailable(
+            f"not in pyscf ({type(first).__name__}) and basis-set-exchange "
+            f"is not installed (pip install basis-set-exchange)")
+
+    try:
+        txt = bse.get_basis(name, elements=[atom], fmt="nwchem",
+                            header=False)
+        parsed = {atom: gto.basis.parse(txt)}
+        gto.M(atom=f"{atom} 0 0 0", basis=parsed, spin=1, verbose=0)
+        return parsed, "bse"
+    except Exception as exc:
+        raise BasisUnavailable(
+            f"pyscf: {type(first).__name__}; bse: {type(exc).__name__}: {exc}")
 
 
 def build_casscf(atom, basis, ncas=3, nelecas=5, nstates=3, verbose=0):
@@ -177,6 +245,125 @@ def analyse(atom, energies):
     return float(np.mean(groups[1]) - np.mean(groups[0]))
 
 
+def measure(atom, basis, soc, use_nevpt2=True, verbose=0, quiet=False):
+    """One (atom, basis, soc) point: returns (splitting_cm, nao, wall_s).
+
+    splitting_cm is None if the degeneracy or ordering check failed, which is
+    a different outcome from a crash and is reported as such.
+    """
+    t0 = time.time()
+    mol, mf, mc = build_casscf(atom, basis, verbose=verbose)
+    nao = mol.nao_nr()
+    energies, osc = run_soc(mf, mc, soc=soc, use_nevpt2=use_nevpt2,
+                            verbose=0 if quiet else 4)
+    if not quiet and osc is not None:
+        arr = np.atleast_1d(np.asarray(osc)).ravel()
+        print(f"  oscillator strengths returned: {arr.size} values, "
+              f"max {np.max(np.abs(arr)):.3e}")
+        print("      (meaningless for a free atom -- what matters is that "
+              "kernel() returns them at all, since that is the borrowed "
+              "intensity HOX needs)")
+    split = analyse(atom, energies) if not quiet else _quiet_analyse(energies)
+    return split, nao, time.time() - t0
+
+
+def _quiet_analyse(energies):
+    """analyse() without the per-state dump, for the sweep's inner loop."""
+    rel = (np.asarray(energies) - energies[0]) * HARTREE2CM
+    if len(rel) < 6:
+        return None
+    groups, current = [], [rel[0]]
+    for e in rel[1:]:
+        if abs(e - current[-1]) < 1.0:
+            current.append(e)
+        else:
+            groups.append(current)
+            current = [e]
+    groups.append(current)
+    if [len(g) for g in groups][:2] != [4, 2]:
+        return None
+    return float(np.mean(groups[1]) - np.mean(groups[0]))
+
+
+def sweep(atoms, bases, socs, use_nevpt2=True, verbose=0):
+    """Basis sweep: which all-electron set reproduces the fine structure.
+
+    Written for Br, where def2-TZVP is 16.6% low and the HOBr band exists ONLY
+    through SOC borrowing, so this error propagates straight into the
+    intensity. Fixing it at the atom costs minutes; discovering it in a 3D
+    raster costs days.
+    """
+    rows = []
+    for atom in atoms:
+        obs = FINE_STRUCTURE_CM.get(atom, float("nan"))
+        print(f"\n{'=' * 72}\n== {atom}: basis sweep against "
+              f"{obs:.2f} cm-1 observed\n{'=' * 72}")
+        for name in bases:
+            try:
+                basis, where = resolve_basis(atom, name)
+            except BasisUnavailable as exc:
+                print(f"  {name:20s} unavailable: {exc}")
+                rows.append((atom, name, None, None, None, None, "unavailable"))
+                continue
+            for soc in socs:
+                tag = f"{name} [{where}] {soc}"
+                try:
+                    split, nao, wall = measure(atom, basis, soc,
+                                               use_nevpt2=use_nevpt2,
+                                               verbose=verbose, quiet=True)
+                except Exception as exc:
+                    print(f"  {tag:40s} FAILED {type(exc).__name__}: {exc}")
+                    rows.append((atom, name, soc, None, None, None,
+                                 f"fail:{type(exc).__name__}"))
+                    continue
+                if split is None:
+                    print(f"  {tag:40s} bad degeneracy/ordering -- not a "
+                          f"usable number")
+                    rows.append((atom, name, soc, None, nao, wall,
+                                 "bad-pattern"))
+                    continue
+                err = 100.0 * (split - obs) / obs
+                print(f"  {tag:40s} nao {nao:4d}  {split:9.2f} cm-1  "
+                      f"{err:+6.1f}%  {wall:6.1f} s")
+                rows.append((atom, name, soc, split, nao, wall, "ok"))
+    return rows
+
+
+def report_sweep(rows):
+    """Rank by |error|, and say what it means for the molecular cost."""
+    print("\n" + "=" * 72)
+    print("== sweep summary, ranked by |error|")
+    print("=" * 72)
+    print(f"{'atom':>5} {'basis':>18} {'soc':>12} {'nao':>5} "
+          f"{'calc/cm-1':>11} {'err':>8} {'wall/s':>8}")
+    ok = [r for r in rows if r[6] == "ok"]
+    for atom, name, soc, split, nao, wall, _ in sorted(
+            ok, key=lambda r: abs(r[3] - FINE_STRUCTURE_CM[r[0]])):
+        obs = FINE_STRUCTURE_CM[atom]
+        print(f"{atom:>5} {name:>18} {soc:>12} {nao:>5} {split:11.2f} "
+              f"{100.0 * (split - obs) / obs:+7.1f}% {wall:8.1f}")
+    bad = [r for r in rows if r[6] != "ok"]
+    if bad:
+        print("\n  not usable:")
+        for atom, name, soc, _, _, _, why in bad:
+            print(f"    {atom:>3} {name:20s} {str(soc):12s} {why}")
+    if not ok:
+        return
+    print("""
+Choosing from this table. The winner is not simply the smallest error: the
+basis has to be affordable in the MOLECULE, where nao roughly triples (H + O
+on top of the halogen) and the raster is thousands of points. A set that is
+2% better and 4x more expensive is the wrong trade for a band whose intensity
+is already uncertain by an order of magnitude (03's f was 10-25x low for
+HOCl). Take the cheapest basis inside a few percent, and record the rest as
+the error bar on the SOC.
+
+Comparing DKH1 against breit-pauli on the SAME basis separates the two error
+sources: if they agree, the residual belongs to the basis, and a better basis
+is the only way forward. If they differ by as much as the error itself, the
+SOC operator is also in play.""")
+
+
 def main():
     p = argparse.ArgumentParser(
         description=__doc__,
@@ -187,10 +374,17 @@ def main():
     p.add_argument("--basis", default=DEFAULT_BASIS,
                    help=f"all-electron relativistic basis (default "
                         f"{DEFAULT_BASIS}, as used by every Prism SOC example)")
-    p.add_argument("--soc", default="DKH1",
-                   help="SOC Hamiltonian: DKH1 (= x2c-1, matches the .x2c() "
-                        "mean field) or breit-pauli. Running both and "
-                        "comparing is itself a check.")
+    p.add_argument("--soc", nargs="+", default=["DKH1"],
+                   help="SOC Hamiltonian(s): DKH1 (= x2c-1, matches the "
+                        ".x2c() mean field) and/or breit-pauli. Giving both "
+                        "is itself a check: it separates basis error from "
+                        "operator error.")
+    p.add_argument("--sweep", action="store_true",
+                   help="sweep candidate all-electron bases instead of "
+                        "running one. This is how the Br basis gets chosen "
+                        "before any HOBr surface is built.")
+    p.add_argument("--sweep-bases", nargs="+", default=CANDIDATE_BASES,
+                   help="override the candidate list")
     p.add_argument("--no-nevpt2", action="store_true",
                    help="state interaction over CASSCF only, skipping the "
                         "QD-NEVPT2 correction")
@@ -198,52 +392,53 @@ def main():
                    help="pyscf verbosity (prism is told 4 regardless)")
     args = p.parse_args()
 
+    if args.sweep:
+        rows = sweep(args.atoms, args.sweep_bases, args.soc,
+                     use_nevpt2=not args.no_nevpt2, verbose=args.verbose)
+        report_sweep(rows)
+        return
+
     print("=" * 72)
     print("== HOX Phase 0.5 -- halogen fine structure as an SOC validation")
-    print(f"== basis {args.basis}, soc {args.soc}, "
+    print(f"== basis {args.basis}, soc {', '.join(args.soc)}, "
           f"{'CASSCF state interaction' if args.no_nevpt2 else 'QD-NEVPT2 + SOC'}")
     print("=" * 72)
 
     results, timings = {}, {}
     for atom in args.atoms:
-        print(f"\n--- {atom} " + "-" * 60)
-        t0 = time.time()
-        try:
-            mol, mf, mc = build_casscf(atom, args.basis, verbose=args.verbose)
-            t_ref = time.time() - t0
-            print(f"  reference done in {t_ref:7.1f} s "
-                  f"(nao {mol.nao_nr()}, CAS(5,3), 3 roots)")
-
-            energies, osc = run_soc(mf, mc, soc=args.soc,
-                                    use_nevpt2=not args.no_nevpt2)
-            if osc is not None:
-                arr = np.atleast_1d(np.asarray(osc)).ravel()
-                print(f"  oscillator strengths returned: {arr.size} values, "
-                      f"max {np.max(np.abs(arr)):.3e}")
-                print("      (meaningless for a free atom -- what matters is "
-                      "that kernel() returns them at all, since that is the "
-                      "borrowed intensity HOX needs)")
-            results[atom] = analyse(atom, energies)
-        except Exception as exc:
-            print(f"  FAILED: {type(exc).__name__}: {exc}")
-            traceback.print_exc()
-            results[atom] = None
-        timings[atom] = time.time() - t0
-        print(f"  wall time {timings[atom]:7.1f} s")
+        for soc in args.soc:
+            key = (atom, soc)
+            print(f"\n--- {atom}, {soc} " + "-" * 50)
+            t0 = time.time()
+            try:
+                split, nao, _ = measure(atom, args.basis, soc,
+                                        use_nevpt2=not args.no_nevpt2,
+                                        verbose=args.verbose)
+                print(f"  nao {nao}, CAS(5,3), 3 roots")
+                results[key] = split
+            except Exception as exc:
+                print(f"  FAILED: {type(exc).__name__}: {exc}")
+                traceback.print_exc()
+                results[key] = None
+            timings[key] = time.time() - t0
+            print(f"  wall time {timings[key]:7.1f} s")
 
     print("\n" + "=" * 72)
     print("== fine structure 2P_1/2 - 2P_3/2")
     print("=" * 72)
-    print(f"{'atom':>6}{'calc/cm-1':>14}{'obs/cm-1':>12}{'err':>10}{'wall/s':>10}")
+    print(f"{'atom':>6}{'soc':>14}{'calc/cm-1':>14}{'obs/cm-1':>12}"
+          f"{'err':>10}{'wall/s':>10}")
     for atom in args.atoms:
-        obs = FINE_STRUCTURE_CM.get(atom, float("nan"))
-        calc = results.get(atom)
-        wall = timings.get(atom, float("nan"))
-        if calc is None:
-            print(f"{atom:>6}{'--':>14}{obs:12.2f}{'--':>10}{wall:10.1f}")
-        else:
-            print(f"{atom:>6}{calc:14.2f}{obs:12.2f}"
-                  f"{100.0 * (calc - obs) / obs:9.1f}%{wall:10.1f}")
+        for soc in args.soc:
+            obs = FINE_STRUCTURE_CM.get(atom, float("nan"))
+            calc = results.get((atom, soc))
+            wall = timings.get((atom, soc), float("nan"))
+            if calc is None:
+                print(f"{atom:>6}{soc:>14}{'--':>14}{obs:12.2f}"
+                      f"{'--':>10}{wall:10.1f}")
+            else:
+                print(f"{atom:>6}{soc:>14}{calc:14.2f}{obs:12.2f}"
+                      f"{100.0 * (calc - obs) / obs:9.1f}%{wall:10.1f}")
 
     print("""
 Reading the result:

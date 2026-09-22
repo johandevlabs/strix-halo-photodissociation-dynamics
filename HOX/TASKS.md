@@ -1042,6 +1042,46 @@ was only ever needed across the Franck-Condon window."*
             exponential, and the 3.6 meV along O-H is identical in every band,
             which is what a fixed interpolation error on Morse curvature looks
             like.
+
+      - [ ] **Outer shell + splice to the asymptote (Johan's call: option B).**
+            A propagation grid runs far past 2.40 A, so the surface must be
+            defined and sensible out to the asymptote even though `10` showed
+            the band cannot see beyond ~2.3 A. On the a 3A" surface HOCl
+            breaks the **O-Cl** bond, so the departing atom is Cl and the
+            surviving fragment is **OH** -- the same diatomic water needed, by
+            coincidence -- and the asymptote is
+            **E(Cl, 2P) + V_OH(r_OH)**, a curve in the spectator coordinate,
+            not a single number. `05`'s fragment check already anchors it:
+            OH(2Pi) −75.70499, Cl(2P) −461.00908, and the triplet at 4.0 A sat
+            28 meV from their sum.
+
+            Note water's two-channel complication does NOT recur: its two O-H
+            bonds were equivalent, so half the flux left through the
+            "spectator" bond and an absorber was needed in both radial
+            coordinates. Here the spectator O-H is a strong bond and the
+            triplet is repulsive only along O-Cl -- one channel. Worth
+            verifying rather than assuming.
+
+            - [ ] `13_outer_shell.py`: 2.20-3.60 A filled with the
+                  symmetry-forced 3A" SA-CASSCF(10,6)/4 roots + SC-NEVPT2 that
+                  `06` followed smoothly to 3.6 A. Its 15% too-shallow
+                  Franck-Condon slope does not matter out here, where only a
+                  smooth path into the absorber is needed. **Starts at
+                  2.20 A, inside the raster**: NEVPT2 and CCSD(T)+EOM are on
+                  different absolute scales, and the overlap is what fixes the
+                  offset. Coarser in the spectator coordinates (angle 10 deg)
+                  since the surface tends to an angle-independent asymptote;
+                  r(O-H) keeps 0.05 A because it carries the asymptotic shape.
+                  1050 points, ~1.9 h on 30 workers at a guessed 200 CPU-s.
+                  Active-space helpers imported from `07` rather than copied.
+            - [ ] `14_fragments.py`: V_OH(r) and E(Cl) in both methods, as
+                  `water/05_oh_diatomic.py` did -- two unrelated methods on
+                  the diatomic was what made water's splice trustworthy.
+            - [ ] `15_splice.py`: align the shell to the raster by the
+                  constant offset over 2.20-2.40 A (**check it is constant
+                  across r(O-H) and angle** -- water's held to 13 meV), blend
+                  onto E(Cl) + V_OH(r_OH) at long range, then PES contour
+                  plots as the intermediate result.
       - [ ] Jacobi transform, relaxation and propagation from `water/`, with
             an absorber from ~2.3 A along the dissociation coordinate, and
             the absorber-position check repeated in 3D.

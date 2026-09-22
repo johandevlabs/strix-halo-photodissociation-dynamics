@@ -1117,11 +1117,40 @@ was only ever needed across the Franck-Condon window."*
                   curve, whose **constancy** is what the splice needs. The
                   harmonic-frequency extraction was checked against a
                   synthetic curve of known omega_e.
-            - [ ] `15_splice.py`: align the shell to the raster by the
-                  constant offset over 2.20-2.40 A (**check it is constant
-                  across r(O-H) and angle** -- water's held to 13 meV), blend
-                  onto E(Cl) + V_OH(r_OH) at long range, then PES contour
-                  plots as the intermediate result.
+            - [x] `14` **run**: OH re 0.9782 A (UCCSD(T)) and 0.9803
+                  (NEVPT2) against 0.9697 observed; omega_e 3727 and 3768
+                  against 3738. Two unrelated methods agreeing with each other
+                  and with measurement at ~1%, which is what made water's
+                  diatomic trustworthy. NEVPT2 - UCCSD(T) runs 0.791-0.855 eV
+                  across the curve, spread 64 meV overall and 36 meV over the
+                  0.80-1.25 A actually used, varying smoothly rather than
+                  scattering.
+            - [x] `15_splice.py`: **done, and the per-column alignment was
+                  necessary.** Offsets span 330 meV across (r(O-H), angle), so
+                  a single global offset would misplace columns by up to
+                  198 meV; fitting one per column absorbs that exactly.
+
+                  The test an offset cannot fake is whether each column's
+                  offset is constant ACROSS the overlap radii: **median
+                  10 meV, max 42 meV**. Independently, the raster and shell
+                  slopes at 2.30 A (interior to both grids) agree to
+                  0.011 eV/A on average, worst column 0.181 eV/A = 36 meV over
+                  the 0.20 A blend. Aligned shell at 3.60 A minus
+                  E(Cl) + V_OH: -59 to +67 meV, expected since the shell is
+                  still on its van der Waals tail there.
+
+                  Note the "local residual 0.0 meV" figures the script also
+                  prints are NOT evidence: everything on the output grid is
+                  spline-interpolated and cosine-blended, so that test
+                  measures the interpolation, not the physics. The slope and
+                  offset-constancy checks are the ones that can fail.
+
+                  Output `hocl_surfaces.npz` (V_S over the bound region for
+                  chi_0; V_T on 1.40-6.00 A x 0.80-1.25 A x 75-135 deg) and
+                  `hocl_surfaces.png`: the a 3A" surface is weakly dependent
+                  on angle and steeply repulsive in O-Cl, as an n -> sigma*
+                  should be; the ground state's well sits at r(O-Cl) 1.70,
+                  r(O-H) 0.97; and the cut through both seams shows no kink.
       - [ ] Jacobi transform, relaxation and propagation from `water/`, with
             an absorber from ~2.3 A along the dissociation coordinate, and
             the absorber-position check repeated in 3D.

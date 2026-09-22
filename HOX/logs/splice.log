@@ -1,0 +1,32 @@
+==============================================================================
+== HOX Phase 1 -- splicing the a 3A" surface
+==============================================================================
+  raster 21x10x13 over r(O-Cl) 1.4-2.4 A
+  shell  15x10x7 over 2.2-3.6 A
+  missing: raster 0, shell 0
+
+  overlap radii used for the offset: 2.20, 2.30, 2.40 A
+  offset (raster - shell): -2.149 to -1.819 eV, column spread 330 meV
+  spread of each column ACROSS the overlap radii: max 42 meV, median 10 meV
+  (that second number is the shape test: an offset cannot absorb a shape disagreement)
+  a single global offset would misplace columns by up to 198 meV; using per-column offsets
+
+  shell (aligned) at 3.60 A minus E(Cl)+V_OH: -59 to 67 meV
+  (water's analogous splice check held to 13 meV; here the shell is still on its
+   van der Waals tail at 3.6 A, so a residual of tens of meV is expected)
+
+  assembled grid (93, 10, 13) over r(O-Cl) 1.4-6.0 A
+  raster->shell      blend 2.2-2.4 A: max local residual 0.0 meV
+  shell->asymptote   blend 3.2-3.6 A: max local residual 0.0 meV
+  whole surface: max local residual 0.4 meV; within 2.30 A 0.4 meV
+  (those residuals mostly measure the spline interpolation and the
+   cosine blends, which are smooth by construction. The test that
+   can actually fail is next.)
+
+  slope agreement at the seam (the check a blend cannot fake):
+    at 2.20 A: raster -0.125, shell +0.045 eV/A; worst column mismatch 0.444 eV/A = 89 meV over the 0.20 A blend   (one-sided derivative at a grid edge)
+    at 2.30 A: raster +0.091, shell +0.102 eV/A; worst column mismatch 0.181 eV/A = 36 meV over the 0.20 A blend
+    at 2.40 A: raster +0.137, shell +0.180 eV/A; worst column mismatch 0.186 eV/A = 37 meV over the 0.20 A blend   (one-sided derivative at a grid edge)
+
+  wrote hocl_surfaces.npz
+  wrote hocl_surfaces.png

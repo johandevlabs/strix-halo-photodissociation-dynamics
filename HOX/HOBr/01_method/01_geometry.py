@@ -86,8 +86,8 @@ MOLECULES = {
                  obs_geom=None),
 }
 
-FIELDS = ["r_ox_A", "r_oh_A", "theta_deg", "nbf", "e_hf_Ha", "e_ccsd_Ha",
-          "e_ccsdt_Ha", "t1", "status", "wall_s"]
+FIELDS = ["basis", "r_ox_A", "r_oh_A", "theta_deg", "nbf", "e_hf_Ha",
+          "e_ccsd_Ha", "e_ccsdt_Ha", "t1", "status", "wall_s"]
 
 
 def geometry(halogen, r_ox, r_oh, theta):
@@ -118,7 +118,7 @@ def compute_point(task):
     """CCSD(T) with x2c at one geometry."""
     halogen, r_ox, r_oh, theta, basis, mem = task
     t0 = time.perf_counter()
-    row = {"r_ox_A": round(r_ox, 5), "r_oh_A": round(r_oh, 5),
+    row = {"basis": basis, "r_ox_A": round(r_ox, 5), "r_oh_A": round(r_oh, 5),
            "theta_deg": round(theta, 4), "status": "ok"}
     try:
         from pyscf import gto, scf, cc
@@ -168,13 +168,21 @@ def _init_worker(counter):
         pass
 
 
-def key(r_ox, r_oh, theta):
+def key(basis, r_ox, r_oh, theta):
     """The identity of a grid point, used by BOTH the grid and the CSV.
 
-    Two different roundings here is a silent way to recompute every point on
-    every rerun while the resume logic looks like it works.
+    THE BASIS IS PART OF THE IDENTITY. Without it a rerun under a different
+    basis finds the old rows already present, computes nothing, and reports
+    the previous basis's numbers under the new one's header -- which is
+    exactly what happened on 2026-09-22 and produced two bit-identical logs
+    labelled def2-tzvp and cc-pvtz-dk. A cache keyed on less than the thing
+    it caches is a silent wrong answer, not a missing feature.
+
+    Two different roundings between the grid and the CSV would likewise make
+    every rerun recompute everything while appearing to resume, so both go
+    through here.
     """
-    return (round(float(r_ox), 5), round(float(r_oh), 5),
+    return (str(basis), round(float(r_ox), 5), round(float(r_oh), 5),
             round(float(theta), 4))
 
 
@@ -186,17 +194,18 @@ def load_done(path):
     with open(path) as fh:
         for row in csv.DictReader(fh):
             try:
-                k = key(row["r_ox_A"], row["r_oh_A"], row["theta_deg"])
+                k = key(row.get("basis", ""), row["r_ox_A"], row["r_oh_A"],
+                        row["theta_deg"])
             except (KeyError, ValueError):
                 continue
             done[k] = row
     return done
 
 
-def build_grid(center, steps):
+def build_grid(basis, center, steps):
     """3x3x3 around the centre: 27 points for 10 quadratic coefficients."""
     axes = [[c - s, c, c + s] for c, s in zip(center, steps)]
-    return [key(*p) for p in itertools.product(*axes)]
+    return [key(basis, *p) for p in itertools.product(*axes)]
 
 
 def quadratic_fit(pts, energies):
@@ -397,7 +406,10 @@ def main():
     rounds = [center] + ([None] if args.refine else [])
     for n, c in enumerate(rounds):
         if c is None:                       # --refine: re-centre and repeat
-            rows = list(load_done(csv_path).values())
+            # ONE basis only: the CSV now holds several, and averaging a
+            # minimum over two of them would be quietly meaningless.
+            rows = [r for k, r in load_done(csv_path).items()
+                    if k[0] == args.basis]
             good = [r for r in rows if r["status"].startswith(("ok", "warn"))]
             pts = [(float(r["r_ox_A"]), float(r["r_oh_A"]),
                     float(r["theta_deg"])) for r in good]
@@ -407,14 +419,14 @@ def main():
                   f"{c[0]:.4f}, {c[1]:.4f}, {c[2]:.2f}")
             args.center = c
 
-        grid = build_grid(c, args.steps)
+        grid = build_grid(args.basis, c, args.steps)
         done = load_done(csv_path)
         todo = [g for g in grid if g not in done]
         print(f"\n  round {n + 1}: {len(grid)} points, {len(todo)} to compute")
 
         if todo and not args.report_only:
-            tasks = [(spec["halogen"], a, b, t, args.basis, args.memory)
-                     for a, b, t in todo]
+            tasks = [(spec["halogen"], a, b, t, bs, args.memory)
+                     for bs, a, b, t in todo]
             new = os.path.exists(csv_path)
             t0 = time.time()
             ctx = mp.get_context("fork")     # 3.14 defaults to forkserver,

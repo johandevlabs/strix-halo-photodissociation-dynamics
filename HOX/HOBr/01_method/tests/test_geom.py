@@ -46,10 +46,11 @@ def energy_from_cartesian_bohr(x):
                                   th_rad / m.DEG])
 
 print("quadratic_fit recovers a known force field:")
-grid = m.build_grid(list(EQ + np.array([0.01, -0.008, 0.7])),  # off-centre
-                    [0.03, 0.03, 3.0])
-e = [energy_from_internals(p) for p in grid]
-coords, g, H, resid = m.quadratic_fit(grid, e)
+grid = m.build_grid("test-basis", list(EQ + np.array([0.01, -0.008, 0.7])),
+                    [0.03, 0.03, 3.0])            # deliberately off-centre
+pts = [g[1:] for g in grid]                       # drop the basis element
+e = [energy_from_internals(p) for p in pts]
+coords, g, H, resid = m.quadratic_fit(pts, e)
 check("rms residual (exact quadratic)", resid, 0.0, 1e-12)
 for i, nm in enumerate("r_OX r_OH theta".split()):
     check(f"minimum {nm}", coords[i], EQ[i], 1e-8)

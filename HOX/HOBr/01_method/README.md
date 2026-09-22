@@ -50,3 +50,24 @@ Run both before sending anything to the EVO; neither needs PySCF.
   rounding θ to 5 decimals and the CSV to 4, which would have silently
   recomputed every point on every rerun while the resume logic looked like it
   worked; both now go through one `key()`.
+
+## The cache bug, 2026-09-22
+
+The first two runs produced logs headed `CCSD(T)/def2-tzvp` and
+`CCSD(T)/cc-pvtz-dk` containing **bit-identical numbers**, down to a 0.145 meV
+fit residual. Two different bases cannot do that.
+
+`key()` identified a grid point by geometry alone, so the second run found all
+27 points already present, computed nothing, and reported the first run's rows
+under its own header. Only one set of energies was ever computed — `nbf` 78
+and the wall times identify them as `cc-pvtz-dk` — and the def2-TZVP log is
+simply mislabelled. The stored CSV has been annotated accordingly.
+
+A cache keyed on less than the thing it caches does not fail, it answers. The
+basis is now part of the key and a `basis` column of the CSV, `--refine`
+filters to one basis, and `tests/test_run.py` runs two bases into the same
+file and checks that the second is not served from the first's rows and that
+the reported frequencies differ.
+
+What made it visible was reading two logs side by side and noticing that
+agreement was *too* good. Nothing in the run would have flagged it.

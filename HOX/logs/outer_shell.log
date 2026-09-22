@@ -1,0 +1,114 @@
+==============================================================================
+== HOX Phase 1 -- multireference outer shell of the a 3A" surface
+==============================================================================
+  r(O-Cl) 2.2-3.6 A, 15 points (overlaps the raster below 2.40)
+  r(O-H)  0.8-1.25 A, 10 points
+  angle   75.0-135.0 deg, 7 points
+  total   1050 geometries, CAS(10,6) SA-4 + SC-NEVPT2, def2-tzvp
+  estimate 58 CPU-hours = 1.9 h on 30 workers at 200 s/point
+  50 already in hocl_outer_shell.csv, 1000 to run
+
+  10/1000  ok=10 warn=0 bad=0  7379 pts/h  eta 8.0 min
+  20/1000  ok=20 warn=0 bad=0  14028 pts/h  eta 4.2 min
+  30/1000  ok=30 warn=0 bad=0  19038 pts/h  eta 3.1 min
+  40/1000  ok=40 warn=0 bad=0  16256 pts/h  eta 3.5 min
+  50/1000  ok=50 warn=0 bad=0  19453 pts/h  eta 2.9 min
+  60/1000  ok=60 warn=0 bad=0  22146 pts/h  eta 2.5 min
+  70/1000  ok=70 warn=0 bad=0  18740 pts/h  eta 3.0 min
+  80/1000  ok=80 warn=0 bad=0  20906 pts/h  eta 2.6 min
+  90/1000  ok=90 warn=0 bad=0  23026 pts/h  eta 2.4 min
+  100/1000  ok=100 warn=0 bad=0  20505 pts/h  eta 2.6 min
+  110/1000  ok=110 warn=0 bad=0  22123 pts/h  eta 2.4 min
+  120/1000  ok=120 warn=0 bad=0  23695 pts/h  eta 2.2 min
+  130/1000  ok=130 warn=0 bad=0  21871 pts/h  eta 2.4 min
+  140/1000  ok=140 warn=0 bad=0  22466 pts/h  eta 2.3 min
+  150/1000  ok=150 warn=0 bad=0  23680 pts/h  eta 2.2 min
+  160/1000  ok=159 warn=0 bad=1  23098 pts/h  eta 2.2 min
+  170/1000  ok=169 warn=0 bad=1  23135 pts/h  eta 2.2 min
+  180/1000  ok=179 warn=0 bad=1  23991 pts/h  eta 2.1 min
+  190/1000  ok=189 warn=0 bad=1  23843 pts/h  eta 2.0 min
+  200/1000  ok=199 warn=0 bad=1  23944 pts/h  eta 2.0 min
+  210/1000  ok=209 warn=0 bad=1  23810 pts/h  eta 2.0 min
+  220/1000  ok=219 warn=0 bad=1  24273 pts/h  eta 1.9 min
+  230/1000  ok=229 warn=0 bad=1  24203 pts/h  eta 1.9 min
+  240/1000  ok=239 warn=0 bad=1  24021 pts/h  eta 1.9 min
+  250/1000  ok=249 warn=0 bad=1  24692 pts/h  eta 1.8 min
+  260/1000  ok=259 warn=0 bad=1  24624 pts/h  eta 1.8 min
+  270/1000  ok=269 warn=0 bad=1  23941 pts/h  eta 1.8 min
+  280/1000  ok=279 warn=0 bad=1  24500 pts/h  eta 1.8 min
+  290/1000  ok=289 warn=0 bad=1  24571 pts/h  eta 1.7 min
+  300/1000  ok=299 warn=0 bad=1  24113 pts/h  eta 1.7 min
+  310/1000  ok=309 warn=0 bad=1  24613 pts/h  eta 1.7 min
+  320/1000  ok=319 warn=0 bad=1  24955 pts/h  eta 1.6 min
+  330/1000  ok=329 warn=0 bad=1  24472 pts/h  eta 1.6 min
+  340/1000  ok=338 warn=0 bad=2  24421 pts/h  eta 1.6 min
+  350/1000  ok=348 warn=0 bad=2  24955 pts/h  eta 1.6 min
+  360/1000  ok=357 warn=0 bad=3  24454 pts/h  eta 1.6 min
+  370/1000  ok=367 warn=0 bad=3  24666 pts/h  eta 1.5 min
+  380/1000  ok=377 warn=0 bad=3  25069 pts/h  eta 1.5 min
+  390/1000  ok=387 warn=0 bad=3  24882 pts/h  eta 1.5 min
+  400/1000  ok=397 warn=0 bad=3  24841 pts/h  eta 1.4 min
+  410/1000  ok=406 warn=0 bad=4  24894 pts/h  eta 1.4 min
+  420/1000  ok=416 warn=0 bad=4  25279 pts/h  eta 1.4 min
+  430/1000  ok=423 warn=0 bad=7  24816 pts/h  eta 1.4 min
+  440/1000  ok=433 warn=0 bad=7  24969 pts/h  eta 1.3 min
+  450/1000  ok=443 warn=0 bad=7  25322 pts/h  eta 1.3 min
+  460/1000  ok=453 warn=0 bad=7  24906 pts/h  eta 1.3 min
+  470/1000  ok=463 warn=0 bad=7  25075 pts/h  eta 1.3 min
+  480/1000  ok=473 warn=0 bad=7  25217 pts/h  eta 1.2 min
+  490/1000  ok=479 warn=0 bad=11  25490 pts/h  eta 1.2 min
+  500/1000  ok=489 warn=0 bad=11  25054 pts/h  eta 1.2 min
+  510/1000  ok=499 warn=0 bad=11  25211 pts/h  eta 1.2 min
+  520/1000  ok=509 warn=0 bad=11  25584 pts/h  eta 1.1 min
+  530/1000  ok=519 warn=0 bad=11  25216 pts/h  eta 1.1 min
+  540/1000  ok=528 warn=0 bad=12  25152 pts/h  eta 1.1 min
+  550/1000  ok=537 warn=0 bad=13  25461 pts/h  eta 1.1 min
+  560/1000  ok=545 warn=0 bad=15  25206 pts/h  eta 1.0 min
+  570/1000  ok=555 warn=0 bad=15  25221 pts/h  eta 1.0 min
+  580/1000  ok=565 warn=0 bad=15  25416 pts/h  eta 1.0 min
+  590/1000  ok=575 warn=0 bad=15  25282 pts/h  eta 1.0 min
+  600/1000  ok=585 warn=0 bad=15  25280 pts/h  eta 0.9 min
+  610/1000  ok=592 warn=0 bad=18  25288 pts/h  eta 0.9 min
+  620/1000  ok=602 warn=0 bad=18  25636 pts/h  eta 0.9 min
+  630/1000  ok=609 warn=0 bad=21  25285 pts/h  eta 0.9 min
+  640/1000  ok=618 warn=0 bad=22  25360 pts/h  eta 0.9 min
+  650/1000  ok=628 warn=0 bad=22  25608 pts/h  eta 0.8 min
+  660/1000  ok=638 warn=0 bad=22  25332 pts/h  eta 0.8 min
+  670/1000  ok=648 warn=0 bad=22  25322 pts/h  eta 0.8 min
+  680/1000  ok=658 warn=0 bad=22  25477 pts/h  eta 0.8 min
+  690/1000  ok=666 warn=0 bad=24  25648 pts/h  eta 0.7 min
+  700/1000  ok=676 warn=0 bad=24  25281 pts/h  eta 0.7 min
+  710/1000  ok=686 warn=0 bad=24  25440 pts/h  eta 0.7 min
+  720/1000  ok=696 warn=0 bad=24  25509 pts/h  eta 0.7 min
+  730/1000  ok=706 warn=0 bad=24  25356 pts/h  eta 0.6 min
+  740/1000  ok=715 warn=0 bad=25  25305 pts/h  eta 0.6 min
+  750/1000  ok=725 warn=0 bad=25  25587 pts/h  eta 0.6 min
+  760/1000  ok=733 warn=0 bad=27  25288 pts/h  eta 0.6 min
+  770/1000  ok=743 warn=0 bad=27  25284 pts/h  eta 0.5 min
+  780/1000  ok=753 warn=0 bad=27  25457 pts/h  eta 0.5 min
+  790/1000  ok=762 warn=0 bad=28  25553 pts/h  eta 0.5 min
+  800/1000  ok=772 warn=0 bad=28  25405 pts/h  eta 0.5 min
+  810/1000  ok=780 warn=0 bad=30  25383 pts/h  eta 0.4 min
+  820/1000  ok=787 warn=0 bad=33  25561 pts/h  eta 0.4 min
+  830/1000  ok=795 warn=0 bad=35  25327 pts/h  eta 0.4 min
+  840/1000  ok=805 warn=0 bad=35  25347 pts/h  eta 0.4 min
+  850/1000  ok=815 warn=0 bad=35  25579 pts/h  eta 0.4 min
+  860/1000  ok=825 warn=0 bad=35  25528 pts/h  eta 0.3 min
+  870/1000  ok=835 warn=0 bad=35  25268 pts/h  eta 0.3 min
+  880/1000  ok=845 warn=0 bad=35  25450 pts/h  eta 0.3 min
+  890/1000  ok=855 warn=0 bad=35  25591 pts/h  eta 0.3 min
+  900/1000  ok=865 warn=0 bad=35  25258 pts/h  eta 0.2 min
+  910/1000  ok=875 warn=0 bad=35  25389 pts/h  eta 0.2 min
+  920/1000  ok=885 warn=0 bad=35  25584 pts/h  eta 0.2 min
+  930/1000  ok=893 warn=0 bad=37  25380 pts/h  eta 0.2 min
+  940/1000  ok=903 warn=0 bad=37  25281 pts/h  eta 0.1 min
+  950/1000  ok=913 warn=0 bad=37  25495 pts/h  eta 0.1 min
+  960/1000  ok=923 warn=0 bad=37  25343 pts/h  eta 0.1 min
+  970/1000  ok=931 warn=0 bad=39  25292 pts/h  eta 0.1 min
+  980/1000  ok=941 warn=0 bad=39  25479 pts/h  eta 0.0 min
+  990/1000  ok=951 warn=0 bad=39  25511 pts/h  eta 0.0 min
+  1000/1000  ok=960 warn=0 bad=40  25553 pts/h  eta 0.0 min
+
+done: 960 ok, 0 warned, 40 failed, 2.3 min
+measured 4 CPU-s per point (was assuming 200)
+-> the full 1050-point shell is 1 CPU-hours = 0.0 h on 30 workers

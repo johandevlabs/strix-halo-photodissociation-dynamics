@@ -981,6 +981,41 @@ was only ever needed across the Franck-Condon window."*
             Python 3.12, but 3.14 defaults to forkserver, where each worker
             re-imports the module and re-runs the thread-limiting environment
             setup this design depends on.
+
+            **Pilot, 2026-09-22: passed, and 5x cheaper than assumed.**
+            60 points in 3.7 min, 57 ok, 3 warned, 0 failed.
+            **111 CPU-s per point, not 570**, so the full 2730-point raster is
+            **84 CPU-hours, ~2.8 h on 30 workers**. The 570 came from
+            multiplying 09's wall time by its parallel factor, which counts
+            threading overhead as work; single-threaded workers avoid it.
+            Another instance of water's finding that the job-array pattern
+            beats threading at this problem size.
+
+            | r(O-Cl) band | points | max T1(S) |
+            | --- | --- | --- |
+            | 1.40-1.80 A | 24 | 0.0102 |
+            | 1.80-2.10 A | 16 | 0.0123 |
+            | 2.10-2.30 A | 11 | 0.0165 |
+            | 2.30-2.45 A | 9 | **0.0251** |
+
+            All three T1 warnings sit at r(O-Cl) >= 2.35 A *and* r(O-H) >=
+            1.10 A: the far corner, beyond the ~2.3 A the band needs and
+            inside where the absorber will be. Within the band-relevant
+            region the worst T1 is 0.0165.
+
+            **The symmetry labelling earned its place.** At four points the
+            lowest triplet is 3A', not 3A": (2.30, 0.80, 135), (2.35, 0.85,
+            125), (2.40, 0.90, 115) and (2.40, 1.25, 135). That is the
+            crossing from `06`/`09` arriving, a little earlier at wide angles.
+            The raster stored the lowest 3A" at each, as designed; without the
+            labelling a 3A' energy would have gone into the surface unnoticed.
+            Those points now carry their own `warn:Ap_below` flag so the full
+            run counts them, and single-excitation weight falls to 0.875 at
+            2.40 A, consistent with the same picture.
+
+            Surface construction should drop or replace the warned corner
+            points rather than interpolate through them; they lie inside the
+            absorber, so nothing the band depends on is lost.
       - [ ] Jacobi transform, relaxation and propagation from `water/`, with
             an absorber from ~2.3 A along the dissociation coordinate, and
             the absorber-position check repeated in 3D.

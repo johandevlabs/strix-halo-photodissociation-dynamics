@@ -147,8 +147,17 @@ def compute_point(task):
                              if others else float("nan"))
         row["gap_app_eV"] = (float((e[app[1]] - e[k]) * HARTREE2EV)
                              if len(app) > 1 else float("nan"))
-        if row["status"] == "ok" and row["t1_s"] >= T1_MAX:
-            row["status"] = "warn:t1"
+        # Both are informational: the stored value is still the lowest 3A".
+        # A 3A' below it is the crossing arriving (seen from r(O-Cl) 2.30 A at
+        # wide angles), and it is exactly what the labelling is for -- without
+        # it a 3A' energy would go into the surface unnoticed.
+        flags = []
+        if row["t1_s"] >= T1_MAX:
+            flags.append("t1")
+        if row["root0_sym"] != 'A"':
+            flags.append("Ap_below")
+        if row["status"] == "ok" and flags:
+            row["status"] = "warn:" + "+".join(flags)
     except Exception as ex:                       # keep the raster running
         row["status"] = f"fail:{type(ex).__name__}"
     return _stamp(row, t0)
@@ -217,9 +226,12 @@ def main():
                    help="run only N points spread evenly over the grid, plus "
                         "equilibrium. Written to the same CSV, so they count "
                         "towards the full raster afterwards.")
-    p.add_argument("--sec-per-point", type=float, default=570.0,
+    p.add_argument("--sec-per-point", type=float, default=111.0,
                    help="single-threaded CPU-seconds per point, for the "
-                        "estimate; 570 measured at ~19 s wall on 30x parallel")
+                        "estimate; 111 measured over the 60-point pilot. The "
+                        "570 assumed before came from 09's wall time times "
+                        "its parallel factor, which counts threading "
+                        "overhead as work")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--csv", default="hocl_pes_raster.csv")
     args = p.parse_args()

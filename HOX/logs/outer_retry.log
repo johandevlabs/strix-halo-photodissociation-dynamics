@@ -1,0 +1,20 @@
+==============================================================================
+== HOX Phase 1 -- multireference outer shell of the a 3A" surface
+==============================================================================
+  r(O-Cl) 2.2-3.6 A, 15 points (overlaps the raster below 2.40)
+  r(O-H)  0.8-1.25 A, 10 points
+  angle   75.0-135.0 deg, 7 points
+  total   1050 geometries, CAS(10,6) SA-4 + SC-NEVPT2, def2-tzvp
+  estimate 58 CPU-hours = 1.9 h on 30 workers at 200 s/point
+  --retry-failed: dropped 41 failed rows (old file kept as hocl_outer_shell.csv.bak)
+  1009 already in hocl_outer_shell.csv, 41 to run
+
+  10/41  ok=10 warn=0 bad=0  7180 pts/h  eta 0.3 min
+  20/41  ok=20 warn=0 bad=0  13869 pts/h  eta 0.1 min
+  30/41  ok=30 warn=0 bad=0  19390 pts/h  eta 0.0 min
+  40/41  ok=40 warn=0 bad=0  16514 pts/h  eta 0.0 min
+  41/41  ok=41 warn=0 bad=0  16815 pts/h  eta 0.0 min
+
+done: 41 ok, 0 warned, 0 failed, 0.1 min
+measured 6 CPU-s per point (was assuming 200)
+-> the full 1050-point shell is 2 CPU-hours = 0.1 h on 30 workers

@@ -52,6 +52,11 @@ import traceback
 import numpy as np
 
 from pyscf import gto, scf, cc, symm
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 
@@ -241,7 +246,7 @@ def main():
     p.add_argument("--basis", default="def2-tzvp")
     p.add_argument("--nroots", type=int, default=4)
     p.add_argument("--no-corners", action="store_true")
-    p.add_argument("--csv", default="hocl_eom_coordinates.csv")
+    p.add_argument("--csv", default=str(DATA / "hocl_eom_coordinates.csv"))
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
 

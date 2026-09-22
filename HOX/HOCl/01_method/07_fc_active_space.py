@@ -76,6 +76,11 @@ from scipy import linalg
 from pyscf import gto, scf, mcscf, mrpt, fci, symm
 from pyscf.lib import logger
 from pyscf.mcscf import avas, dmet_cas
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 NM_PER_EV = 1239.841984
@@ -419,8 +424,8 @@ def main():
     p.add_argument("--nroots-triplet", type=int, default=4)
     p.add_argument("--nroots-singlet", type=int, default=1)
     p.add_argument("--max-cycle", type=int, default=100)
-    p.add_argument("--csv", default="hocl_fc_active_space.csv")
-    p.add_argument("--png", default="hocl_fc_active_space.png")
+    p.add_argument("--csv", default=str(DATA / "hocl_fc_active_space.csv"))
+    p.add_argument("--png", default=str(DATA / "hocl_fc_active_space.png"))
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
 

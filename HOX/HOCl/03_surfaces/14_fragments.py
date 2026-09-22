@@ -49,6 +49,11 @@ import numpy as np
 
 from pyscf import gto, scf, cc, mcscf, mrpt, fci
 from pyscf.mcscf import avas
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 HARTREE2CM = 219474.6313702
@@ -127,7 +132,7 @@ def main():
     p.add_argument("--avas-oh", nargs="+", default=["O 2s", "O 2p", "H 1s"])
     p.add_argument("--avas-cl", nargs="+", default=["Cl 3p"])
     p.add_argument("--minao", default="ano")
-    p.add_argument("--csv", default="hocl_fragments.csv")
+    p.add_argument("--csv", default=str(DATA / "hocl_fragments.csv"))
     args = p.parse_args()
 
     n = int(round((args.rmax - args.rmin) / args.step)) + 1

@@ -52,6 +52,11 @@ import multiprocessing as mp  # noqa: E402
 import time  # noqa: E402
 
 import numpy as np  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 DEG = np.pi / 180.0
@@ -61,6 +66,8 @@ FIELDS = ["r_ocl_A", "r_oh_A", "theta_deg", "ncas", "nelecas", "conv_cas",
           "e_casscf_Ha", "e_nevpt2_Ha", "s2", "gap_app_eV", "status", "wall_s"]
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
+# 07 lives in the sibling approach directory, where the method was chosen.
+_FC07_PY = os.path.join(_HERE, os.pardir, "01_method", "07_fc_active_space.py")
 _fc07 = None
 
 
@@ -68,8 +75,7 @@ def fc07():
     """07's active-space machinery, loaded once (workers inherit by fork)."""
     global _fc07
     if _fc07 is None:
-        spec = importlib.util.spec_from_file_location(
-            "fc07", os.path.join(_HERE, "07_fc_active_space.py"))
+        spec = importlib.util.spec_from_file_location("fc07", _FC07_PY)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         _fc07 = mod
@@ -230,7 +236,7 @@ def main():
                    help="drop rows whose status is fail (keeping a .bak) "
                         "so this run recomputes exactly those points")
     p.add_argument("--dry-run", action="store_true")
-    p.add_argument("--csv", default="hocl_outer_shell.csv")
+    p.add_argument("--csv", default=str(DATA / "hocl_outer_shell.csv"))
     args = p.parse_args()
 
     def grid(lo, hi, step):

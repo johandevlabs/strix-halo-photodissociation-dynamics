@@ -58,6 +58,11 @@ import multiprocessing as mp  # noqa: E402
 import time  # noqa: E402
 
 import numpy as np  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 DEG = np.pi / 180.0
@@ -233,7 +238,7 @@ def main():
                         "its parallel factor, which counts threading "
                         "overhead as work")
     p.add_argument("--dry-run", action="store_true")
-    p.add_argument("--csv", default="hocl_pes_raster.csv")
+    p.add_argument("--csv", default=str(DATA / "hocl_pes_raster.csv"))
     args = p.parse_args()
 
     def grid(lo, hi, step):

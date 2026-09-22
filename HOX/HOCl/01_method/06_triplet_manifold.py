@@ -82,6 +82,11 @@ from pyscf import gto, scf, mcscf, mrpt, fci, symm
 from pyscf.mcscf import avas
 from pyscf.fci import spin_op
 from pyscf.scf import hf as scf_hf
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 BOHR_PER_ANG = 1.0 / 0.529177210903
@@ -333,10 +338,10 @@ def main():
     p.add_argument("--max-cycle", type=int, default=100)
     p.add_argument("--no-nevpt2", action="store_true",
                    help="CASSCF energies only; enough to see a crossing")
-    p.add_argument("--compare", default="hocl_scan_pin.csv",
+    p.add_argument("--compare", default=str(DATA / "hocl_scan_pin.csv"),
                    help="05 output to overlay (shape only)")
-    p.add_argument("--csv", default="hocl_triplet_manifold.csv")
-    p.add_argument("--png", default="hocl_triplet_manifold.png")
+    p.add_argument("--csv", default=str(DATA / "hocl_triplet_manifold.csv"))
+    p.add_argument("--png", default=str(DATA / "hocl_triplet_manifold.png"))
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
 

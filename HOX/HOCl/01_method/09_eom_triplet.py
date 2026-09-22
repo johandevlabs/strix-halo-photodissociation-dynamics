@@ -47,6 +47,11 @@ import traceback
 import numpy as np
 
 from pyscf import gto, scf, cc
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 R_OH_ANG = 0.9644
@@ -211,10 +216,10 @@ def main():
     p.add_argument("--at", type=float, default=R_OCL_EQ_ANG,
                    help="where to compare slopes (default the 1.6891 A used "
                         "throughout; 05's CCSD(T) minimum is ~1.698 A)")
-    p.add_argument("--uccsdt-csv", default="hocl_scan_fc.csv")
-    p.add_argument("--nevpt2-csv", default="hocl_fc_active_space.csv")
-    p.add_argument("--cas127-csv", default="hocl_nevpt2_cas127.csv")
-    p.add_argument("--csv", default="hocl_eom_triplet.csv")
+    p.add_argument("--uccsdt-csv", default=str(DATA / "hocl_scan_fc.csv"))
+    p.add_argument("--nevpt2-csv", default=str(DATA / "hocl_fc_active_space.csv"))
+    p.add_argument("--cas127-csv", default=str(DATA / "hocl_nevpt2_cas127.csv"))
+    p.add_argument("--csv", default=str(DATA / "hocl_eom_triplet.csv"))
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
 

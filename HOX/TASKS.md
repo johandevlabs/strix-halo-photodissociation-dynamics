@@ -6,8 +6,22 @@ a 3A'' surface with spin-orbit coupling.
 
 Background and citations: `docs/deep-review-claude.md`.
 
-**The premise is not yet verified.** Phase 0 exists to kill this project
-cheaply if the gap is already filled. Do Phase 0 before writing any code.
+**Where the scripts live.** This file names them by their numeric prefix
+throughout (`05`, `12`, ...), which is how they are referred to in the commit
+history too. Since 2026-09-22 they sit in subdirectories by approach:
+`toolchain/` holds `00`-`02` (shared by every halogen), and `HOCl/` holds the
+rest — `01_method/` for `03`-`09` and `11`, `02_band_model/` for `10`,
+`03_surfaces/` for `12`-`15`, with the CSVs in `HOCl/data/` and the EVO's
+stdout in `HOCl/logs/`. Each directory has a README summarising what was
+settled there; this file remains the chronological record. Data paths resolve
+against the script's own location, so any of them can be run from anywhere.
+
+**The premise is still not verified.** Phase 0 exists to kill this project
+cheaply if the gap is already filled, and its literature checks remain open —
+the papers are paywalled. Work proceeded anyway, deliberately: Phase 0.5 and
+the HOCl surface are worth having whether or not the gap turns out to be
+filled, since they validate a method against a measured band. The premise
+gates the *claim*, not the code.
 
 ---
 

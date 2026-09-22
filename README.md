@@ -19,7 +19,7 @@ could say something new.
 | folder | subject | status |
 | --- | --- | --- |
 | [`water/`](water/) | H2O / HDO / D2O A-band photodissociation | **complete and validated** |
-| [`HOX/`](HOX/) | HOCl / HOBr / HOI triplet-band photodissociation | **scoping only** — literature review, no code yet |
+| [`HOX/`](HOX/) | HOCl / HOBr / HOI triplet-band photodissociation | **in progress** — SOC toolchain validated, the HOCl a 3A" surface built; propagation and HOBr still to come |
 
 Each folder has its own README describing what is there and how far it got.
 Completeness varies by design; this repo grows as work happens.

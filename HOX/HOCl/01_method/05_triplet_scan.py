@@ -56,6 +56,11 @@ import traceback
 import numpy as np
 
 from pyscf import gto, scf, cc
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 
@@ -267,8 +272,8 @@ def main():
                    help="skip the singlet; it is only needed in the bound "
                         "region anyway")
     p.add_argument("--no-asymptote", action="store_true")
-    p.add_argument("--csv", default="hocl_scan.csv")
-    p.add_argument("--png", default="hocl_scan.png")
+    p.add_argument("--csv", default=str(DATA / "hocl_scan.csv"))
+    p.add_argument("--png", default=str(DATA / "hocl_scan.png"))
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
 

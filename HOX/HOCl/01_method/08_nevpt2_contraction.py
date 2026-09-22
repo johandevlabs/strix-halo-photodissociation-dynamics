@@ -74,6 +74,11 @@ import traceback
 import numpy as np
 
 from pyscf import gto, scf, mcscf, mrpt, fci
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 # The active-space machinery is 07's, loaded from that file so both scripts
 # select, canonicalise and symmetrise orbitals with the same code. (Script
@@ -334,7 +339,7 @@ def main():
     p.add_argument("--kmin", type=int, default=-1)
     p.add_argument("--kmax", type=int, default=1)
     p.add_argument("--max-cycle", type=int, default=100)
-    p.add_argument("--csv", default="hocl_nevpt2_contraction.csv")
+    p.add_argument("--csv", default=str(DATA / "hocl_nevpt2_contraction.csv"))
     p.add_argument("--verbose", type=int, default=0)
     p.add_argument("--prism-verbose", type=int, default=0)
     args = p.parse_args()

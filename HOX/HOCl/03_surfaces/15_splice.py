@@ -44,6 +44,11 @@ import csv
 
 import numpy as np
 from scipy.interpolate import CubicSpline
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 
@@ -103,9 +108,9 @@ def main():
     p = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--raster", default="hocl_pes_raster.csv")
-    p.add_argument("--shell", default="hocl_outer_shell.csv")
-    p.add_argument("--fragments", default="hocl_fragments.csv")
+    p.add_argument("--raster", default=str(DATA / "hocl_pes_raster.csv"))
+    p.add_argument("--shell", default=str(DATA / "hocl_outer_shell.csv"))
+    p.add_argument("--fragments", default=str(DATA / "hocl_fragments.csv"))
     p.add_argument("--e-cl-cc", type=float, default=-461.00908095,
                    help="E(Cl) UCCSD(T)/x2c, from 14's log")
     p.add_argument("--join-in", type=float, default=2.20,
@@ -118,8 +123,8 @@ def main():
                    help="...and ends at the shell's last point")
     p.add_argument("--rmax", type=float, default=6.00,
                    help="extend the surface to here on the asymptote")
-    p.add_argument("--npz", default="hocl_surfaces.npz")
-    p.add_argument("--png", default="hocl_surfaces.png")
+    p.add_argument("--npz", default=str(DATA / "hocl_surfaces.npz"))
+    p.add_argument("--png", default=str(DATA / "hocl_surfaces.png"))
     args = p.parse_args()
 
     ras = read_csv(args.raster)

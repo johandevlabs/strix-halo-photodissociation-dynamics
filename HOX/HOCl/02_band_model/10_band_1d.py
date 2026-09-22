@@ -64,6 +64,11 @@ import os
 
 import numpy as np
 from scipy.interpolate import CubicSpline
+from pathlib import Path
+
+# Data files live in HOCl/data/, one level up from this approach directory,
+# so the defaults below work no matter where the script is invoked from.
+DATA = Path(__file__).resolve().parents[1] / "data"
 
 HARTREE2EV = 27.211386245988
 BOHR_PER_ANG = 1.0 / 0.529177210903
@@ -272,14 +277,14 @@ def main():
     p = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--scan-fc", default="hocl_scan_fc.csv")
-    p.add_argument("--scan-pin", default="hocl_scan_pin.csv")
-    p.add_argument("--eom", default="hocl_eom_triplet.csv")
-    p.add_argument("--eom-outer", default="hocl_eom_outer.csv")
+    p.add_argument("--scan-fc", default=str(DATA / "hocl_scan_fc.csv"))
+    p.add_argument("--scan-pin", default=str(DATA / "hocl_scan_pin.csv"))
+    p.add_argument("--eom", default=str(DATA / "hocl_eom_triplet.csv"))
+    p.add_argument("--eom-outer", default=str(DATA / "hocl_eom_outer.csv"))
     p.add_argument("--nevpt2-tail", nargs="+",
-                   default=["hocl_triplet_manifold_cas2.csv",
-                            "hocl_triplet_manifold_cas3.csv",
-                            "hocl_triplet_manifold_cas4.csv"])
+                   default=[str(DATA / "hocl_triplet_manifold_cas2.csv"),
+                            str(DATA / "hocl_triplet_manifold_cas3.csv"),
+                            str(DATA / "hocl_triplet_manifold_cas4.csv")])
     p.add_argument("--npts", type=int, default=1024)
     p.add_argument("--dt", type=float, default=1.0, help="atomic units")
     p.add_argument("--nsteps", type=int, default=6000)
@@ -290,8 +295,8 @@ def main():
     p.add_argument("--nlev", type=int, default=3)
     p.add_argument("--temperatures", type=float, nargs="+",
                    default=[200.0, 250.0, 298.0])
-    p.add_argument("--csv", default="hocl_band_1d.csv")
-    p.add_argument("--png", default="hocl_band_1d.png")
+    p.add_argument("--csv", default=str(DATA / "hocl_band_1d.csv"))
+    p.add_argument("--png", default=str(DATA / "hocl_band_1d.png"))
     args = p.parse_args()
 
     S, T, N, offset = build_surfaces(args)

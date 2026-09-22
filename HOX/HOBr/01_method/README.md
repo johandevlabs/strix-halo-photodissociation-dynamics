@@ -3,6 +3,7 @@
 | script | descends from | question |
 | --- | --- | --- |
 | `01_geometry.py` | — (new) | where is the minimum, and is the force field right? |
+| `02_obr_cut.py` | HOCl's `06`, `09`, `11` | is EOM-CCSD valid for HOBr, where does ³A′ cross, and does aug- matter in the bond-breaking region? |
 
 ## `01_geometry.py`
 
@@ -50,6 +51,50 @@ Run both before sending anything to the EVO; neither needs PySCF.
   rounding θ to 5 decimals and the CSV to 4, which would have silently
   recomputed every point on every rerun while the resume logic looked like it
   worked; both now go through one `key()`.
+
+## `02_obr_cut.py`
+
+One 1D cut along O-Br answers four questions that would otherwise be four
+runs, and a second basis adds a fifth for the cost of doubling a cheap job.
+
+1. **Is EOM-CCSD valid for HOBr, out to what radius?** For HOCl it held to
+   2.29 Å, T1(S) passing 0.02 by 2.6 Å. Br is heavier with 4× the SOC, so
+   none of that transfers. The raster's outer edge depends on the answer.
+2. **Where does ³A′ cross ³A″?** HOCl's raster found ³A′ below at 112 of 2730
+   points; the symmetry labelling is the only reason a ³A′ energy did not
+   enter the surface unnoticed.
+3. **Band position and width to first order** — vertical and slope at the FC
+   geometry, against Ingham's 457 nm.
+4. **Does aug- matter where the bond breaks?**
+
+On (4), the atomic sweep is no evidence either way: SOC is a near-nuclear
+property, so `aug-cc-pvtz-dk` matching `cc-pvtz-dk` to 0.1 points on the ²P
+splitting says nothing about 2-3 Å. The expectation is that it does little —
+ã³A″ is n→σ* dissociating to OH(²Π) + Br(²P), valence throughout, with no
+Rydberg, anion or charge-transfer character. Two things could still differ:
+
+- **BSSE**, an attractive error that peaks where the fragments are close but
+  separating. Its signature is a difference that **grows with r**, so the
+  script fits the trend and reports that, not the offset — a constant offset
+  is two bases describing the same state at different completeness and
+  cancels out of a band shape.
+- **Spurious diffuse roots**, the way aug- could make things *worse*. The
+  raster stores whatever its labelling picks, and diffuse functions add
+  low-lying roots to sort through exactly where the level density is already
+  high. So all six roots and their irreps are stored, and the report counts
+  how many sit below the valence ³A″ in each basis.
+
+### Tests
+
+`tests/test_cut.py`, no PySCF. A synthetic manifold with a ³A′ crossing, a
+T1 threshold and a basis difference of known slope, checking that each is
+*detected* rather than merely storable — plus a control where the basis
+difference is a constant offset, which must **not** be reported as a trend.
+
+Expectations in that test are derived from the synthetic surface rather than
+written down. The first draft hard-coded the crossing radius and the T1
+threshold by eye, both wrong, and the script's correct answers looked like
+failures.
 
 ## The cache bug, 2026-09-22
 

@@ -4,6 +4,7 @@
 | --- | --- | --- |
 | `01_geometry.py` | — (new) | where is the minimum, and is the force field right? |
 | `02_obr_cut.py` | HOCl's `06`, `09`, `11` | is EOM-CCSD valid for HOBr, where does ³A′ cross, and does aug- matter in the bond-breaking region? |
+| `04_soc_vertical.py` | HOCl's `03` | how much intensity does the triplet borrow, and how far does SOC shift the band? |
 
 ## `01_geometry.py`
 
@@ -95,6 +96,31 @@ Expectations in that test are derived from the synthetic surface rather than
 written down. The first draft hard-coded the crossing radius and the T1
 threshold by eye, both wrong, and the script's correct answers looked like
 failures.
+
+## `04_soc_vertical.py`
+
+HOCl's `03` adapted: Ms = 0 SA-CASSCF (direct_spin1, no fix_spin_) and DKH1
+QD-NEVPT2 with state-interaction SOC, `cc-pvtz-dk`, at `01`'s geometry. Two
+questions:
+
+- **f.** `02_band_model/03` needs f ≥ 1.3 × 10⁻⁴ to reproduce Ingham's peak σ.
+  HOCl's equivalent came out 10-25× low; Br's SOC is ~4× Cl's and f goes as
+  its square, so HOBr should borrow far more.
+- **The spin-orbit shift of the band.** QD-NEVPT2 is run twice on the same
+  reference, spin-free and with SOC, and the shift is the change in
+  (E_T − E_0). For HOCl it was −11 meV. Second order scales as the coupling
+  squared, so HOBr's could be the ~0.1-0.2 eV that separates the spin-free
+  band from the measured one — which would replace the rigid alignment `03`
+  used to read the temperature ratio.
+
+The ³A″ band is taken as the lowest three excited SOC states, with their
+spread and the gap above printed, rather than trusted to energy clustering:
+for Br the triplet's own splitting can exceed any fixed tolerance.
+
+`tests/test_soc_report.py` feeds the report HOCl's actual Prism output from
+`HOCl/logs/soc_hocl.log` and checks it reproduces 03 (3.4477 eV, f 8.8e-7),
+the −11 meV shift, and that f exactly zero is flagged. `--molecule HOCl
+--basis def2-tzvp` repeats that check on the EVO with the real chain.
 
 ## The cache bug, 2026-09-22
 

@@ -120,6 +120,7 @@ shortfall — that remains unexplained and elsewhere.
 | --- | --- |
 | [`01_method/`](01_method/) | geometry, force field, and the validity checks that must be redone for a heavier halogen |
 | [`02_band_model/`](02_band_model/) | the 1D band: how much surface it needs, the basis measured on the band, a first look at σ(298)/σ(220) |
+| [`03_surfaces/`](03_surfaces/) | the 3D raster, and later the NEVPT2 shell, fragments and splice |
 | `01_method/tests/` | offline tests, run before anything goes to the EVO |
 | `data/`, `logs/` | as in `HOCl/` |
 
@@ -163,10 +164,10 @@ from.
       margin; aug- moves the band 0.9 nm; implied f ≥ 1.3e-4 (after a factor-2 fix, see there); and σ(298)/σ(220)
       is −1 to −3% over 440-500 nm but +20% at 550 nm. See
       `02_band_model/README.md`.
-- [ ] **Molecular SOC and the borrowed intensity**, the analogue of
-      `HOCl/01_method/03`. This is where the basis choice is confirmed on a
-      molecule rather than a free atom, and where f is compared with Ingham's
-      measured σ.
+- [ ] **`01_method/04_soc_vertical.py`**: the borrowed f against 03's
+      floor of 1.3e-4, and the spin-orbit shift of the band, measured as
+      spin-free vs SOC QD-NEVPT2 on one reference.
+- [ ] **`03_surfaces/05_pes_raster.py`**: 2470 points, ~11 h overnight.
 - [ ] **EOM-CCSD validity** across the Franck-Condon region, the analogue of
       `HOCl/01_method/11`, and the triplet manifold along O-Br, the analogue
       of `06`. Both must be redone: Br's SOC is 4× Cl's, and the 3A'/3A"

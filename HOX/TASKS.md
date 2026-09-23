@@ -1592,6 +1592,24 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       ratios -- everything else water/README reports -- are unaffected. The
       correction is analytic; no rerun is needed.
 
+- [ ] **`HOBr/01_method/04_soc_vertical.py`** -- written 2026-09-24. HOCl's
+      03 at HOBr's geometry with cc-pvtz-dk / DKH1, plus a spin-free
+      QD-NEVPT2 on the same reference so the SOC SHIFT of the band is
+      measured: HOCl's was -11 meV (from its log); second order scales as the
+      coupling squared, so HOBr's could be the ~0.1-0.2 eV between the
+      spin-free band (437 nm) and the measured one (457). f is compared with
+      03's floor of 1.3e-4. Report checked offline on HOCl's real Prism
+      output (reproduces 3.4477 eV, f 8.8e-7, -11 meV).
+- [ ] **`HOBr/03_surfaces/05_pes_raster.py`** -- written 2026-09-24. HOCl's
+      12 with HOBr's numbers: r(O-Br) 1.55-2.45 A (same offsets from r_eq as
+      HOCl's grid), r(O-H) 0.80-1.25, 75-135 deg, 2470 points, cc-pvtz-dk,
+      5 EOM roots. ~480 CPU-s/point, ~11 h on 30 workers. All-electron for
+      consistency with 01/02.
+- [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
+      a valence basis is most of the 5x cost over HOCl (532 vs 101
+      CPU-s/point) and not especially balanced. Compare on 02's cut before
+      any second raster; the first one stays all-electron so 01-03 transfer.
+
 - [ ] Repeat Phase 1 for HOBr. Scalar-relativistic treatment required
       (ECP or x2c/DKH; aug-cc-pVnZ-PP or ANO-RCC basis).
 - [ ] Ground-state surface: consider using **Peterson's global MRCI PES**

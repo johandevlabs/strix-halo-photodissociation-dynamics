@@ -69,12 +69,13 @@ HARTREE2EV = 27.211386245988
 DEG = np.pi / 180.0
 NM_PER_EV = 1239.841984
 
-# Spectator coordinates, held fixed along the cut. Update from 01_geometry.py
-# once it has run: these are the recalled starting values, good enough to
-# compare two bases against each other but not to quote.
+# Spectator coordinates, held fixed along the cut. HOBr's are 01_geometry.py's
+# CCSD(T)/cc-pvtz-dk minimum. The first run (2026-09-23) used the recalled
+# values 1.834 / 0.961 / 102.3, which the computed ones confirmed to within
+# 0.004 A and 0.3 deg.
 MOLECULES = {
-    "HOBr": dict(halogen="Br", r_eq=1.834, r_oh=0.961, theta=102.3,
-                 obs_nm=457.0),
+    "HOBr": dict(halogen="Br", r_eq=1.8357, r_oh=0.9646, theta=102.02,
+                 obs_nm=457.0),     # 01_geometry.py, CCSD(T)/cc-pvtz-dk
     "HOCl": dict(halogen="Cl", r_eq=1.6891, r_oh=0.9644, theta=102.96,
                  obs_nm=380.0),
 }
@@ -282,10 +283,11 @@ def report_one(basis, rows, spec, nroots):
              "nowhere: 3A\" is lowest at every radius"))
 
     # 3. the band, to first order
-    i_eq = int(np.argmin(np.abs(rr - spec["r_eq"])))
-    vert = om[i_eq]
-    slope = float(np.gradient(om, rr)[i_eq])
-    print(f"\n  vertical at r = {rr[i_eq]:.3f} A: {vert:.3f} eV "
+    # Interpolated to r_eq, not read off the nearest grid point: at -5 eV/A,
+    # the 0.014 A between 1.85 and HOBr's 1.836 is worth 75 meV, i.e. 12 nm.
+    vert = float(np.interp(spec["r_eq"], rr, om))
+    slope = float(np.interp(spec["r_eq"], rr, np.gradient(om, rr)))
+    print(f"\n  vertical at r = {spec['r_eq']:.4f} A: {vert:.3f} eV "
           f"= {NM_PER_EV / vert:.0f} nm, against {spec['obs_nm']:.0f} nm "
           f"measured ({100 * (NM_PER_EV / vert - spec['obs_nm']) / spec['obs_nm']:+.1f}%)")
     print(f"  slope there: {slope:.3f} eV/A  "
@@ -300,7 +302,7 @@ def report_one(basis, rows, spec, nroots):
                 is_app=is_app, n_below=n_roots_below)
 
 
-def report_bases(res, bases):
+def report_bases(res, bases, spec):
     """The aug- question: an offset is uninteresting, a TREND is not."""
     if len(bases) < 2 or any(b not in res or res[b] is None for b in bases[:2]):
         return
@@ -318,24 +320,51 @@ def report_bases(res, bases):
     print(f"  {'r/A':>7}{'d(omega)/meV':>14}")
     for r, dv in zip(common, d):
         print(f"  {r:>7.3f}{dv * 1000:>14.1f}")
-    slope, intercept = np.polyfit(common, d * 1000, 1)
-    print(f"\n  mean offset {np.mean(d) * 1000:+.1f} meV, "
-          f"spread {np.ptp(d) * 1000:.1f} meV")
-    print(f"  trend with r: {slope:+.1f} meV per A")
-    print("""
-  Reading this. A constant offset is the two bases describing the SAME state
-  at slightly different completeness, and it cancels out of a band shape. A
-  difference that GROWS with r is the interesting case: that is the BSSE
-  signature, since basis-set superposition is an attractive error that peaks
-  where the fragments are close but separating, and it would distort the
-  slope the band width depends on.""")
-    if abs(slope) < 20:
-        print("  -> flat within 20 meV/A: aug- is not buying anything here,\n"
-              "     and the cheaper set carries the raster.")
-    else:
-        print(f"  -> {abs(slope):.0f} meV/A is a real trend. Check the root\n"
-              "     symmetries below before concluding it is BSSE rather than\n"
-              "     a diffuse root being picked up by the labelling.")
+
+    # Judge each REGION on its own question. The first version fitted one
+    # straight line across 1.5-3.2 A, and on the real HOBr cut it reported a
+    # "+91 meV/A real trend, check for BSSE" -- for a difference that was
+    # 224 meV on the inner wall and FLAT (+0..+9 meV) in the exit channel,
+    # i.e. the opposite of BSSE. A single slope cannot tell where a
+    # difference lives, and where it lives is the whole question.
+    r_eq = spec["r_eq"]
+    regions = [
+        ("Franck-Condon window", r_eq - 0.10, r_eq + 0.10,
+         "sets the band: an offset shifts it, a slope rescales its width"),
+        ("exit channel", r_eq + 0.45, common.max(),
+         "where BSSE would show, as a difference growing with r"),
+    ]
+    print()
+    verdict = {}
+    for name, lo, hi, what in regions:
+        m = (common >= lo - 1e-9) & (common <= hi + 1e-9)
+        if m.sum() < 3:
+            print(f"  {name}: too few points in {lo:.2f}-{hi:.2f} A")
+            continue
+        dm = d[m] * 1000
+        sl = float(np.polyfit(common[m], dm, 1)[0])
+        verdict[name] = (float(np.mean(dm)), sl)
+        print(f"  {name} ({lo:.2f}-{hi:.2f} A) -- {what}")
+        print(f"      offset {np.mean(dm):+.1f} meV, slope {sl:+.0f} meV/A")
+
+    ref_slope = abs(res[a]["slope"]) * 1000          # meV/A
+    if "Franck-Condon window" in verdict:
+        off, sl = verdict["Franck-Condon window"]
+        # V_T falls along the cut, so a positive difference-slope makes it
+        # SHALLOWER; say which, rather than print a signed percentage.
+        sense = "shallower" if sl * np.sign(res[a]["slope"]) < 0 else "steeper"
+        print(f"\n  -> in the FC window {b} shifts the vertical by "
+              f"{off:+.0f} meV and makes the slope "
+              f"{abs(100 * sl / ref_slope):.1f}% {sense}: the band moves by "
+              f"about that much and its width scales by about that fraction.")
+    if "exit channel" in verdict:
+        off, sl = verdict["exit channel"]
+        if abs(sl) < 20:
+            print(f"  -> exit channel flat ({sl:+.0f} meV/A): no BSSE signature,"
+                  f" and the outer surface does not need {b}.")
+        else:
+            print(f"  -> exit channel slope {sl:+.0f} meV/A: that is the BSSE"
+                  f" signature, or a diffuse root -- see the root counts below.")
 
     # The risk side of aug-: extra low-lying roots to sort through. If a
     # basis puts MORE roots below the valence 3A", the labelling has more
@@ -472,7 +501,7 @@ def main():
         rows = [done[key(b, r)] for r in radii if key(b, r) in done]
         rows.sort(key=lambda r: _f(r, "r_ox_A"))
         res[b] = report_one(b, rows, spec, args.nroots) if rows else None
-    report_bases(res, args.bases)
+    report_bases(res, args.bases, spec)
     maybe_plot(res, args.bases, png_path)
     print(f"\n  csv: {csv_path}")
 

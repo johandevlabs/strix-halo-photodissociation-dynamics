@@ -1418,6 +1418,94 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       errors in the first draft, one off by 1e7, both of which would have
       produced entirely plausible-looking frequencies.
 
+- [x] **Geometry and force field, 2026-09-23.** CCSD(T)/cc-pvtz-dk, x2c:
+      r(O-Br) 1.8357 A, r(O-H) 0.9646 A, angle 102.02 deg -- the recalled
+      start values (1.834 / 0.961 / 102.3) hold to 0.004 A and 0.3 deg.
+      Harmonic 632.4 / 1199.4 / 3868.6 cm-1 against fundamentals 620.23 /
+      1162.57 / 3614.90: ratios 1.020 / 1.032 / 1.070, all harmonic-above-
+      fundamental. The mode that carries the temperature dependence, the O-Br
+      stretch, has the most reasonable ratio of the three. v=1 of it holds
+      1.60% at 220 K and 4.72% at 298 K.
+
+      The def2-TZVP HOCl comparison (now genuinely computed): r(O-Cl) 1.7003
+      (+0.011 against literature) and ratios 1.039 / 1.017 / 1.062, against
+      cc-pvtz-dk's 1.7069 (+0.018) and 1.062 / 1.033 / 1.058. So for CHLORINE
+      def2-TZVP gives the better heavy-atom stretch. A likely reason, not
+      verified: cc-pVTZ lacks the tight d function second-row atoms need when
+      bonded to an electronegative partner -- the reason cc-pV(T+d)Z exists.
+      That is a Cl problem, not a Br one, and HOBr's O-Br ratio of 1.020 is
+      consistent with it. No change to the HOBr choice.
+
+- [x] **`02_obr_cut.py`, the O-Br cut, 2026-09-23.** CCSD(T) + EOM-CCSD, 6
+      triplet roots, 29 radii 1.50-3.20 A, cc-pvtz-dk and aug-cc-pvtz-dk.
+      58 points, 0 failures, 50 min. Spectators at the recalled values, which
+      01 has since confirmed.
+
+      **The crossing did not move inward.** 3A' becomes the lowest triplet
+      from 2.55 A (cc) / 2.60 A (aug), ~0.7 A past equilibrium -- about where
+      HOCl's sat relative to its own (~0.65 A). This was the biggest
+      structural risk in HOBr: had the 4x larger Br SOC and a softer bond
+      pulled the crossing into the Franck-Condon region, the single-surface
+      premise would have failed. It holds, on this cut. HOCl's raster found
+      the crossing arriving earlier at wide angles, so the raster's symmetry
+      labelling still has to watch for it.
+
+      **Where EOM stops.** T1(S) stays below 0.02 all the way to 3.2 A
+      (0.0191), far cleaner than HOCl, which passed 0.02 by 2.6 A. But T1 is
+      not sufficient here: omega falls to 0.1 eV at 3.2 A, so the singlet and
+      triplet are nearly degenerate and the ground state is diradical, which a
+      closed-shell reference cannot describe whatever T1 says. The honest
+      indicator is the single-excitation weight, below 0.90 from 2.45 A in
+      both bases, as the 3A' approaches. So the raster stops at ~2.40 A as
+      HOCl's did, and hands over to the NEVPT2 shell.
+
+      **Band to first order.** Vertical at 1.8357 A: 2.871 eV = 432 nm (cc),
+      2.832 eV = 438 nm (aug), against 457 nm measured: -5.5% and -4.2%.
+      HOCl's vertical was 361 nm against 380 (-5.0%), and its 1D band then
+      peaked at 373, so the vertical sitting blue of the band is expected.
+      No SOC shift is included, and Br's is 4x Cl's. Slope -5.32 eV/A against
+      HOCl's -6.97: a shallower wall, so a narrower band in energy.
+
+      **Does aug- matter where the bond breaks? No.** The difference has three
+      regions, and they answer different questions:
+
+      | region | aug minus cc | meaning |
+      | --- | --- | --- |
+      | inner wall, 1.50-1.70 A | -224 to -74 meV | valence-Rydberg mixing |
+      | FC window, 1.74-1.94 A | -42 meV, slope 3.5% shallower | shifts the band ~6 nm, narrows it ~3.5% |
+      | exit channel, 2.29-3.20 A | +0 to +9 meV, 8 meV/A | **no BSSE signature** |
+
+      On the inner wall aug- brings the second 3A" down from 2.65 to 1.87 eV
+      above the first at 1.50 A, converging with cc by 1.80 A: the sigma*
+      rises into the Rydberg region as the bond is compressed, and diffuse
+      functions let the two mix. Neither basis put more roots below the
+      valence 3A" (max one, the 3A', in both), so the diffuse-root risk did
+      not materialise.
+
+      Cost: 532 s/point (cc, nbf 87) against 2166 s (aug, nbf 128), **4.1x**.
+
+      Decision: **cc-pvtz-dk for the raster.** aug- buys nothing in the exit
+      channel and ~3.5% in band width at 4x the cost. For the deliverable --
+      the CHANGE in sigma between 220 and 298 K -- a uniform rescaling of the
+      wall slope largely cancels, because both temperatures' bands are
+      reflected through the same wall. If the absolute band shape is ever
+      needed to better than a few percent, an aug- correction over the FC
+      window alone is the cheap route, not an aug- raster.
+
+      **The report got this wrong first.** It fitted one straight line across
+      1.5-3.2 A and printed "+91 meV/A is a real trend, check for BSSE" -- for
+      a difference that was large on the inner wall and FLAT in the exit
+      channel, i.e. the opposite of BSSE. The offline test only fed it linear
+      differences, which a single slope does describe. It now judges the FC
+      window and the exit channel separately, and `tests/test_cut.py` feeds
+      it the real shape and requires "no BSSE signature". Also: the vertical
+      was read off the nearest grid point (1.85 A); at -5 eV/A the 0.014 A to
+      the true minimum is worth 75 meV, ~12 nm, so it is now interpolated.
+
+      **Raster cost, for planning:** 532 CPU-s/point with 6 roots, against
+      HOCl's 101 with 4. A HOCl-sized 2730-point raster would be ~400 CPU-h,
+      ~13.5 h on 30 workers, and 4 roots will take some of that back.
+
 - [ ] Repeat Phase 1 for HOBr. Scalar-relativistic treatment required
       (ECP or x2c/DKH; aug-cc-pVnZ-PP or ANO-RCC basis).
 - [ ] Ground-state surface: consider using **Peterson's global MRCI PES**

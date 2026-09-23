@@ -146,14 +146,17 @@ from.
 
       **No def2-TZVP comparison exists yet**, despite a log that claims one —
       see the cache bug below.
-- [ ] **Rerun the HOCl validation under `--basis def2-tzvp`**, now that the
-      basis is part of the cache key, to see whether `cc-pvtz-dk` is as good
-      for a force field as it is for SOC. The atomic sweep cannot say.
-- [ ] **HOBr's own geometry**: `01_geometry.py --molecule HOBr --basis cc-pvtz-dk`.
-- [ ] **Does aug- matter in the bond-breaking region?** The atomic sweep is
-      silent on this: SOC is a near-nuclear property, so `aug-cc-pvtz-dk`
-      matching `cc-pvtz-dk` to 0.1 points says nothing about 2-3 Å. See
-      `01_method/README.md`.
+- [x] **HOCl under def2-tzvp**: better heavy-atom stretch than cc-pvtz-dk
+      for Cl (ratio 1.039 against 1.062), plausibly cc-pVTZ's missing tight d
+      on a second-row atom. A Cl issue; HOBr unaffected.
+- [x] **HOBr's geometry**: r(O-Br) 1.8357 Å, r(O-H) 0.9646 Å, ∠ 102.02°;
+      ω 632 / 1199 / 3869 cm⁻¹, ratios to the fundamentals 1.020 / 1.032 /
+      1.070. v=1 of the O-Br stretch: 1.60% at 220 K, 4.72% at 298 K.
+- [x] **`02_obr_cut.py`**: the crossing stays ~0.7 Å out (3A′ lowest from
+      2.55 Å); EOM trustworthy to ~2.40 Å by single-excitation weight;
+      vertical 432 nm against 457 measured; **aug- does not matter where the
+      bond breaks** (exit channel flat to 9 meV) and costs 4.1×. Raster in
+      `cc-pvtz-dk`. Details in `../TASKS.md`.
 - [ ] **Molecular SOC and the borrowed intensity**, the analogue of
       `HOCl/01_method/03`. This is where the basis choice is confirmed on a
       molecule rather than a free atom, and where f is compared with Ingham's

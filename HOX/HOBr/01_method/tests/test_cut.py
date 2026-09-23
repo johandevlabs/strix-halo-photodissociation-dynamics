@@ -88,11 +88,12 @@ r_t1 = 2.50 + (m.T1_MAX - 0.008) / 0.02
 first_t1 = min(r for r in RADII if r >= r_t1 - 1e-9)
 check("T1 limit detected",
       f"T1(S) first reaches {m.T1_MAX} at {first_t1:.3f} A" in out, True)
-# 3. the basis trend, injected at -30 meV/A
-trend = [l for l in out.splitlines() if "trend with r" in l][0]
-val = float(trend.split(":")[1].strip().split()[0])
-check("trend recovered as -30 meV/A", round(val), -30)
-check("trend called real, not flat", "is a real trend" in out, True)
+# 3. the basis difference, injected as -30 meV/A everywhere: it must show
+#    in the exit channel as a BSSE-like slope
+ex = [l for l in out.splitlines() if "offset" in l and "slope" in l][1]
+val = float(ex.split("slope")[1].split()[0])
+check("exit-channel slope recovered as -30 meV/A", round(val), -30)
+check("exit-channel trend flagged", "that is the BSSE signature" in out, True)
 # 4. no spurious extra roots in this synthetic case
 check("diffuse-root risk reported as absent", "did not materialise" in out, True)
 
@@ -101,6 +102,28 @@ buf = io.StringIO()
 with contextlib.redirect_stdout(buf):
     m.main()
 check("nothing recomputed", "0 to compute" in buf.getvalue(), True)
+
+print("\n=== the REAL HOBr shape must not be called BSSE ===")
+# What aug-cc-pvtz-dk actually did on 2026-09-23: -224 meV on the inner wall,
+# decaying through the FC window, flat (+0..+9 meV) from 2.3 A out. The
+# first report fitted one line to all of it and flagged BSSE. It must not.
+csv3 = os.path.join(tempfile.mkdtemp(), "real.csv")
+def real_shape(task):
+    row = fake_point(task)
+    r = task[1]
+    if task[4] == "aug-cc-pvtz-dk":
+        row["omega_app_eV"] = (row["omega_app_eV"] + 0.030 * (r - 1.50)
+                               - 0.25 * np.exp(-(r - 1.50) / 0.20) + 0.009)
+    return row
+m.compute_point = real_shape
+buf = io.StringIO()
+with contextlib.redirect_stdout(buf):
+    sys.argv = ["x", "--csv", csv3, "--png", csv3 + ".png", "--nproc", "4"]
+    m.main()
+o3 = buf.getvalue()
+check("inner-wall difference NOT reported as BSSE",
+      "no BSSE signature" in o3, True)
+check("FC-window effect reported instead", "shifts the vertical by" in o3, True)
 
 print("\n=== a flat basis difference must NOT be called a trend ===")
 csv2 = os.path.join(tempfile.mkdtemp(), "flat.csv")
@@ -114,7 +137,7 @@ buf = io.StringIO()
 with contextlib.redirect_stdout(buf):
     sys.argv = ["x", "--csv", csv2, "--png", csv2 + ".png", "--nproc", "4"]
     m.main()
-check("flat offset reported as flat", "not buying anything" in buf.getvalue(), True)
+check("flat offset reported as flat", "no BSSE signature" in buf.getvalue(), True)
 
 print("\n" + ("ALL PASS" if ok else "FAILURES ABOVE"))
 sys.exit(0 if ok else 1)

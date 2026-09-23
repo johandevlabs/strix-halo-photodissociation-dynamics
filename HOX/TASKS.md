@@ -1472,7 +1472,7 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       | region | aug minus cc | meaning |
       | --- | --- | --- |
       | inner wall, 1.50-1.70 A | -224 to -74 meV | valence-Rydberg mixing |
-      | FC window, 1.74-1.94 A | -42 meV, slope 3.5% shallower | shifts the band ~6 nm, narrows it ~3.5% |
+      | FC window, 1.74-1.94 A | -42 meV, slope 3.5% shallower | ~~shifts the band ~6 nm~~ -- measured by `03`: +0.9 nm, 3.9% narrower |
       | exit channel, 2.29-3.20 A | +0 to +9 meV, 8 meV/A | **no BSSE signature** |
 
       On the inner wall aug- brings the second 3A" down from 2.65 to 1.87 eV
@@ -1505,6 +1505,65 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       **Raster cost, for planning:** 532 CPU-s/point with 6 roots, against
       HOCl's 101 with 4. A HOCl-sized 2730-point raster would be ~400 CPU-h,
       ~13.5 h on 30 workers, and 4 roots will take some of that back.
+
+- [x] **`HOBr/02_band_model/03_band_1d.py`, the 1D band model, 2026-09-23.**
+      HOCl's 10 adapted to 02's cut: V_S CCSD(T), V_T = V_S + omega(EOM),
+      trusted to 2.40 A, tails beyond (EOM continued / flat / linear). Local,
+      43 s. 1D v=0->1 634 cm-1 against 01's harmonic 632 and the observed 620.
+
+      **How much surface the band needs: to ~2.0 A.** With positive controls
+      passing (absorber at r_eq-0.09: 14%; V_T flattened beyond r_eq+0.09:
+      66%), the band starts to respond to an absorber from r_eq+0.01 and to a
+      surface cut at r_eq+0.16 = 2.00 A. Those are HOCl's offsets exactly
+      (absorber from 1.7 A, cut at 1.85 A, r_eq 1.69). Everything from
+      r_eq+0.51 out -- all tails, absorber strengths, ramp lengths -- moves the
+      band by at most 0.05%. So the raster to ~2.40 A has 0.40 A of margin,
+      and the 3A' crossing at 2.55 A is product-branching scope, as for HOCl.
+
+      **The aug- band shift, measured: +0.9 nm, not the ~6 nm estimated from
+      02.** That estimate compared omega at a FIXED geometry, where aug is 38
+      meV lower. But aug also moves the ground-state minimum 0.006 A inward
+      (1.8275 against 1.8332 A), so chi_0 sits where the steep V_T is ~30 meV
+      higher, and the quantity the band actually samples, <V_T>_chi0 - E_v0,
+      differs by only 8 meV. Width 3.9% narrower. The temperature ratio over
+      440-500 nm moves by at most 0.002. The basis choice is settled on the
+      band itself now, not on a proxy for it.
+
+      **Band.** 1D peak 437 nm against 457 measured, FWHM 0.566 eV. The f that
+      would reproduce Ingham's peak sigma of 2.3e-20 cm2 is **6.4e-5** -- a
+      floor, since a 1D band is too narrow and its peak therefore too high for
+      a given f. That is the target for HOBr's SOC vertical run.
+
+      **First look at the deliverable, and it is not where TASKS.md expected
+      it.** sigma(298)/sigma(220) from O-Br stretch hot bands, read with the
+      model band shifted rigidly (-126 meV) onto the measured peak:
+
+      | nm | 420 | 440 | 457 | 480 | 500 | 520 | 550 |
+      | --- | --- | --- | --- | --- | --- | --- | --- |
+      | aligned | 1.003 | 0.982 | 0.972 | 0.972 | 0.990 | 1.036 | 1.196 |
+      | sigma/peak | 0.64 | 0.91 | 1.00 | 0.86 | 0.59 | 0.34 | 0.11 |
+
+      Over 440-500 nm the change is **-1 to -3%**: below the 5% 'negligible'
+      line of the impact threshold. The temperature effect is in the red
+      WING, +4% at 520 nm and +20% at 550 nm, where sigma is a third of the
+      peak and less. Physically sensible: v=1 has a node, so its reflection
+      is broader, and hot bands move intensity from the centre to the wings.
+
+      The first run printed only the FIXED-wavelength read, which gave "-3%
+      to +6% over 440-500 nm": the +6% at 500 nm was the model band sitting
+      20 nm blue, so 500 nm fell further down its red side than it does in
+      reality. The script now reports both reads and bases its verdict on the
+      aligned one.
+
+      Consequences, provisional on the 3D model: (i) the impact-threshold
+      framing on 440-500 nm may be the wrong window -- if the effect lives in
+      the red wing, whether it matters is a J-value question, and at high
+      solar zenith angle the actinic flux shifts red, which is exactly where
+      HOBr photolysis is said to be dominated by this band. That makes Phase
+      3 part of the answer, not an afterthought. (ii) A 1D band is too narrow,
+      which EXAGGERATES wing ratios, so the +20% at 550 nm is likely an upper
+      bound. (iii) The alignment is itself an assumption that the SOC
+      splitting and the 3D model have to remove.
 
 - [ ] Repeat Phase 1 for HOBr. Scalar-relativistic treatment required
       (ECP or x2c/DKH; aug-cc-pVnZ-PP or ANO-RCC basis).

@@ -119,6 +119,7 @@ shortfall — that remains unexplained and elsewhere.
 | | |
 | --- | --- |
 | [`01_method/`](01_method/) | geometry, force field, and the validity checks that must be redone for a heavier halogen |
+| [`02_band_model/`](02_band_model/) | the 1D band: how much surface it needs, the basis measured on the band, a first look at σ(298)/σ(220) |
 | `01_method/tests/` | offline tests, run before anything goes to the EVO |
 | `data/`, `logs/` | as in `HOCl/` |
 
@@ -157,6 +158,11 @@ from.
       vertical 432 nm against 457 measured; **aug- does not matter where the
       bond breaks** (exit channel flat to 9 meV) and costs 4.1×. Raster in
       `cc-pvtz-dk`. Details in `../TASKS.md`.
+- [x] **`02_band_model/03_band_1d.py`**: the band needs the surface to
+      ~2.0 Å (HOCl's offsets exactly), so the raster to 2.40 Å has 0.4 Å of
+      margin; aug- moves the band 0.9 nm; implied f ≥ 6.4e-5; and σ(298)/σ(220)
+      is −1 to −3% over 440-500 nm but +20% at 550 nm. See
+      `02_band_model/README.md`.
 - [ ] **Molecular SOC and the borrowed intensity**, the analogue of
       `HOCl/01_method/03`. This is where the basis choice is confirmed on a
       molecule rather than a free atom, and where f is compared with Ingham's

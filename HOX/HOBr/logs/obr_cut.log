@@ -1,0 +1,210 @@
+========================================================================
+== HOBr a 3A" along O-Br, 2 bases
+== CCSD(T) + EOM-EE-CCSD triplet, 6 roots, x2c, Cs
+== spectators fixed at r(O-H) = 0.9610 A, angle = 102.30 deg
+========================================================================
+  29 radii x 2 bases = 58 points
+  58 to compute, 0 already present
+    [1/58] cc-pvtz-dk 2.2: ok (334.35 s)
+    [2/58] cc-pvtz-dk 2.25: ok (349.94 s)
+    [3/58] cc-pvtz-dk 2.0: ok (446.99 s)
+    [4/58] cc-pvtz-dk 1.6: ok (459.84 s)
+    [5/58] cc-pvtz-dk 2.9: warn:Ap_below+w1 (463.96 s)
+    [6/58] cc-pvtz-dk 3.0: warn:Ap_below+w1 (465.06 s)
+    [7/58] cc-pvtz-dk 3.1: warn:Ap_below+w1 (477.51 s)
+    [8/58] cc-pvtz-dk 3.2: warn:Ap_below+w1 (478.05 s)
+    [9/58] cc-pvtz-dk 1.7: ok (478.22 s)
+    [10/58] cc-pvtz-dk 1.75: ok (486.55 s)
+    [11/58] cc-pvtz-dk 1.95: ok (498.28 s)
+    [12/58] cc-pvtz-dk 1.65: ok (504.2 s)
+    [13/58] cc-pvtz-dk 2.8: warn:Ap_below+w1 (507.75 s)
+    [14/58] cc-pvtz-dk 2.05: ok (519.53 s)
+    [15/58] cc-pvtz-dk 2.4: ok (531.75 s)
+    [16/58] cc-pvtz-dk 1.9: ok (533.83 s)
+    [17/58] cc-pvtz-dk 2.55: warn:Ap_below+w1 (547.3 s)
+    [18/58] cc-pvtz-dk 2.3: ok (547.71 s)
+    [19/58] cc-pvtz-dk 2.5: warn:w1 (547.91 s)
+    [20/58] cc-pvtz-dk 2.35: ok (551.68 s)
+    [21/58] cc-pvtz-dk 1.8: ok (551.84 s)
+    [22/58] cc-pvtz-dk 2.15: ok (552.54 s)
+    [23/58] cc-pvtz-dk 1.55: ok (559.27 s)
+    [24/58] cc-pvtz-dk 2.45: warn:w1 (563.04 s)
+    [25/58] cc-pvtz-dk 2.7: warn:Ap_below+w1 (573.58 s)
+    [26/58] cc-pvtz-dk 1.85: ok (575.99 s)
+    [27/58] cc-pvtz-dk 2.1: ok (590.28 s)
+    [28/58] cc-pvtz-dk 2.6: warn:Ap_below+w1 (590.41 s)
+    [29/58] cc-pvtz-dk 1.5: ok (650.0 s)
+    [30/58] aug-cc-pvtz-dk 1.6: ok (1511.28 s)
+    [31/58] aug-cc-pvtz-dk 1.55: ok (1563.5 s)
+    [32/58] aug-cc-pvtz-dk 2.4: ok (1457.97 s)
+    [33/58] aug-cc-pvtz-dk 1.5: ok (2247.18 s)
+    [34/58] aug-cc-pvtz-dk 3.1: warn:Ap_below+w1 (1752.44 s)
+    [35/58] aug-cc-pvtz-dk 3.2: warn:Ap_below+w1 (1850.01 s)
+    [36/58] aug-cc-pvtz-dk 2.6: warn:Ap_below+w1 (1889.78 s)
+    [37/58] aug-cc-pvtz-dk 2.3: ok (1999.96 s)
+    [38/58] aug-cc-pvtz-dk 1.9: ok (2100.77 s)
+    [39/58] aug-cc-pvtz-dk 2.15: ok (2081.62 s)
+    [40/58] aug-cc-pvtz-dk 2.9: warn:Ap_below+w1 (2020.95 s)
+    [41/58] aug-cc-pvtz-dk 3.0: warn:Ap_below+w1 (2026.74 s)
+    [42/58] aug-cc-pvtz-dk 2.8: warn:Ap_below+w1 (2079.83 s)
+    [43/58] aug-cc-pvtz-dk 2.45: warn:w1 (2099.0 s)
+    [44/58] aug-cc-pvtz-dk 2.7: warn:Ap_below+w1 (2102.54 s)
+    [45/58] aug-cc-pvtz-dk 1.8: ok (2199.35 s)
+    [46/58] aug-cc-pvtz-dk 1.85: ok (2228.88 s)
+    [47/58] aug-cc-pvtz-dk 2.35: ok (2165.76 s)
+    [48/58] aug-cc-pvtz-dk 2.2: ok (2205.46 s)
+    [49/58] aug-cc-pvtz-dk 2.5: warn:w1 (2183.11 s)
+    [50/58] aug-cc-pvtz-dk 1.95: ok (2263.42 s)
+    [51/58] aug-cc-pvtz-dk 2.55: warn:w1 (2206.7 s)
+    [52/58] aug-cc-pvtz-dk 1.65: ok (2319.23 s)
+    [53/58] aug-cc-pvtz-dk 2.25: ok (2269.1 s)
+    [54/58] aug-cc-pvtz-dk 2.05: ok (2309.96 s)
+    [55/58] aug-cc-pvtz-dk 2.1: ok (2309.69 s)
+    [56/58] aug-cc-pvtz-dk 1.75: ok (2361.2 s)
+    [57/58] aug-cc-pvtz-dk 2.0: ok (2384.4 s)
+    [58/58] aug-cc-pvtz-dk 1.7: ok (2522.7 s)
+  done in 49.7 min
+
+========================================================================
+== cc-pvtz-dk
+========================================================================
+  29 of 29 points usable   nbf 87
+
+      r/A    T1(S)  w(3A")/eV   root0  gap any   gap A"     w1  status
+    1.500   0.0053      4.370      A"    0.908    2.645  0.959  ok
+    1.550   0.0054      4.257      A"    0.905    2.870  0.958  ok
+    1.600   0.0055      4.080      A"    0.899    3.161  0.957  ok
+    1.650   0.0056      3.857      A"    0.891    3.492  0.956  ok
+    1.700   0.0058      3.604      A"    0.880    3.800  0.954  ok
+    1.750   0.0059      3.336      A"    0.868    3.760  0.953  ok
+    1.800   0.0061      3.063      A"    0.854    3.434  0.950  ok
+    1.850   0.0063      2.794      A"    0.837    3.107  0.948  ok
+    1.900   0.0065      2.535      A"    0.817    2.807  0.946  ok
+    1.950   0.0068      2.289      A"    0.794    2.535  0.943  ok
+    2.000   0.0070      2.058      A"    0.767    2.290  0.939  ok
+    2.050   0.0073      1.844      A"    0.737    2.069  0.936  ok
+    2.100   0.0076      1.647      A"    0.704    1.870  0.932  ok
+    2.150   0.0080      1.467      A"    0.666    1.691  0.928  ok
+    2.200   0.0083      1.303      A"    0.623    1.529  0.923  ok
+    2.250   0.0087      1.154      A"    0.574    1.383  0.919  ok
+    2.300   0.0092      1.020      A"    0.514    1.251  0.913  ok
+    2.350   0.0096      0.899      A"    0.439    1.132  0.908  ok
+    2.400   0.0101      0.791      A"    0.343    1.024  0.902  ok
+    2.450   0.0106      0.695      A"    0.229    0.927  0.896  warn:w1
+    2.500   0.0111      0.609      A"    0.108    0.839  0.889  warn:w1
+    2.550   0.0117      0.533      A'   -0.014    0.759  0.882  warn:Ap_below+w1
+    2.600   0.0123      0.466      A'   -0.131    0.687  0.875  warn:Ap_below+w1
+    2.700   0.0135      0.356      A'   -0.345    0.563  0.861  warn:Ap_below+w1
+    2.800   0.0147      0.272      A'    0.330    0.463  0.845  warn:Ap_below+w1
+    2.900   0.0159      0.209      A'    0.281    0.381  0.830  warn:Ap_below+w1
+    3.000   0.0170      0.162      A'    0.240    0.315  0.815  warn:Ap_below+w1
+    3.100   0.0181      0.129      A'    0.206    0.261  0.800  warn:Ap_below+w1
+    3.200   0.0191      0.105      A'    0.177    0.218  0.786  warn:Ap_below+w1
+
+  T1(S) first reaches 0.02 at no radius in 1.4-3.2 A (max 0.0191)
+  single-excitation weight drops below 0.90 at 2.450 A
+  lowest triplet is 3A' from 2.550 A outward (8 points) -- the crossing
+
+  vertical at r = 1.850 A: 2.794 eV = 444 nm, against 457 nm measured (-2.9%)
+  slope there: -5.280 eV/A  (HOCl's EOM-CCSD reference was -6.965)
+
+========================================================================
+== aug-cc-pvtz-dk
+========================================================================
+  29 of 29 points usable   nbf 128
+
+      r/A    T1(S)  w(3A")/eV   root0  gap any   gap A"     w1  status
+    1.500   0.0059      4.146      A"    0.866    1.870  0.956  ok
+    1.550   0.0060      4.085      A"    0.863    2.021  0.956  ok
+    1.600   0.0062      3.951      A"    0.857    2.259  0.955  ok
+    1.650   0.0064      3.760      A"    0.848    2.562  0.954  ok
+    1.700   0.0066      3.530      A"    0.836    2.907  0.953  ok
+    1.750   0.0068      3.278      A"    0.823    3.264  0.951  ok
+    1.800   0.0070      3.017      A"    0.807    3.423  0.949  ok
+    1.850   0.0072      2.758      A"    0.789    3.123  0.947  ok
+    1.900   0.0074      2.506      A"    0.767    2.823  0.944  ok
+    1.950   0.0077      2.265      A"    0.744    2.550  0.942  ok
+    2.000   0.0079      2.040      A"    0.717    2.303  0.939  ok
+    2.050   0.0082      1.830      A"    0.687    2.081  0.935  ok
+    2.100   0.0085      1.636      A"    0.654    1.880  0.932  ok
+    2.150   0.0089      1.459      A"    0.619    1.699  0.928  ok
+    2.200   0.0092      1.298      A"    0.580    1.536  0.923  ok
+    2.250   0.0096      1.152      A"    0.536    1.388  0.919  ok
+    2.300   0.0100      1.020      A"    0.487    1.255  0.914  ok
+    2.350   0.0104      0.901      A"    0.425    1.135  0.909  ok
+    2.400   0.0109      0.795      A"    0.346    1.026  0.903  ok
+    2.450   0.0114      0.700      A"    0.246    0.927  0.897  warn:w1
+    2.500   0.0119      0.616      A"    0.131    0.838  0.891  warn:w1
+    2.550   0.0124      0.541      A"    0.012    0.758  0.885  warn:w1
+    2.600   0.0130      0.474      A'   -0.105    0.685  0.878  warn:Ap_below+w1
+    2.700   0.0141      0.365      A'   -0.322    0.560  0.864  warn:Ap_below+w1
+    2.800   0.0153      0.281      A'    0.291    0.458  0.850  warn:Ap_below+w1
+    2.900   0.0165      0.218      A'    0.245    0.375  0.835  warn:Ap_below+w1
+    3.000   0.0176      0.171      A'    0.207    0.307  0.820  warn:Ap_below+w1
+    3.100   0.0187      0.138      A'    0.175    0.253  0.806  warn:Ap_below+w1
+    3.200   0.0197      0.114      A'    0.148    0.209  0.792  warn:Ap_below+w1
+
+  T1(S) first reaches 0.02 at no radius in 1.4-3.2 A (max 0.0197)
+  single-excitation weight drops below 0.90 at 2.450 A
+  lowest triplet is 3A' from 2.600 A outward (7 points) -- the crossing
+
+  vertical at r = 1.850 A: 2.758 eV = 450 nm, against 457 nm measured (-1.6%)
+  slope there: -5.119 eV/A  (HOCl's EOM-CCSD reference was -6.965)
+
+========================================================================
+== aug-cc-pvtz-dk minus cc-pvtz-dk
+========================================================================
+      r/A  d(omega)/meV
+    1.500        -223.7
+    1.550        -171.6
+    1.600        -129.1
+    1.650         -97.2
+    1.700         -74.0
+    1.750         -57.4
+    1.800         -45.3
+    1.850         -36.2
+    1.900         -29.1
+    1.950         -23.4
+    2.000         -18.6
+    2.050         -14.5
+    2.100         -10.9
+    2.150          -7.7
+    2.200          -4.8
+    2.250          -2.2
+    2.300           0.1
+    2.350           2.1
+    2.400           3.8
+    2.450           5.2
+    2.500           6.4
+    2.550           7.4
+    2.600           8.1
+    2.700           9.0
+    2.800           9.3
+    2.900           9.3
+    3.000           9.1
+    3.100           8.8
+    3.200           8.5
+
+  mean offset -29.6 meV, spread 233.0 meV
+  trend with r: +90.9 meV per A
+
+  Reading this. A constant offset is the two bases describing the SAME state
+  at slightly different completeness, and it cancels out of a band shape. A
+  difference that GROWS with r is the interesting case: that is the BSSE
+  signature, since basis-set superposition is an attractive error that peaks
+  where the fragments are close but separating, and it would distort the
+  slope the band width depends on.
+  -> 91 meV/A is a real trend. Check the root
+     symmetries below before concluding it is BSSE rather than
+     a diffuse root being picked up by the labelling.
+
+  has aug- put more roots below the valence 3A"?
+                 basis  radii  3A" lowest  max roots below
+            cc-pvtz-dk     29          21                1
+        aug-cc-pvtz-dk     29          22                1
+    -> no extra low-lying roots from aug-cc-pvtz-dk; the diffuse-root
+       risk did not materialise here.
+
+  wrote /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_obr_cut.png
+
+  csv: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_obr_cut.csv

@@ -49,8 +49,14 @@ purpose, and the temperature ratio is a first look, not a result.
 
 Conventions are water/09_propagate.py's: split-operator propagation,
 S_v(t) = <mu chi_v | mu chi_v(t)>,
-sigma_v(E) = (4 pi E / 3c) * 2 Re Int_0^T exp(i(E_v + E)t) S_v(t) w(t) dt,
+sigma_v(E) = (4 pi E / 3c) * Re Int_0^T exp(i(E_v + E)t) S_v(t) w(t) dt,
 cos^2 window w(t), Boltzmann average over v. Local: numpy + scipy only.
+
+The normalisation is checked on every run against the sum rule
+Int sigma dE = 2 pi^2 f / c. water/09_propagate.py's form carried an extra
+factor 2 ("2 Re"), copied here at first, which doubled every absolute sigma
+and halved the implied f while leaving shapes and ratios untouched -- so
+nothing but a check on the absolute scale could have caught it.
 
 Usage:
     python 03_band_1d.py 2>&1 | tee ../logs/band_1d.log
@@ -182,7 +188,14 @@ def cross_sections(S_all, e_levels, dt, E, dt_max=4.0):
     for v, S in enumerate(S_all):
         phase = np.exp(1j * (e_levels[v] + E[:, None]) * t[None, :])
         integ = np.trapezoid(phase * (S * win)[None, :], t, axis=1)
-        sig[v] = (4.0 * np.pi * E / (3.0 * C_AU)) * 2.0 * np.real(integ)
+        # (4 pi E / 3c) * Re Int_0^inf, NOT 2 Re: the Fourier representation
+        # of the delta function is (1/2pi) Int_-inf^inf = (1/pi) Re Int_0^inf,
+        # and (4 pi^2 E / 3c)(1/pi) = 4 pi E / 3c. Until 2026-09-24 this line
+        # carried an extra 2, inherited from water/09_propagate.py, which made
+        # every ABSOLUTE sigma twice too large (shapes, widths and ratios are
+        # unaffected). Caught by the sum rule Int sigma dE = 2 pi^2 f / c, which
+        # the script now checks on every run.
+        sig[v] = (4.0 * np.pi * E / (3.0 * C_AU)) * np.real(integ)
     return np.clip(sig * BOHR2_TO_CM2, 0.0, None)
 
 
@@ -355,6 +368,16 @@ def model(basis, args, quiet=False):
     # the window moved -1 to -3%.
     lams = np.array([400.0, 420.0, 440.0, 457.0, 480.0, 500.0, 520.0, 550.0])
     lo_T, hi_T = 220.0, 298.0
+    # Sum rule: Int sigma dE = (4 pi^2 / 3c) |mu|^2 <E>, and with |mu|^2 set
+    # from f at the vertical energy that is 2 pi^2 f / c times <E>/vertical,
+    # i.e. within ~1% of 1. A factor 2 here is the error water's
+    # 09_propagate.py carried, which no shape or ratio test can see.
+    sr = float(np.trapezoid(sig_v[0] / BOHR2_TO_CM2, E)
+               / (2.0 * np.pi ** 2 * F_NOMINAL / C_AU))
+    say(f"\n  sum rule check, v=0: Int sigma dE / (2 pi^2 f / c) = {sr:.4f}"
+        + ("" if abs(sr - 1) < 0.05 else
+           "   !! NOT ~1: the absolute scale of sigma is wrong"))
+
     pk, smax, fw = band_stats(E, s_ref)
     shift = NM_EV / OBS_PEAK_NM / HARTREE2EV - pk / HARTREE2EV
     ratio, ratio_al = {}, {}

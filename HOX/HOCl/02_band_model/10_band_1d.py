@@ -52,7 +52,8 @@ absorber test is the purpose; everything else is orientation.
 
 Conventions are water/09_propagate.py's: split-operator propagation,
 S_v(t) = <mu chi_v | mu chi_v(t)>,
-sigma_v(E) = (4 pi E / 3c) * 2 Re Int_0^T exp(i(E_v + E)t) S_v(t) w(t) dt,
+sigma_v(E) = (4 pi E / 3c) * Re Int_0^T exp(i(E_v + E)t) S_v(t) w(t) dt
+(corrected 2026-09-24 from water's 2 Re, which doubled absolute sigma),
 with a cos^2 window w(t), and a Boltzmann average over v.
 
 Usage:
@@ -237,7 +238,14 @@ def cross_sections(S_all, e_levels, dt, E, dt_max=4.0):
     for v, S in enumerate(S_all):
         phase = np.exp(1j * (e_levels[v] + E[:, None]) * t[None, :])
         integ = np.trapezoid(phase * (S * win)[None, :], t, axis=1)
-        sig[v] = (4.0 * np.pi * E / (3.0 * C_AU)) * 2.0 * np.real(integ)
+        # (4 pi E / 3c) * Re Int_0^inf, NOT 2 Re: the Fourier representation
+        # of the delta function is (1/2pi) Int_-inf^inf = (1/pi) Re Int_0^inf,
+        # and (4 pi^2 E / 3c)(1/pi) = 4 pi E / 3c. Until 2026-09-24 this line
+        # carried an extra 2, inherited from water/09_propagate.py, which made
+        # every ABSOLUTE sigma twice too large (shapes, widths and ratios are
+        # unaffected). Caught by the sum rule Int sigma dE = 2 pi^2 f / c, which
+        # the script now checks on every run.
+        sig[v] = (4.0 * np.pi * E / (3.0 * C_AU)) * np.real(integ)
     return np.clip(sig * BOHR2_TO_CM2, 0.0, None)
 
 

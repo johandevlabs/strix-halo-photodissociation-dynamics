@@ -160,7 +160,7 @@ from.
       `cc-pvtz-dk`. Details in `../TASKS.md`.
 - [x] **`02_band_model/03_band_1d.py`**: the band needs the surface to
       ~2.0 Å (HOCl's offsets exactly), so the raster to 2.40 Å has 0.4 Å of
-      margin; aug- moves the band 0.9 nm; implied f ≥ 6.4e-5; and σ(298)/σ(220)
+      margin; aug- moves the band 0.9 nm; implied f ≥ 1.3e-4 (after a factor-2 fix, see there); and σ(298)/σ(220)
       is −1 to −3% over 440-500 nm but +20% at 550 nm. See
       `02_band_model/README.md`.
 - [ ] **Molecular SOC and the borrowed intensity**, the analogue of

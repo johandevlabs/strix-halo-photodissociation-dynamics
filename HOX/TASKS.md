@@ -1530,7 +1530,8 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       band itself now, not on a proxy for it.
 
       **Band.** 1D peak 437 nm against 457 measured, FWHM 0.566 eV. The f that
-      would reproduce Ingham's peak sigma of 2.3e-20 cm2 is **6.4e-5** -- a
+      would reproduce Ingham's peak sigma of 2.3e-20 cm2 is **1.3e-4** (first
+      reported as 6.4e-5; see the factor-2 entry below) -- a
       floor, since a 1D band is too narrow and its peak therefore too high for
       a given f. That is the target for HOBr's SOC vertical run.
 
@@ -1564,6 +1565,32 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       which EXAGGERATES wing ratios, so the +20% at 550 nm is likely an upper
       bound. (iii) The alignment is itself an assumption that the SOC
       splitting and the 3D model have to remove.
+
+- [x] **A factor of 2 in every absolute cross section, 2026-09-24.** The
+      time-domain transform in `water/09_propagate.py` (and `10_mu_sensitivity`),
+      copied into HOCl's `10` and HOBr's `03`, reads
+      sigma = (4 pi E / 3c) * **2** Re Int_0^inf S(t) exp(...) dt. The correct
+      prefactor has no 2: the delta function is (1/2pi) Int_-inf^inf =
+      (1/pi) Re Int_0^inf. Confirmed two independent ways -- the derivation,
+      and the sum rule Int sigma dE = 2 pi^2 f / c on a real HOBr propagation,
+      which came out 1.989x.
+
+      Invisible to every test so far, because a constant factor leaves band
+      shapes, peaks, widths, isotope ratios and temperature ratios exactly
+      unchanged. It surfaced only because HOBr's implied f disagreed by a
+      factor of 2 with a sum-rule estimate from the peak and width.
+
+      Fixed in both HOX band models, with the sum rule now checked on every
+      run (0.995). HOBr's implied f: 6.4e-5 -> **1.3e-4**. HOCl's `10`
+      rerun, absolute sigma halved, nothing else moved.
+
+      **water/ is NOT changed here -- flagged for Johan.** Its `11_compare_obs`
+      computes f_calc by integrating sigma_calc, so the factor sits in both,
+      and the "sigma and f low by the same factor" check could not see it.
+      Water's reported "transition dipole 1.29x too small" is therefore
+      1.29 x sqrt(2) = **1.83x too small**. Peak positions, widths and isotope
+      ratios -- everything else water/README reports -- are unaffected. The
+      correction is analytic; no rerun is needed.
 
 - [ ] Repeat Phase 1 for HOBr. Scalar-relativistic treatment required
       (ECP or x2c/DKH; aug-cc-pVnZ-PP or ANO-RCC basis).

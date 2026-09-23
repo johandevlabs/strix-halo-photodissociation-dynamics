@@ -34,7 +34,8 @@ of the band should be measured on the band, not inferred from a proxy.
 ## The f the band needs
 
 Propagated at a nominal f and scaled to Ingham's peak σ = 2.3 × 10⁻²⁰ cm²:
-**f ≥ 6.4 × 10⁻⁵**. A floor, since a 1D band is too narrow and its peak too
+**f ≥ 1.3 × 10⁻⁴** (first reported as 6.4 × 10⁻⁵, before the factor-2 fix
+below). A floor, since a 1D band is too narrow and its peak too
 high for a given f. That is the target for HOBr's SOC vertical run.
 
 ## First look at σ(298 K)/σ(220 K)
@@ -65,3 +66,18 @@ move the band. Condon.
 If the 3D model confirms it, the impact threshold's 440-500 nm window may be
 the wrong place to look, and whether the wing matters becomes a J-value
 question: at high solar zenith angle the actinic flux shifts red.
+
+## The factor of 2 in absolute σ, 2026-09-24
+
+The cross-section transform was copied from `water/09_propagate.py`:
+σ(E) = (4πE/3c)·**2** Re∫₀^∞. The correct form is (4πE/3c)·Re∫₀^∞ — the delta
+function is (1/2π)∫₋∞^∞ = (1/π)Re∫₀^∞, and (4π²E/3c)(1/π) = 4πE/3c. The
+extra 2 doubled every absolute σ and so halved the implied f.
+
+Shapes, positions, widths and every temperature ratio are untouched by a
+constant factor, which is why no test here saw it. It surfaced because the
+implied f disagreed by exactly 2 with a back-of-envelope sum-rule estimate
+from the peak and width. The model now checks ∫σ dE against 2π²f/c on every
+run (0.995 on the reference setting; not exactly 1 because μ is fixed at the
+vertical energy, not the band's mean). HOCl's `10_band_1d.py` had the same
+line and is fixed and rerun; its absolute σ halved, nothing else moved.

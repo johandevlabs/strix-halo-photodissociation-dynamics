@@ -168,11 +168,11 @@ from.
       floor of 1.3e-4, and the spin-orbit shift of the band, measured as
       spin-free vs SOC QD-NEVPT2 on one reference.
 - [ ] **`03_surfaces/05_pes_raster.py`**: 2470 points, ~11 h overnight.
-- [ ] **EOM-CCSD validity** across the Franck-Condon region, the analogue of
-      `HOCl/01_method/11`, and the triplet manifold along O-Br, the analogue
-      of `06`. Both must be redone: Br's SOC is 4× Cl's, and the 3A'/3A"
-      crossing that sat harmlessly outside HOCl's band may not stay there.
-- [ ] Raster, outer shell, fragments, splice — `HOCl/03_surfaces/`'s recipe.
+- [x] **EOM-CCSD validity**: along O-Br by `02` (the crossing stayed out).
+      Across O-H and the bend -- HOCl's `11` -- the raster checks it at every
+      point instead (T1, single-excitation weight, A'/A" label), so a separate
+      run is not needed; read it off the raster.
+- [ ] Outer NEVPT2 shell, fragments, splice -- `HOCl/03_surfaces/`'s `13`-`15`.
 - [ ] Relaxation, Boltzmann average, propagation, σ(λ, T) over 200-300 K.
 
 ## Why the force field is not a detail here

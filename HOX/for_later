@@ -1,0 +1,2 @@
+# ...then the full run, detached so it survives the ssh session closing
+nohup python HOBr/03_surfaces/05_pes_raster.py --nproc 30 > HOBr/logs/pes_raster.log 2>&1 &

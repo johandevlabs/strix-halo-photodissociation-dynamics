@@ -1,0 +1,21 @@
+==============================================================================
+== HOX Phase 2 -- 3D CCSD(T) + EOM-CCSD raster for HOBr
+==============================================================================
+  r(O-Br) 1.55-2.45 A, 19 points
+  r(O-H)  0.8-1.25 A, 10 points
+  angle   75.0-135.0 deg, 13 points
+  total   2470 geometries, cc-pvtz-dk, 5 EOM roots
+  estimate 329 CPU-hours = 11.0 h on 30 workers at 480 s/point
+  PILOT: 40 points spread over the grid, plus equilibrium; same CSV, so they count later
+  0 already in /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_pes_raster.csv, 40 to run
+
+  10/40  ok=10 warn=0 bad=0  84 pts/h  eta 21.4 min
+  20/40  ok=20 warn=0 bad=0  160 pts/h  eta 7.5 min
+  30/40  ok=30 warn=0 bad=0  219 pts/h  eta 2.7 min
+  40/40  ok=36 warn=4 bad=0  216 pts/h  eta 0.0 min
+
+done: 36 ok, 4 warned, 0 failed, 11.1 min
+measured 500 CPU-s per point (was assuming 480)
+-> the full 2470-point raster is 343 CPU-hours = 11.4 h on 30 workers
+
+inspect: awk -F, 'NR==1||$14!="ok"' /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_pes_raster.csv | head -30

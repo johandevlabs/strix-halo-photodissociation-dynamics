@@ -3,6 +3,7 @@
 | script | descends from | what |
 | --- | --- | --- |
 | `05_pes_raster.py` | HOCl's `12_pes_raster.py` | 3D CCSD(T) + EOM-CCSD raster: V_S and V_T from one calculation per point |
+| `06_raster_check.py` | HOCl's hand check in `TASKS.md` | warnings and where, smoothness, agreement with `02`'s cut, the FC window |
 
 HOCl's `12` ran 2730 points with zero failures, so `05` is that script with
 HOBr's numbers in it rather than a rewrite: geometry, grid, basis, roots and
@@ -31,3 +32,22 @@ cut would settle whether to switch. Open, not done.
 `tests/test_raster.py`: pilot then full then resume on a stubbed calculation,
 into a directory that does not exist yet — 2470 points, no duplicates,
 equilibrium included in the pilot, nothing re-run.
+
+## The run, 2026-09-24
+
+2470 points in 9.7 h, 0 failed, 432 CPU-s/point. `06_raster_check.py`:
+
+| check | HOBr | HOCl |
+| --- | --- | --- |
+| warnings | 45, all at r ≥ 2.30 Å | 181, none below 2.25 Å |
+| max T1(S) | 0.0163 | 0.0251 |
+| max cubic residual, inner wall / elsewhere | 5.4 / ≤ 3.6 meV | 10.1 / ≤ 3.6 meV |
+| vs the independent 1D cut | 0.02 meV at 19 radii | — |
+| vertical at the minimum | 2.867 eV = 432 nm | 3.432 eV |
+| V_T across χ₀'s angles at the FC radius | 0.20 eV | 0.26 eV |
+
+The cut agreement is not the same data compared twice: the cut's spectators
+(0.961 Å, 102.3°) sit between grid points, the nearest of which is up to
+14 meV off. Interpolation over 0.011 Å and 2.3° recovering an independent
+6-root calculation to 0.02 meV says the surface is smooth in the spectators
+and the labelling found the same state everywhere.

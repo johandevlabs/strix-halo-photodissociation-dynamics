@@ -169,9 +169,11 @@ from.
       HOCl was 10-25x short, so a common systematic. SOC shifts the band by
       -1 meV: it does NOT close the 20 nm gap. CASSCF unconverged at 100
       cycles.
-- [ ] **The f deficit**: `04 --nroots 10/16 --max-cycle 300`, then a larger
-      active space. CAS(12,7) has one virtual, so every state it can borrow
-      from is n/pi -> sigma*.
+- [x] **The f deficit, round 1**: not convergence (f moves 0.1% from 100 to
+      300 cycles), not the root count inside CAS(12,7) (1.33-1.54e-5 from 6
+      to 16 roots).
+- [ ] **The f deficit, round 2**: full valence, `04 --avas "Br 4p" "O 2p"
+      "H 1s"`, and the same on HOCl.
 - [x] **`03_surfaces/05_pes_raster.py`**: 2470 points, 0 failed, 9.7 h;
       `06_raster_check.py` finds it smooth (<= 5.4 meV), warnings only at
       >= 2.30 A, and the cut reproduced to 0.02 meV.
@@ -179,7 +181,8 @@ from.
       Across O-H and the bend -- HOCl's `11` -- the raster checks it at every
       point instead (T1, single-excitation weight, A'/A" label), so a separate
       run is not needed; read it off the raster.
-- [ ] Outer NEVPT2 shell, fragments, splice -- `HOCl/03_surfaces/`'s `13`-`15`.
+- [ ] **Outer shell, fragments, splice**: `03_surfaces/07`-`09`, written and
+      tested offline; to run.
 - [ ] Relaxation, Boltzmann average, propagation, σ(λ, T) over 200-300 K.
 
 ## Why the force field is not a detail here

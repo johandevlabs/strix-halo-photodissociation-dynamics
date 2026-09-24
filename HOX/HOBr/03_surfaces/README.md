@@ -4,6 +4,9 @@
 | --- | --- | --- |
 | `05_pes_raster.py` | HOCl's `12_pes_raster.py` | 3D CCSD(T) + EOM-CCSD raster: V_S and V_T from one calculation per point |
 | `06_raster_check.py` | HOCl's hand check in `TASKS.md` | warnings and where, smoothness, agreement with `02`'s cut, the FC window |
+| `07_outer_shell.py` | HOCl's `13` | SA-CASSCF(10,6) + SC-NEVPT2 over 2.25-3.85 Å, overlapping the raster |
+| `08_fragments.py` | HOCl's `14` | OH(X ²Π) curve and E(Br), both method families; E(Br) stored in the CSV |
+| `09_splice.py` | HOCl's `15` | raster + shell + asymptote → `hobr_surfaces.npz` |
 
 HOCl's `12` ran 2730 points with zero failures, so `05` is that script with
 HOBr's numbers in it rather than a rewrite: geometry, grid, basis, roots and
@@ -51,3 +54,22 @@ The cut agreement is not the same data compared twice: the cut's spectators
 14 meV off. Interpolation over 0.011 Å and 2.3° recovering an independent
 6-root calculation to 0.02 meV says the surface is smooth in the spectators
 and the labelling found the same state everywhere.
+
+## Shell, fragments, splice
+
+Generated from HOCl's `13`-`15` by substitution, so the method is the one
+that built HOCl's surface. Three deliberate differences:
+
+- `07` imports the active-space machinery from `HOCl/01_method/07`, where it
+  was validated, instead of carrying a second copy.
+- `08` writes E(Br) into every row of its CSV, and `09` reads it from there.
+  HOCl's `15` took E(Cl) as a command-line default copied from a log — a
+  number that silently goes stale when a basis changes.
+- `09` measures the seam slopes with spline derivatives, not `np.gradient`.
+  With the raster at 0.05 Å and the shell at 0.10 Å, central differences
+  carry different truncation errors, and on a synthetic surface with
+  *identical* slopes that showed up as a 0.062 eV/Å "mismatch". Splines:
+  0.007. HOCl's seam sat where V_T is nearly flat, so it never mattered there.
+
+`tests/test_splice.py` is the end-to-end check: one analytic surface, a known
+method offset varying across (r_OH, angle), and the splice has to recover it.

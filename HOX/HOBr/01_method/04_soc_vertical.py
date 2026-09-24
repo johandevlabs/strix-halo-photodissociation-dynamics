@@ -43,6 +43,7 @@ Usage:
     python 04_soc_vertical.py 2>&1 | tee ../logs/soc_vertical.log
     python 04_soc_vertical.py --molecule HOCl --basis def2-tzvp   # control
     python 04_soc_vertical.py --cas 7 12                          # CAS(12,7)
+    python 04_soc_vertical.py --avas "Br 4p" "O 2p" "H 1s" --nroots 12
 """
 import argparse
 import time
@@ -284,13 +285,22 @@ def main():
     p.add_argument("--nroots", type=int, default=6)
     p.add_argument("--max-cycle", type=int, default=100)
     p.add_argument("--minao", default="ano")
+    p.add_argument("--avas", nargs="+", default=None, metavar="LABEL",
+                   help="override the AVAS labels. Full valence, which adds "
+                        "sigma/sigma*(O-H): --avas 'Br 4p' 'O 2p' 'H 1s'. The "
+                        "default CAS(12,7) has ONE virtual, so every state the "
+                        "triplet can borrow from is n/pi -> sigma*(O-Br); the "
+                        "~10x f deficit in both HOCl and HOBr is the reason to "
+                        "try a larger space")
     p.add_argument("--cluster-tol", type=float, default=0.05)
     p.add_argument("--no-spin-free", action="store_true",
                    help="skip the spin-free QD-NEVPT2 run (no SOC shift)")
     p.add_argument("--verbose", type=int, default=0)
     args = p.parse_args()
 
-    spec = MOLECULES[args.molecule]
+    spec = dict(MOLECULES[args.molecule])
+    if args.avas:
+        spec["avas"] = list(args.avas)
     geom = tuple(args.geom) if args.geom else spec["geom"]
     print("=" * 72)
     print(f"== {args.molecule} vertical a 3A\" with SOC: borrowed f and the "

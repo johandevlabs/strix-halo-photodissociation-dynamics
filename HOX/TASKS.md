@@ -1669,6 +1669,48 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
 
       Fit to build a surface from.
 
+- [x] **The f deficit, first two suspects ruled out, 2026-09-24.** `04`
+      rerun at --max-cycle 300 and --nroots 10 / 16:
+
+      | run | summed f | centroid | SOC shift |
+      | --- | --- | --- | --- |
+      | 6 roots, 100 cycles | 1.51e-5 | 2.894 eV | -1 meV |
+      | 6 roots, 300 cycles | 1.51e-5 | 2.894 | -1 |
+      | 10 roots, 300 | 1.54e-5 | 2.904 | -4 |
+      | 16 roots, 300 | 1.33e-5 | 2.889 | -5 |
+
+      The "unconverged" CASSCF is not a problem: from 100 to 300 cycles the
+      root energies move ~1e-6 Ha (0.03 meV) and f by 0.1% -- it creeps just
+      short of tight thresholds (conv_tol 1e-11, grad 1e-6). And more roots
+      WITHIN CAS(12,7) do not move f. So neither convergence nor state count
+      inside this active space is the ~10x. Next: the active space itself --
+      `04 --avas "Br 4p" "O 2p" "H 1s"` for full valence, as HOCl's 08 used,
+      and the same on HOCl to see whether its 10-25x moves with it.
+
+- [ ] **Outer shell, fragments, splice for HOBr** -- written 2026-09-24 as
+      `HOBr/03_surfaces/07`, `08`, `09`, generated from HOCl's 13-15 by
+      substitution. Shell 2.25-3.85 A (1190 points; overlaps the raster at
+      2.25/2.35/2.45), CAS(10,6) on ["Br 4p","O 2p"], importing HOCl's 07
+      active-space module rather than copying it. Fragments write E(Br) into
+      every CSV row; the splice reads it there instead of from a
+      command-line default copied from a log, as HOCl's 15 did with E(Cl).
+
+      One real fix to the method. The seam slope check used np.gradient on
+      grids of different spacing (raster 0.05, shell 0.10 A), so the two
+      carried different truncation errors: on a synthetic surface with
+      IDENTICAL slopes in both pieces, it reported a 0.062 eV/A mismatch at
+      2.35 A. HOCl's seam sat on a nearly flat stretch of V_T, where that
+      error is negligible, so it never showed. Now spline derivatives: 0.007
+      eV/A on the same synthetic surface. HOCl's 15 left as it is -- its
+      numbers are unaffected at its flat seam.
+
+      Tests: `tests/test_splice.py` builds raster, shell and fragments from
+      ONE analytic surface with a known, column-varying method offset and
+      checks the splice recovers it to 1 meV, lands on E(Br) + V_OH, leaves
+      the raster region untouched, agrees on the seam slope, and refuses a
+      CSV with two different E(Br). `tests/test_shell_fragments.py` covers
+      the shell's pool and resume and the fragments' E(Br) columns.
+
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101
       CPU-s/point) and not especially balanced. Compare on 02's cut before

@@ -1,0 +1,33 @@
+========================================================================
+== HOBr raster check
+========================================================================
+  2470 points: r(O-Br) 1.55-2.45 (19), r(O-H) 0.8-1.25 (10), angle 75.0-135.0 (13)
+
+  status: 2425 ok, 44 warn:Ap_below, 1 warn:eom_unconverged
+  warned points span r(O-Br) 2.30-2.45 A, r(O-H) 0.80-1.25, angle 85-135
+    r 1.55-1.80:   0 of 650 warned
+    r 1.80-2.10:   0 of 780 warned
+    r 2.10-2.30:   0 of 520 warned
+    r 2.30-2.45:  45 of 520 warned
+  max T1(S) 0.0163  (all below 0.02)
+  single-excitation weight: min 0.880; below 0.90 at 185 points, from r(O-Br) 2.35 A
+
+  smoothness: max |V - cubic through 4 neighbours|, meV
+      r(O-Br) band  along O-Br  along O-H  along angle   (V_T)
+    1.55-1.80 A           5.4        3.6          0.5
+    1.80-2.10 A           1.0        3.6          0.5
+    2.10-2.30 A           0.2        3.6          0.3
+    2.30-2.45 A           0.1        3.6          0.2
+    V_S overall: 1.3, 3.6, 0.8
+    largest V_T residual at (1.65, 1.25, 85.0), status ok
+
+  against 02's cut (cc-pvtz-dk, spectators 0.961 A / 102.3 deg), 19 radii:
+    omega(raster, interpolated) - omega(cut): -0.02 to +0.01 meV, median -0.00
+    (nearest grid point differs from the cut by up to 14 meV, so this tests the interpolation, not a copy)
+
+  FC window at 01's minimum (1.8357, 0.9646, 102.02):
+    vertical 2.867 eV = 432 nm; slope along O-Br -5.35 eV/A (02's cut: 2.871 eV, -5.32)
+    chi_0 samples angles 85-120 deg (V_S <= 0.25 eV); across them V_T moves 0.20 eV at the FC radius (HOCl: 0.26)
+
+========================================================================
+  -> fit to build a surface from.

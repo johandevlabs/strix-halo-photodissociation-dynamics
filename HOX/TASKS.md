@@ -1592,19 +1592,83 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       ratios -- everything else water/README reports -- are unaffected. The
       correction is analytic; no rerun is needed.
 
-- [ ] **`HOBr/01_method/04_soc_vertical.py`** -- written 2026-09-24. HOCl's
-      03 at HOBr's geometry with cc-pvtz-dk / DKH1, plus a spin-free
-      QD-NEVPT2 on the same reference so the SOC SHIFT of the band is
-      measured: HOCl's was -11 meV (from its log); second order scales as the
-      coupling squared, so HOBr's could be the ~0.1-0.2 eV between the
-      spin-free band (437 nm) and the measured one (457). f is compared with
-      03's floor of 1.3e-4. Report checked offline on HOCl's real Prism
-      output (reproduces 3.4477 eV, f 8.8e-7, -11 meV).
-- [ ] **`HOBr/03_surfaces/05_pes_raster.py`** -- written 2026-09-24. HOCl's
+- [x] **`HOBr/01_method/04_soc_vertical.py`, run 2026-09-24.**
+
+      *Control:* `--molecule HOCl --basis def2-tzvp` reproduces HOCl's 03
+      exactly -- 3.4477 eV, summed f 8.92e-7. The adaptation is sound.
+
+      *Correction:* I had quoted HOCl's SOC shift as -11 meV, read from 03's
+      log. That compared the SOC states with the per-state DIAGONAL NEVPT2
+      energies; against the spin-free QD-NEVPT2 this script now computes, the
+      shift is ~0 (triplet 3.4478 eV spin-free, 3.4477 with SOC). The 11 meV
+      was quasi-degenerate mixing, not spin-orbit.
+
+      *HOBr* (cc-pvtz-dk, DKH1, AVAS CAS(12,7), 6 Ms=0 roots, 224 s):
+
+      | | HOBr | HOCl |
+      | --- | --- | --- |
+      | a 3A" centroid | 2.894 eV = 428.5 nm | 3.448 eV = 359.6 nm |
+      | component splitting | 75 cm-1 | 4 cm-1 |
+      | summed f | **1.51e-5** | 8.9e-7 |
+      | SOC shift of the band | **-1 meV** | ~0 |
+      | f needed (03, a floor) | 1.3e-4 | -- |
+
+      **SOC does not close the 20 nm gap.** Spin-orbit coupling lowers the
+      ground state and the triplet by the same ~11 meV; the band moves 0.2 nm.
+      The hypothesis that it would supply the ~0.1-0.2 eV between the
+      spin-free band (437 nm in 03) and the measured one (457 nm) is
+      falsified. The gap has to come from the surfaces or the method, and the
+      rigid alignment 03 used to read the temperature ratio stays an
+      assumption for now.
+
+      **f scales as expected, and is still ~8x short.** HOBr/HOCl f = 17, and
+      the square of the atomic splitting ratio, (3685/882)^2, is 17.4 -- the
+      borrowing behaves exactly like a second-order SOC effect should. But
+      1.5e-5 is 0.12 of the 1.3e-4 needed, and that target is a floor. HOCl
+      came out 10-25x short. **A common ~10x deficit in both molecules** is a
+      systematic, not noise. Candidates, all testable at the vertical:
+        (a) too few states to borrow from. The SOC state interaction only
+            mixes the 6 reference roots, and CAS(12,7) has ONE virtual, so
+            every excited state in it is n/pi -> sigma*. Any brighter lender
+            outside that space is simply absent. First test: --nroots 6/10/16
+            within CAS(12,7); then a larger active space.
+        (b) the CASSCF reference did not converge in 100 macro cycles (HOCl's
+            did). <S^2> is clean and the vertical agrees with EOM to 23 meV,
+            but f is the fragile quantity. Rerun with --max-cycle 300.
+        (c) the ~7% SOC deficit from the toolchain sweep: 14% in f. Real but
+            small.
+      A Condon, vertical-only f against a band-integrated one is not a factor
+      of 10 either.
+
+- [x] **`HOBr/03_surfaces/05_pes_raster.py`** -- written 2026-09-24. HOCl's
       12 with HOBr's numbers: r(O-Br) 1.55-2.45 A (same offsets from r_eq as
       HOCl's grid), r(O-H) 0.80-1.25, 75-135 deg, 2470 points, cc-pvtz-dk,
       5 EOM roots. ~480 CPU-s/point, ~11 h on 30 workers. All-electron for
       consistency with 01/02.
+      **Run overnight: 2470 points in 9.7 h (40-point pilot + 2430), 0
+      failed, 432 CPU-s/point.** Checked by `06_raster_check.py`, which is
+      HOCl's hand check made into a script:
+
+      - 45 warned (44 `Ap_below`, 1 `eom_unconverged`), ALL at r(O-Br) >=
+        2.30 A -- none in the 1.55-2.30 A where the band lives (03 needs
+        <= 2.00). HOCl: none below 2.25.
+      - T1(S) max 0.0163, below 0.02 everywhere (HOCl reached 0.025 at its
+        edge). Single-excitation weight below 0.90 at 185 points, from 2.35 A.
+      - Smooth: max deviation from a 4-neighbour cubic 5.4 meV on the inner
+        wall, 1.0 by 1.80 A, 3.6 along O-H in every band (Morse curvature,
+        as HOCl), <= 0.5 along the angle. Nothing near 20.
+      - Against 02's independent cut (6 roots, spectators 0.961 A / 102.3
+        deg, between grid points): interpolated omega agrees to **0.02 meV**
+        at all 19 radii. Not a copy -- the nearest grid point is up to 14 meV
+        off -- so it confirms both the interpolation and that the same state
+        was found everywhere.
+      - FC window: vertical 2.867 eV = 432 nm, slope -5.35 eV/A.
+      - **The bend moves V_T 0.20 eV across the angles chi_0 samples**
+        (85-120 deg) at the FC radius; HOCl 0.26. 03's frozen bend is a real
+        approximation here too.
+
+      Fit to build a surface from.
+
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101
       CPU-s/point) and not especially balanced. Compare on 02's cut before

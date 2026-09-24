@@ -164,10 +164,17 @@ from.
       margin; aug- moves the band 0.9 nm; implied f ≥ 1.3e-4 (after a factor-2 fix, see there); and σ(298)/σ(220)
       is −1 to −3% over 440-500 nm but +20% at 550 nm. See
       `02_band_model/README.md`.
-- [ ] **`01_method/04_soc_vertical.py`**: the borrowed f against 03's
-      floor of 1.3e-4, and the spin-orbit shift of the band, measured as
-      spin-free vs SOC QD-NEVPT2 on one reference.
-- [ ] **`03_surfaces/05_pes_raster.py`**: 2470 points, ~11 h overnight.
+- [x] **`01_method/04_soc_vertical.py`**: f = 1.5e-5, 17x HOCl's (the
+      SOC-squared scaling exactly) and ~8x short of the 1.3e-4 needed --
+      HOCl was 10-25x short, so a common systematic. SOC shifts the band by
+      -1 meV: it does NOT close the 20 nm gap. CASSCF unconverged at 100
+      cycles.
+- [ ] **The f deficit**: `04 --nroots 10/16 --max-cycle 300`, then a larger
+      active space. CAS(12,7) has one virtual, so every state it can borrow
+      from is n/pi -> sigma*.
+- [x] **`03_surfaces/05_pes_raster.py`**: 2470 points, 0 failed, 9.7 h;
+      `06_raster_check.py` finds it smooth (<= 5.4 meV), warnings only at
+      >= 2.30 A, and the cut reproduced to 0.02 meV.
 - [x] **EOM-CCSD validity**: along O-Br by `02` (the crossing stayed out).
       Across O-H and the bend -- HOCl's `11` -- the raster checks it at every
       point instead (T1, single-excitation weight, A'/A" label), so a separate

@@ -1,0 +1,520 @@
+========================================================================
+== HOBr vertical a 3A" with SOC: borrowed f and the spin-orbit shift
+== cc-pvtz-dk, DKH1-QD-NEVPT2, 10 Ms=0 roots, geometry (1.8357, 0.9646, 102.02)
+========================================================================
+  AVAS ['Br 4p', 'O 2p'] selected CAS(12e, 7o)
+  WARNING: CASSCF did not converge; SOC results from an unconverged reference are not trustworthy.
+  reference 583.5 s (nao 87)
+
+   root              E / Ha     <S^2>    2S+1
+      0    -2679.9361201527    0.0000    1.00
+      1    -2679.8250169167    2.0000    3.00
+      2    -2679.7961705037    0.0000    1.00
+      3    -2679.7859996347    2.0000    3.00
+      4    -2679.7532666602    0.0000    1.00
+      5    -2679.7168873581    2.0000    3.00
+      6    -2679.7141380155    2.0000    3.00
+      7    -2679.7042537414    0.0000    1.00
+      8    -2679.6701056715    0.0000    1.00
+      9    -2679.6572956672    2.0000    3.00
+
+Computing NEVPT energies...
+
+Method:                                            nevpt2
+Method type:                                       qd
+Nuclear repulsion energy:                         93.356207799163
+Number of electrons:                               44
+Number of basis functions:                         87
+Reference wavefunction type:                       sa-casscf
+Number of reference states:                        10
+Number of reference microstates:                   10
+Number of frozen orbitals:                         0
+Number of core orbitals:                           16
+Number of active orbitals:                         7
+Number of external orbitals:                       64
+Number of active electrons:                        [(np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6))]
+Spin–orbit coupling:                               None
+G-tensor:                                          False
+Reference density fitting?                         False
+Correlation density fitting?                       False
+Temporary directory path:                          /tmp
+
+Internal contraction:                              Full (= Partial)
+Compute singles amplitudes?                        False
+Overlap truncation parameter (singles):            1.00e-08
+Overlap truncation parameter (doubles):            1.00e-08
+
+Einsum Backend:                                    opt_einsum
+
+Transforming integrals to MO basis...
+Correlation energy [0]:                           -0.093737962428
+
+Computing energy of state #1...
+Reference state active-space energy:             -33.039390292941
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018912058246
+Correlation energy [+1']:                         -0.000344294938
+Correlation energy [-1']:                         -0.061483592029
+Correlation energy [+1]:                          -0.004553613612
+Correlation energy [-1]:                          -0.088742636660
+Correlation energy [+2]:                          -0.000297496656
+Correlation energy [-2]:                          -0.221333173626
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.936120152661
+NEVPT2 correlation energy:                        -0.489404828196
+Total NEVPT2 energy:                           -2680.425524980857
+
+Computing energy of state #2...
+Reference state active-space energy:             -32.928287057021
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.019478004128
+Correlation energy [+1']:                         -0.000063103674
+Correlation energy [-1']:                         -0.065445530962
+Correlation energy [+1]:                          -0.004162611469
+Correlation energy [-1]:                          -0.088820349709
+Correlation energy [+2]:                          -0.000008556672
+Correlation energy [-2]:                          -0.220116497720
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.825016916741
+NEVPT2 correlation energy:                        -0.491832616762
+Total NEVPT2 energy:                           -2680.316849533504
+
+Computing energy of state #3...
+Reference state active-space energy:             -32.899440643970
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018780794195
+Correlation energy [+1']:                         -0.000221089216
+Correlation energy [-1']:                         -0.063107435666
+Correlation energy [+1]:                          -0.004096733230
+Correlation energy [-1]:                          -0.088751342863
+Correlation energy [+2]:                          -0.000017919328
+Correlation energy [-2]:                          -0.221249712993
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.796170503690
+NEVPT2 correlation energy:                        -0.489962989918
+Total NEVPT2 energy:                           -2680.286133493608
+
+Computing energy of state #4...
+Reference state active-space energy:             -32.889269774993
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018335115497
+Correlation energy [+1']:                         -0.000192586295
+Correlation energy [-1']:                         -0.071558757123
+Correlation energy [+1]:                          -0.004363012901
+Correlation energy [-1]:                          -0.090589095271
+Correlation energy [+2]:                          -0.000012091480
+Correlation energy [-2]:                          -0.225182987922
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.785999634713
+NEVPT2 correlation energy:                        -0.503971608918
+Total NEVPT2 energy:                           -2680.289971243631
+
+Computing energy of state #5...
+Reference state active-space energy:             -32.856536800471
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018214345716
+Correlation energy [+1']:                         -0.000276610753
+Correlation energy [-1']:                         -0.071167183706
+Correlation energy [+1]:                          -0.004311813067
+Correlation energy [-1]:                          -0.090566557921
+Correlation energy [+2]:                          -0.000035182221
+Correlation energy [-2]:                          -0.226732024590
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.753266660191
+NEVPT2 correlation energy:                        -0.505041680403
+Total NEVPT2 energy:                           -2680.258308340594
+
+Computing energy of state #6...
+Reference state active-space energy:             -32.820157498366
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.020024249267
+Correlation energy [+1']:                         -0.000087919587
+Correlation energy [-1']:                         -0.052216056208
+Correlation energy [+1]:                          -0.003953933360
+Correlation energy [-1]:                          -0.089540390055
+Correlation energy [+2]:                          -0.000006335887
+Correlation energy [-2]:                          -0.223372473391
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.716887358086
+NEVPT2 correlation energy:                        -0.482939320183
+Total NEVPT2 energy:                           -2680.199826678269
+
+Computing energy of state #7...
+Reference state active-space energy:             -32.817408155774
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.020998559549
+Correlation energy [+1']:                         -0.000502358826
+Correlation energy [-1']:                         -0.039985619632
+Correlation energy [+1]:                          -0.004143009202
+Correlation energy [-1]:                          -0.088621710748
+Correlation energy [+2]:                          -0.000007539934
+Correlation energy [-2]:                          -0.219432863683
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.714138015494
+NEVPT2 correlation energy:                        -0.467429624002
+Total NEVPT2 energy:                           -2680.181567639495
+
+Computing energy of state #8...
+Reference state active-space energy:             -32.807523881726
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.019536406963
+Correlation energy [+1']:                         -0.000173119919
+Correlation energy [-1']:                         -0.045904698891
+Correlation energy [+1]:                          -0.003921613295
+Correlation energy [-1]:                          -0.089576130744
+Correlation energy [+2]:                          -0.000013058987
+Correlation energy [-2]:                          -0.224051324644
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.704253741446
+NEVPT2 correlation energy:                        -0.476914315872
+Total NEVPT2 energy:                           -2680.181168057319
+
+Computing energy of state #9...
+Reference state active-space energy:             -32.773375811783
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.017110311781
+Correlation energy [+1']:                         -0.000202048842
+Correlation energy [-1']:                         -0.049171642163
+Correlation energy [+1]:                          -0.003731535480
+Correlation energy [-1]:                          -0.089321493060
+Correlation energy [+2]:                          -0.000101735656
+Correlation energy [-2]:                          -0.224308787081
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.670105671503
+NEVPT2 correlation energy:                        -0.477685516491
+Total NEVPT2 energy:                           -2680.147791187994
+
+Computing energy of state #10...
+Reference state active-space energy:             -32.760565807471
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.017832438428
+Correlation energy [+1']:                         -0.000186240959
+Correlation energy [-1']:                         -0.052978650428
+Correlation energy [+1]:                          -0.003785255899
+Correlation energy [-1]:                          -0.089638247966
+Correlation energy [+2]:                          -0.000004314980
+Correlation energy [-2]:                          -0.224560152853
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.657295667191
+NEVPT2 correlation energy:                        -0.482723263942
+Total NEVPT2 energy:                           -2680.140018931133
+
+Computing the QD-NEVPT2 effective Hamiltonian...
+
+Summary of results for the QD-NEVPT2 calculation with the SA-CASSCF reference:
+------------------------------------------------------------------------------------------------------------------
+  State    Degen.        E(total)            dE(a.u.)        dE(eV)      dE(nm)       dE(cm-1)      Osc Str.  
+------------------------------------------------------------------------------------------------------------------
+    1        1        -2680.425544306907     0.00000000       0.0000                      0.0000               
+    2        3        -2680.318664483872     0.10687982       2.9083     426.3045     23457.4098     0.00000000
+    3        3        -2680.291206824745     0.13433748       3.6555     339.1708     29483.6694     0.00000000
+    4        1        -2680.288256953462     0.13728735       3.7358     331.8831     30131.0913     0.00129888
+    5        1        -2680.258297532472     0.16724677       4.5510     272.4319     36706.4242     0.00556195
+    6        3        -2680.198066722839     0.22747758       6.1900     200.2982     49925.5589     0.00000000
+    7        3        -2680.180332058385     0.24521225       6.6726     185.8119     53817.8678     0.00000000
+    8        1        -2680.179044597468     0.24649971       6.7076     184.8414     54100.4329     0.00702368
+    9        1        -2680.147782670067     0.27776164       7.5583     164.0376     60961.6329     0.00005444
+   10        3        -2680.139963936198     0.28558037       7.7710     159.5465     62677.6466     0.00000000
+----------------------------------------------------------------------------------------------------------------
+> CPU time for total NEVPT2 calculation    637.86 sec, wall time     20.00 sec
+  spin-free QD-NEVPT2 20.7 s
+
+Computing NEVPT energies...
+
+Method:                                            nevpt2
+Method type:                                       qd
+Nuclear repulsion energy:                         93.356207799163
+Number of electrons:                               44
+Number of basis functions:                         87
+Reference wavefunction type:                       sa-casscf
+Number of reference states:                        10
+Number of reference microstates:                   10
+Number of frozen orbitals:                         0
+Number of core orbitals:                           16
+Number of active orbitals:                         7
+Number of external orbitals:                       64
+Number of active electrons:                        [(np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6)), (np.int64(6), np.int64(6))]
+Spin–orbit coupling:                               dkh1
+G-tensor:                                          False
+Reference density fitting?                         False
+Correlation density fitting?                       False
+Temporary directory path:                          /tmp
+
+Internal contraction:                              Full (= Partial)
+Compute singles amplitudes?                        False
+Overlap truncation parameter (singles):            1.00e-08
+Overlap truncation parameter (doubles):            1.00e-08
+
+Einsum Backend:                                    opt_einsum
+
+Transforming integrals to MO basis...
+Correlation energy [0]:                           -0.093737962428
+
+Computing energy of state #1...
+Reference state active-space energy:             -33.039390292941
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018912058246
+Correlation energy [+1']:                         -0.000344294938
+Correlation energy [-1']:                         -0.061483592029
+Correlation energy [+1]:                          -0.004553613612
+Correlation energy [-1]:                          -0.088742636660
+Correlation energy [+2]:                          -0.000297496656
+Correlation energy [-2]:                          -0.221333173626
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.936120152661
+NEVPT2 correlation energy:                        -0.489404828196
+Total NEVPT2 energy:                           -2680.425524980857
+
+Computing energy of state #2...
+Reference state active-space energy:             -32.928287057021
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.019478004128
+Correlation energy [+1']:                         -0.000063103674
+Correlation energy [-1']:                         -0.065445530962
+Correlation energy [+1]:                          -0.004162611469
+Correlation energy [-1]:                          -0.088820349709
+Correlation energy [+2]:                          -0.000008556672
+Correlation energy [-2]:                          -0.220116497720
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.825016916741
+NEVPT2 correlation energy:                        -0.491832616762
+Total NEVPT2 energy:                           -2680.316849533504
+
+Computing energy of state #3...
+Reference state active-space energy:             -32.899440643970
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018780794195
+Correlation energy [+1']:                         -0.000221089216
+Correlation energy [-1']:                         -0.063107435666
+Correlation energy [+1]:                          -0.004096733230
+Correlation energy [-1]:                          -0.088751342863
+Correlation energy [+2]:                          -0.000017919328
+Correlation energy [-2]:                          -0.221249712993
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.796170503690
+NEVPT2 correlation energy:                        -0.489962989918
+Total NEVPT2 energy:                           -2680.286133493608
+
+Computing energy of state #4...
+Reference state active-space energy:             -32.889269774993
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018335115497
+Correlation energy [+1']:                         -0.000192586295
+Correlation energy [-1']:                         -0.071558757121
+Correlation energy [+1]:                          -0.004363012901
+Correlation energy [-1]:                          -0.090589095271
+Correlation energy [+2]:                          -0.000012091480
+Correlation energy [-2]:                          -0.225182987922
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.785999634713
+NEVPT2 correlation energy:                        -0.503971608915
+Total NEVPT2 energy:                           -2680.289971243628
+
+Computing energy of state #5...
+Reference state active-space energy:             -32.856536800471
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.018214345716
+Correlation energy [+1']:                         -0.000276610753
+Correlation energy [-1']:                         -0.071167183706
+Correlation energy [+1]:                          -0.004311813067
+Correlation energy [-1]:                          -0.090566557921
+Correlation energy [+2]:                          -0.000035182221
+Correlation energy [-2]:                          -0.226732024590
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.753266660191
+NEVPT2 correlation energy:                        -0.505041680403
+Total NEVPT2 energy:                           -2680.258308340594
+
+Computing energy of state #6...
+Reference state active-space energy:             -32.820157498366
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.020024249267
+Correlation energy [+1']:                         -0.000087919587
+Correlation energy [-1']:                         -0.052216056208
+Correlation energy [+1]:                          -0.003953933360
+Correlation energy [-1]:                          -0.089540390055
+Correlation energy [+2]:                          -0.000006335887
+Correlation energy [-2]:                          -0.223372473391
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.716887358086
+NEVPT2 correlation energy:                        -0.482939320183
+Total NEVPT2 energy:                           -2680.199826678269
+
+Computing energy of state #7...
+Reference state active-space energy:             -32.817408155774
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.020998559549
+Correlation energy [+1']:                         -0.000502358826
+Correlation energy [-1']:                         -0.039985619632
+Correlation energy [+1]:                          -0.004143009202
+Correlation energy [-1]:                          -0.088621710748
+Correlation energy [+2]:                          -0.000007539934
+Correlation energy [-2]:                          -0.219432863683
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.714138015494
+NEVPT2 correlation energy:                        -0.467429624002
+Total NEVPT2 energy:                           -2680.181567639495
+
+Computing energy of state #8...
+Reference state active-space energy:             -32.807523881726
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.019536406963
+Correlation energy [+1']:                         -0.000173119919
+Correlation energy [-1']:                         -0.045904698891
+Correlation energy [+1]:                          -0.003921613295
+Correlation energy [-1]:                          -0.089576130744
+Correlation energy [+2]:                          -0.000013058987
+Correlation energy [-2]:                          -0.224051324644
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.704253741446
+NEVPT2 correlation energy:                        -0.476914315872
+Total NEVPT2 energy:                           -2680.181168057319
+
+Computing energy of state #9...
+Reference state active-space energy:             -32.773375811783
+Reference state spin multiplicity:                 1
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.017110311781
+Correlation energy [+1']:                         -0.000202048842
+Correlation energy [-1']:                         -0.049171642163
+Correlation energy [+1]:                          -0.003731535480
+Correlation energy [-1]:                          -0.089321493060
+Correlation energy [+2]:                          -0.000101735656
+Correlation energy [-2]:                          -0.224308787081
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.670105671503
+NEVPT2 correlation energy:                        -0.477685516491
+Total NEVPT2 energy:                           -2680.147791187994
+
+Computing energy of state #10...
+Reference state active-space energy:             -32.760565807471
+Reference state spin multiplicity:                 3
+Number of active electrons:                        [(np.int64(6), np.int64(6))]
+Correlation energy [0']:                          -0.017832438428
+Correlation energy [+1']:                         -0.000186240959
+Correlation energy [-1']:                         -0.052978650428
+Correlation energy [+1]:                          -0.003785255899
+Correlation energy [-1]:                          -0.089638247966
+Correlation energy [+2]:                          -0.000004314980
+Correlation energy [-2]:                          -0.224560152853
+Correlation energy [0]:                           -0.093737962428
+SA-CASSCF reference state total energy:        -2679.657295667191
+NEVPT2 correlation energy:                        -0.482723263942
+Total NEVPT2 energy:                           -2680.140018931133
+
+Computing the QD-NEVPT2 effective Hamiltonian...
+
+Initializing state-interaction spin–orbit coupling program...
+Apply S_plus due to Ms=0...
+Performing state-interaction spin–orbit coupling calculation within spin-free framework...
+
+Note that SOC Hamiltionian is sf-X2C-1e+so-DKH1 instead of usual DKH. 
+
+Calculating Wigner 1-RDM...
+> CPU time for total sf-X2C-1e+so-DKH1 calculation    224.61 sec, wall time     12.68 sec
+
+Summary of results for the DKH1-QD-NEVPT2 calculation with the SA-CASSCF reference:
+------------------------------------------------------------------------------------------------------------------
+  State    Degen.        E(total)            dE(a.u.)        dE(eV)      dE(nm)       dE(cm-1)      Osc Str.  
+------------------------------------------------------------------------------------------------------------------
+    1        1        -2680.425940386639     0.00000000       0.0000                      0.0000               
+    2        1        -2680.319311900230     0.10662849       2.9015     427.3094     23402.2477     0.00000008
+    3        1        -2680.319288422607     0.10665196       2.9021     427.2153     23407.4005     0.00000117
+    4        1        -2680.319060026653     0.10688036       2.9084     426.3024     23457.5276     0.00001414
+    5        1        -2680.294081727700     0.13185866       3.5881     345.5469     28939.6306     0.00044805
+    6        1        -2680.290881587075     0.13505880       3.6751     337.3594     29641.9802     0.00000000
+    7        1        -2680.290521620615     0.13541877       3.6849     336.4626     29720.9838     0.00000075
+    8        1        -2680.285823361863     0.14011702       3.8128     325.1807     30752.1324     0.00084567
+    9        1        -2680.258373020515     0.16756737       4.5597     271.9107     36776.7859     0.00552202
+   10        1        -2680.198665055497     0.22727533       6.1845     200.4765     49881.1695     0.00000622
+   11        1        -2680.198471305137     0.22746908       6.1897     200.3057     49923.6928     0.00000001
+   12        1        -2680.198219816097     0.22772057       6.1966     200.0845     49978.8883     0.00002262
+   13        1        -2680.182616477867     0.24332391       6.6212     187.2539     53403.4252     0.00294839
+   14        1        -2680.179605857658     0.24633453       6.7031     184.9654     54064.1799     0.00000002
+   15        1        -2680.179529686717     0.24641070       6.7052     184.9082     54080.8975     0.00000909
+   16        1        -2680.176687699444     0.24925269       6.7825     182.7998     54704.6416     0.00402541
+   17        1        -2680.150361180171     0.27557921       7.4989     165.3367     60482.6448     0.00004421
+   18        1        -2680.139703814603     0.28623657       7.7889     159.1808     62821.6661     0.00000303
+   19        1        -2680.139594543102     0.28634584       7.7919     159.1200     62845.6485     0.00004361
+   20        1        -2680.136890648269     0.28904974       7.8654     157.6315     63439.0848     0.00001167
+----------------------------------------------------------------------------------------------------------------
+> CPU time for total SOC-NEVPT2 calculation    842.92 sec, wall time     34.01 sec
+  SOC QD-NEVPT2 34.9 s
+
+  20 spin-orbit states:
+    i              E / Ha   dE / eV   dE / nm             f
+    0    -2680.4259403866    0.0000        --              
+    1    -2680.3193119002    2.9015     427.3    8.2403e-08
+    2    -2680.3192884226    2.9021     427.2    1.1747e-06
+    3    -2680.3190600267    2.9084     426.3    1.4142e-05
+    4    -2680.2940817277    3.5881     345.5    4.4805e-04
+    5    -2680.2908815871    3.6751     337.4    4.2621e-10
+    6    -2680.2905216206    3.6849     336.5    7.5033e-07
+    7    -2680.2858233619    3.8128     325.2    8.4567e-04
+    8    -2680.2583730205    4.5597     271.9    5.5220e-03
+    9    -2680.1986650555    6.1845     200.5    6.2171e-06
+   10    -2680.1984713051    6.1897     200.3    1.1327e-08
+   11    -2680.1982198161    6.1966     200.1    2.2622e-05
+   12    -2680.1826164779    6.6212     187.3    2.9484e-03
+   13    -2680.1796058577    6.7031     185.0    1.7717e-08
+   14    -2680.1795296867    6.7052     184.9    9.0884e-06
+   15    -2680.1766876994    6.7825     182.8    4.0254e-03
+   16    -2680.1503611802    7.4989     165.3    4.4210e-05
+   17    -2680.1397038146    7.7889     159.2    3.0308e-06
+   18    -2680.1395945431    7.7919     159.1    4.3609e-05
+   19    -2680.1368906483    7.8654     157.6    1.1668e-05
+
+  clusters (tol 0.05 eV):
+      0  n=1    0.0000 eV        -- nm  sum f 0.0000e+00
+      1  n=3    2.9040 eV     426.9 nm  sum f 1.5399e-05
+      2  n=1    3.5881 eV     345.5 nm  sum f 4.4805e-04
+      3  n=2    3.6800 eV     336.9 nm  sum f 7.5076e-07
+      4  n=1    3.8128 eV     325.2 nm  sum f 8.4567e-04
+      5  n=1    4.5597 eV     271.9 nm  sum f 5.5220e-03
+      6  n=3    6.1903 eV     200.3 nm  sum f 2.8850e-05
+      7  n=1    6.6212 eV     187.3 nm  sum f 2.9484e-03
+      8  n=2    6.7041 eV     184.9 nm  sum f 9.1061e-06
+      9  n=1    6.7825 eV     182.8 nm  sum f 4.0254e-03
+     10  n=1    7.4989 eV     165.3 nm  sum f 4.4210e-05
+     11  n=2    7.7904 eV     159.2 nm  sum f 4.6639e-05
+     12  n=1    7.8654 eV     157.6 nm  sum f 1.1668e-05
+
+  a 3A" band = the lowest three excited SOC states:
+      energies   2.9015, 2.9021, 2.9084 eV  (spread 55 cm-1)
+      centroid   2.9040 eV = 426.9 nm
+      summed f   1.5399e-05
+      gap to the next state 0.680 eV
+
+  spin-free QD-NEVPT2, same reference: 0.0000, 2.9083, 3.6555, 3.7358, 4.5510, 6.1900, 6.6726, 6.7076, 7.5583, 7.7710 eV
+      matched spin-free triplet 2.9083 eV (absolute match 15 meV)
+      ground state lowered by SOC -10.8 meV
+  -> SOC shifts the a 3A" band by -4 meV: 426.3 -> 426.9 nm (+0.6 nm)
+     03's 1D band peaked at 437 nm with a spin-free surface; moved by this shift
+     it would sit near 438 nm, against 457 nm measured.
+
+  f against measurement:
+      computed (sum of 3 components)   1.540e-05
+      needed by 03's band model         1.3e-04  (a floor)   calc/needed 0.12
+      Gaussian estimate, Ingham peak x 03's width 1.26e-04   calc/obs 0.12
+      (the SOC is ~7% low at this basis and operator -- the toolchain sweep --
+       so f carries ~14% from that alone. HOCl's equivalent came out 10-25x low.)
+
+  total 639.1 s wall

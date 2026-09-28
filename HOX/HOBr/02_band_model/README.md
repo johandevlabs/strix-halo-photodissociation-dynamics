@@ -3,6 +3,7 @@
 | script | descends from | question |
 | --- | --- | --- |
 | `03_band_1d.py` | HOCl's `10_band_1d.py` | how much surface does the band need, what does the basis do to the band, and a first σ(298)/σ(220) |
+| `10_compare_obs.py` | water's `11_compare_obs.py` | the computed bands against every measured HOBr spectrum, band by band |
 
 A 1D wavepacket along O-Br on `01_method/02`'s cut, OH and the angle frozen.
 Local — numpy and scipy, ~45 s — so it runs on the laptop.
@@ -81,3 +82,24 @@ from the peak and width. The model now checks ∫σ dE against 2π²f/c on every
 run (0.995 on the reference setting; not exactly 1 because μ is fixed at the
 vertical energy, not the band's mean). HOCl's `10_band_1d.py` had the same
 line and is fixed and rerun; its absolute σ halved, nothing else moved.
+
+## Against the measurements (`10_compare_obs.py`, 2026-09-28)
+
+The measured visible band depends on whose measurement:
+
+| | peak | FWHM | f |
+| --- | --- | --- | --- |
+| Ingham 1998 (followed by JPL-2010 and IUPAC) | 457 nm | 0.28 eV | 6.2 × 10⁻⁵ |
+| Barnes 1996 | 437 nm | 0.55 eV | 4.7 × 10⁻⁵ |
+| **this model** | **437 nm** | **0.57 eV** | (1.5 × 10⁻⁵ from `04`) |
+
+The model matches Barnes to 1 nm and 4% in width, and misses the recommended
+data by 20 nm and a factor 2. The "20 nm blue" gap, and the rigid shift used
+above to read the temperature ratio, both assumed Ingham. If Barnes is right,
+the FIXED-wavelength column is the one to read: −3% to +6% over 440-500 nm and
++64% at 550 nm.
+
+The f comparison: the singlet bands (the lenders) come out 1.2× and 2.8× too
+strong, so the borrowed band's 3-4× shortfall is not the lenders' dipoles.
+The earlier "≥ 1.3 × 10⁻⁴" target assumed the model's width; measured, the
+band carries 4.7-6.2 × 10⁻⁵.

@@ -1,0 +1,30 @@
+============================================================================
+== HOBr: computed bands against the measured spectra
+============================================================================
+
+  Ingham (1998), three Gaussians in energy (rms 4.8e-22 cm2):
+       band    E/eV   peak/cm2  FWHM/eV     f obs    f calc  calc/obs   computed states under it
+      457nm   2.711   2.28e-20    0.281  6.20e-05  1.51e-05      0.24   429, 429, 428 nm
+      352nm   3.522   1.19e-19    0.561  6.47e-04  7.78e-04      1.20   344, 337, 336, 324 nm
+      284nm   4.364   2.49e-19    0.716  1.73e-03  4.91e-03      2.84   273 nm
+  The singlet bands test the LENDERS: their computed transition dipoles are right to
+  within a factor of ~2-3, and too strong rather than too weak. The borrowed band's
+  shortfall is therefore not the lenders'; it lies in the coupling to them, or in lenders
+  missing from the active space.
+
+  the visible band, dataset by dataset (red half-width read directly, no fit):
+           dataset  peak/nm     sigma  red HWHM/eV  sigma(420)/peak
+      Ingham(1998)      456  2.30e-20        0.152             0.42
+          JPL-2010      455  2.29e-20        0.169             0.42
+       IUPAC(2007)      455  2.28e-20        0.169             0.42
+      Barnes(1996)      436  8.88e-21        0.282             0.89
+    Rattigan(1996)      420  1.28e-20        0.257             1.00   (no separate band: the maximum is the window edge)
+  Barnes (1996) is a single Gaussian to rms 2e-24: a reported band fit, 437 nm,
+  FWHM 0.548 eV, f 4.72e-05. Ingham's visible band: 457 nm, FWHM 0.281 eV, f 6.20e-05.
+
+  03's 1D band (cc-pvtz-dk, 298 K): 437 nm, FWHM 0.570 eV, red HWHM 0.268 eV
+  -> position and width match Barnes (1996) (437 nm, 0.548 eV) and NOT Ingham (1998) / JPL / IUPAC
+     (457 nm, 0.281 eV). The two measurements carry similar integrated intensity
+     (f 4.7e-05 and 6.2e-05); they disagree on where the band sits and how wide it is.
+
+  borrowed f: computed 1.51e-05 against 4.7e-05 (Barnes) - 6.2e-05 (Ingham): 0.24-0.32, i.e. mu ~1.8-2.0x low.

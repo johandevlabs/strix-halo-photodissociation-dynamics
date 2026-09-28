@@ -1766,6 +1766,64 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       right); and `04` called a full-valence HOCl run a "CONTROL ...
       reproduced", though a different active space is not a control.
 
+- [x] **The f deficit, round 3 -- mostly a wrong target, and a disagreement
+      between measurements. 2026-09-28.** `HOBr/02_band_model/10_compare_obs.py`
+      compares the computed bands with every HOBr spectrum in the MPI-Mainz
+      atlas (cached in `HOBr/data/obs/`), band by band.
+
+      *The lenders are fine.* Ingham's spectrum decomposed into three
+      Gaussians and integrated: the 352 nm singlet band f = 6.5e-4 against
+      7.8e-4 computed (1.2x), the 284 nm band 1.7e-3 against 4.9e-3 (2.8x).
+      The lenders' transition dipoles are right to a factor 2-3 and too
+      STRONG if anything, so water's CASSCF transition-moment problem is not
+      what limits the borrowed intensity.
+
+      *The target was overstated.* "f >= 1.3e-4" was Ingham's peak sigma
+      times the 1D MODEL's width. Measured, the visible band carries f =
+      6.2e-5 (Ingham) or 4.7e-5 (Barnes 1996). Computed 1.5e-5: **3-4x low,
+      mu ~1.8-2x low** -- not 10x. Unresolved, but now a modest shortfall,
+      and in the coupling or missing lenders, not the lenders' own dipoles.
+
+      *The measurements disagree on the band's shape, and the calculation
+      sides with one.*
+
+      | | peak | FWHM | peak sigma | f |
+      | --- | --- | --- | --- | --- |
+      | Ingham 1998 (= JPL-2010, IUPAC in the visible) | 457 nm | 0.28 eV | 2.3e-20 | 6.2e-5 |
+      | Barnes 1996 | 437 nm | 0.55 eV | 8.9e-21 | 4.7e-5 |
+      | Rattigan 1996 | no separate visible band | | | |
+      | **03's 1D model** | **437 nm** | **0.55-0.57 eV** | | |
+
+      Barnes's dataset is itself a single Gaussian (rms 2e-24): a reported
+      band fit. Fit-free red half-widths: Ingham 0.15, Barnes 0.28, model
+      0.27 eV. The ab initio band matches Barnes's position and width to
+      within 1 nm and 4%, and misses the recommended (Ingham) band by 20 nm
+      and a factor of 2 in width. Both measurements carry similar integrated
+      intensity; they disagree on where it sits.
+
+      So the "20 nm blue" that SOC was supposed to explain, and the rigid
+      shift 03 used to read the temperature ratio, both assumed Ingham. If
+      Barnes is right, no shift is needed, and 03's FIXED-wavelength read
+      is the one: sigma(298)/sigma(220) = 0.970 / 0.971 / 0.998 / 1.061 at
+      440 / 457 / 480 / 500 nm and 1.64 at 550 nm (Ingham-aligned: 0.98 /
+      0.97 / 0.97 / 0.99 and 1.20).
+
+      Cautions before this goes anywhere: it is a 1D band (the raster says
+      the bend adds little width -- V_T moves 0.20 eV over chi_0's angles --
+      but the 3D model decides), Condon, no SOC in the shape; the same model
+      put HOCl's band at 373 nm against 372 measured, which is the case for
+      trusting its POSITION. The recommended data are what atmospheric models
+      use, so a band 20 nm redder and half as wide as the physics predicts
+      matters for J(HOBr) at high solar zenith angle independently of the
+      temperature question. Worth reading Ingham and Barnes to see why the
+      evaluators chose Ingham before making anything of it.
+
+      HOCl for comparison (Barnes 1998, a shoulder, so decomposition-
+      dependent): visible band 372 nm, FWHM 0.43, f 2.7e-5; computed f
+      8.9e-7, 30x low. Measured HOBr/HOCl f ratio ~2, against the SOC-squared
+      17 the calculation follows -- HOCl's shoulder carries more intensity
+      than spin-orbit borrowing gives it, or the decomposition over-assigns.
+
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101
       CPU-s/point) and not especially balanced. Compare on 02's cut before

@@ -187,6 +187,14 @@ from.
       splice offsets constant to a median 13 meV, seam slopes 0.07 eV/Å at
       2.35 Å (exit channel). `data/hobr_surfaces.npz` -- **the surface is
       built.**
+- [x] **Against the measured spectra** (`02_band_model/10_compare_obs.py`):
+      the lenders' f is right to 1.2-2.8×; the borrowed f is 3-4× low, not
+      10× (the earlier target used the model's own width). And the two
+      measurements of the visible band disagree -- Ingham (and JPL/IUPAC)
+      457 nm and 0.28 eV wide, Barnes 437 nm and 0.55 eV -- **and the
+      computed band matches Barnes**, to 1 nm and 4%.
+- [ ] Read Ingham (1998) and Barnes (1996): why did the evaluators choose
+      Ingham, and how was Br2 (strong near 415 nm) subtracted in each?
 - [ ] Jacobi transform, relaxation, 3D propagation, σ(λ, T).
 
 ## Why the force field is not a detail here

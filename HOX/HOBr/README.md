@@ -172,8 +172,10 @@ from.
 - [x] **The f deficit, round 1**: not convergence (f moves 0.1% from 100 to
       300 cycles), not the root count inside CAS(12,7) (1.33-1.54e-5 from 6
       to 16 roots).
-- [ ] **The f deficit, round 2**: full valence, `04 --avas "Br 4p" "O 2p"
-      "H 1s"`, and the same on HOCl.
+- [x] **The f deficit, round 2**: adding σ*(O-H) (CAS(12,8)) lowers f 15-16%
+      in BOTH molecules. Shared cause, not found. The deliverable is a ratio,
+      in which a constant scale on μ cancels; see `../TASKS.md` for the
+      decision this leaves.
 - [x] **`03_surfaces/05_pes_raster.py`**: 2470 points, 0 failed, 9.7 h;
       `06_raster_check.py` finds it smooth (<= 5.4 meV), warnings only at
       >= 2.30 A, and the cut reproduced to 0.02 meV.
@@ -181,9 +183,11 @@ from.
       Across O-H and the bend -- HOCl's `11` -- the raster checks it at every
       point instead (T1, single-excitation weight, A'/A" label), so a separate
       run is not needed; read it off the raster.
-- [ ] **Outer shell, fragments, splice**: `03_surfaces/07`-`09`, written and
-      tested offline; to run.
-- [ ] Relaxation, Boltzmann average, propagation, σ(λ, T) over 200-300 K.
+- [x] **Outer shell, fragments, splice**: shell 1190 points, 0 failed;
+      splice offsets constant to a median 13 meV, seam slopes 0.07 eV/Å at
+      2.35 Å (exit channel). `data/hobr_surfaces.npz` -- **the surface is
+      built.**
+- [ ] Jacobi transform, relaxation, 3D propagation, σ(λ, T).
 
 ## Why the force field is not a detail here
 

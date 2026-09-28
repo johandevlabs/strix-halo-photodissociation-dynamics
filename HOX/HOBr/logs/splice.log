@@ -1,0 +1,33 @@
+==============================================================================
+== HOX Phase 2 -- splicing the HOBr a 3A" surface
+==============================================================================
+  E(Br) UCCSD(T) -2604.69154554 Ha, from /home/johan/Projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_fragments.csv
+  raster 19x10x13 over r(O-Br) 1.55-2.45 A
+  shell  17x10x7 over 2.25-3.85 A
+  missing: raster 0, shell 0
+
+  overlap radii used for the offset: 2.25, 2.35, 2.45 A
+  offset (raster - shell): -1.725 to -1.453 eV, column spread 272 meV
+  spread of each column ACROSS the overlap radii: max 31 meV, median 13 meV
+  (that second number is the shape test: an offset cannot absorb a shape disagreement)
+  a single global offset would misplace columns by up to 161 meV; using per-column offsets
+
+  shell (aligned) at 3.85 A minus E(Br)+V_OH: -21 to 57 meV
+  (HOCl's was -59 to +67 meV at 3.6 A, the shell still on its van der Waals tail;
+   tens of meV is expected here too)
+
+  assembled grid (95, 10, 13) over r(O-Br) 1.55-6.25 A
+  raster->shell      blend 2.25-2.45 A: max local residual 0.1 meV
+  shell->asymptote   blend 3.45-3.85 A: max local residual 0.0 meV
+  whole surface: max local residual 0.2 meV; within 2.30 A 0.2 meV
+  (those residuals mostly measure the spline interpolation and the
+   cosine blends, which are smooth by construction. The test that
+   can actually fail is next.)
+
+  slope agreement at the seam (the check a blend cannot fake):
+    at 2.25 A: raster -0.188, shell -0.166 eV/A; worst column mismatch 0.233 eV/A = 47 meV over the 0.20 A blend   (at a grid edge: least reliable)
+    at 2.35 A: raster +0.122, shell +0.054 eV/A; worst column mismatch 0.175 eV/A = 35 meV over the 0.20 A blend
+    at 2.45 A: raster +0.247, shell +0.172 eV/A; worst column mismatch 0.166 eV/A = 33 meV over the 0.20 A blend   (at a grid edge: least reliable)
+
+  wrote /home/johan/Projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_surfaces.npz
+  wrote /home/johan/Projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_surfaces.png

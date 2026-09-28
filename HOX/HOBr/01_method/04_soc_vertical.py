@@ -261,9 +261,13 @@ def report(spec, e_soc, osc, e_sf, tol):
               "toolchain sweep --\n       so f carries ~14% from that alone. "
               "HOCl's equivalent came out 10-25x low.)")
     else:
-        print(f"  CONTROL against HOCl's 03: vertical {centroid:.4f} eV "
+        label = "CONTROL" if spec.get("is_control", True) else "comparison"
+        print(f"  {label} against HOCl's 03: vertical {centroid:.4f} eV "
               f"(03: {spec['ref_vertical']}), summed f {f_c:.2e} "
               f"(03: {spec['ref_f']:.1e})")
+        if not spec.get("is_control", True):
+            print("  (not a control: active space or roots differ from 03's)")
+            return
         ok = (abs(centroid - spec["ref_vertical"]) < 0.01
               and 0.8 < f_c / spec["ref_f"] < 1.25)
         print("  -> reproduced; the adaptation is sound." if ok else
@@ -331,6 +335,11 @@ def main():
         t1 = time.time()
         e_soc, osc = qd_nevpt2(mf, mc, soc=args.soc)
         print(f"  SOC QD-NEVPT2 {time.time() - t1:.1f} s")
+        # The HOCl control compares with 03, so it only means something at
+        # 03's settings. A full-valence HOCl run printed "reproduced" for a
+        # different active space; now it is labelled a comparison instead.
+        spec["is_control"] = (args.avas is None and args.cas is None
+                             and args.nroots == 6)
         report(spec, e_soc, osc, e_sf, args.cluster_tol)
     except Exception as exc:
         print(f"\n  FAILED: {type(exc).__name__}: {exc}")

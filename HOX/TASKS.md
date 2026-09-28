@@ -1687,7 +1687,38 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       `04 --avas "Br 4p" "O 2p" "H 1s"` for full valence, as HOCl's 08 used,
       and the same on HOCl to see whether its 10-25x moves with it.
 
-- [ ] **Outer shell, fragments, splice for HOBr** -- written 2026-09-24 as
+- [x] **The f deficit, round 2: full valence does not help, 2026-09-28.**
+      AVAS with "H 1s" added gave CAS(12,8) -- one more orbital, sigma*(O-H)
+      -- not the CAS(14,9) expected. With 12 roots:
+
+      | | CAS(12,7) | CAS(12,8) |
+      | --- | --- | --- |
+      | HOBr f | 1.51e-5 | 1.28e-5 (-15%) |
+      | HOCl f | 8.9e-7 | 7.5e-7 (-16%) |
+      | HOBr centroid | 2.894 eV | 2.864 |
+
+      f went DOWN, in both molecules by the same fraction. Every test so far
+      has moved HOCl and HOBr together, so the ~10x is one shared cause.
+      Ruled out: CASSCF convergence, root count inside the space, the
+      sigma*(O-H) lenders. Left:
+        (i)   missing diffuse / Rydberg lenders -- needs a diffuse basis and
+              Rydberg orbitals in the space, a real project;
+        (ii)  CASSCF-quality transition moments for the lenders. Water is the
+              precedent: its mu came out 1.83x low (after the factor-2 fix),
+              i.e. f 3.3x low, from a CASSCF transition density -- a third of
+              the gap on its own;
+        (iii) the target: Ingham's 2.3e-20 cm2 and HOCl's 4e-21 are quoted
+              from memory, unverified, and the band widths are estimates.
+
+      **Whether to keep chasing it is a decision, not a calculation.** The
+      deliverable is sigma(298)/sigma(220), and a constant scale on mu
+      cancels in that ratio exactly; Phase 3 would apply computed ratios to
+      measured sigma(298), so absolute f is not needed there either. What
+      DOES reach the ratio is how mu_SOC varies across the Franck-Condon
+      window (non-Condon), which water's 10_mu_sensitivity tested and which
+      04 can measure cheaply at a handful of geometries.
+
+- [x] **Outer shell, fragments, splice for HOBr** -- written 2026-09-24 as
       `HOBr/03_surfaces/07`, `08`, `09`, generated from HOCl's 13-15 by
       substitution. Shell 2.25-3.85 A (1190 points; overlaps the raster at
       2.25/2.35/2.45), CAS(10,6) on ["Br 4p","O 2p"], importing HOCl's 07
@@ -1710,6 +1741,30 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       the raster region untouched, agrees on the seam slope, and refuses a
       CSV with two different E(Br). `tests/test_shell_fragments.py` covers
       the shell's pool and resume and the fragments' E(Br) columns.
+
+      **Run 2026-09-28: the HOBr a 3A" surface is built.**
+      - Shell: 1190 points, 0 failed, 6.5 min (10 CPU-s/point; HOCl 4).
+      - Fragments: OH re 0.9719 A (UCCSD(T)) / 0.9745 (NEVPT2) against 0.9697
+        observed; omega_e 3707 / 3742 against 3738. NEVPT2 - UCCSD(T) spread
+        45 meV over the 0.80-1.25 A used (HOCl 36).
+      - Splice (`logs/splice.log`, local): each column's offset constant
+        across the overlap to median 13 meV, max 31 (HOCl 10 / 42); a single
+        global offset would misplace columns by 161 meV, so per-column. Seam
+        slope at the interior radius 2.35 A: raster +0.122, shell +0.054
+        eV/A, mean mismatch 0.068 eV/A (HOCl 0.011), worst column 0.175 =
+        35 meV over the blend. The shell is the shallower, as CAS(10,6)
+        NEVPT2 was for HOCl; at 2.35 A this is exit-channel shape, beyond
+        the 2.00 A the band sees. Shell end minus E(Br) + V_OH: -21 to +57
+        meV (HOCl -59 to +67). Asymptote 2.27 eV above the ground minimum
+        (HOCl 2.36).
+      - Output `HOBr/data/hobr_surfaces.npz` (halogen-neutral keys) and
+        `hobr_surfaces.png`.
+
+      Two bugs from generating these by substitution, both fixed: `08`
+      printed HOCl's asymptote energy and "28 meV" cross-check, hard-coded in
+      HOCl's 14 and carried over verbatim (the HOBr numbers above it were
+      right); and `04` called a full-valence HOCl run a "CONTROL ...
+      reproduced", though a different active space is not a control.
 
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101

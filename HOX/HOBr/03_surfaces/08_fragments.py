@@ -208,8 +208,8 @@ def main():
     print(f"\n  asymptote at r(O-H) = {r[i_eq]:.4f} A:")
     print(f"    UCCSD(T)  E(Br) + V_OH = {e_x_cc + rows[i_eq]['e_uccsdt_Ha']:.8f} Ha")
     print(f"    NEVPT2    E(Br) + V_OH = {e_x_nev + rows[i_eq]['e_nevpt2_Ha']:.8f} Ha")
-    print(f"  05's fragment check (UCCSD(T), no x2c consistency check) gave "
-          f"-536.71407 Ha;\n  the triplet at 4.0 A sat 28 meV from it.")
+    # (HOCl's 14 printed a HOCl-specific cross-check here; it does not
+    # apply to HOBr and was dropped. 09's residual at 3.85 A is the check.)
     print(f"\n  total {time.time() - t0:.0f} s")
 
 

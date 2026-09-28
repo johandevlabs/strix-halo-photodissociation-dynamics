@@ -372,10 +372,12 @@ def model(basis, args, quiet=False):
     # from f at the vertical energy that is 2 pi^2 f / c times <E>/vertical,
     # i.e. within ~1% of 1. A factor 2 here is the error water's
     # 09_propagate.py carried, which no shape or ratio test can see.
-    sr = float(np.trapezoid(sig_v[0] / BOHR2_TO_CM2, E)
-               / (2.0 * np.pi ** 2 * F_NOMINAL / C_AU))
-    say(f"\n  sum rule check, v=0: Int sigma dE / (2 pi^2 f / c) = {sr:.4f}"
-        + ("" if abs(sr - 1) < 0.05 else
+    # Exact: Int (sigma/E) dE = 4 pi^2 |mu|^2 / 3c, needing no energy to
+    # turn f into |mu|^2 (the f form was ~1% off for exactly that reason).
+    sr = float(np.trapezoid(sig_v[0] / BOHR2_TO_CM2 / E, E)
+               / (4.0 * np.pi ** 2 * mu_dip ** 2 / (3.0 * C_AU)))
+    say(f"\n  sum rule check, v=0: Int (sigma/E) dE / (4 pi^2 mu^2 / 3c) = {sr:.4f}"
+        + ("" if abs(sr - 1) < 0.02 else
            "   !! NOT ~1: the absolute scale of sigma is wrong"))
 
     pk, smax, fw = band_stats(E, s_ref)

@@ -120,7 +120,8 @@ shortfall — that remains unexplained and elsewhere.
 | --- | --- |
 | [`01_method/`](01_method/) | geometry, force field, and the validity checks that must be redone for a heavier halogen |
 | [`02_band_model/`](02_band_model/) | the 1D band: how much surface it needs, the basis measured on the band, a first look at σ(298)/σ(220) |
-| [`03_surfaces/`](03_surfaces/) | the 3D raster, and later the NEVPT2 shell, fragments and splice |
+| [`03_surfaces/`](03_surfaces/) | the 3D raster, NEVPT2 shell, fragments and splice |
+| [`04_dynamics/`](04_dynamics/) | Jacobi transform, vibrational states, 3D propagation and σ(λ, T) |
 | `01_method/tests/` | offline tests, run before anything goes to the EVO |
 | `data/`, `logs/` | as in `HOCl/` |
 
@@ -195,7 +196,9 @@ from.
       computed band matches Barnes**, to 1 nm and 4%.
 - [ ] Read Ingham (1998) and Barnes (1996): why did the evaluators choose
       Ingham, and how was Br2 (strong near 415 nm) subtracted in each?
-- [ ] Jacobi transform, relaxation, 3D propagation, σ(λ, T).
+- [ ] **3D dynamics** (`04_dynamics/11`-`13`): written and validated on a
+      test grid -- ν₃ 618.9 cm⁻¹ against 620.2 observed, and the 3D band
+      443 nm / 0.575 eV, still Barnes's band. Production run on the EVO.
 
 ## Why the force field is not a detail here
 

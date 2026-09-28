@@ -1824,6 +1824,26 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       17 the calculation follows -- HOCl's shoulder carries more intensity
       than spin-orbit borrowing gives it, or the decomposition over-assigns.
 
+- [ ] **3D dynamics, `HOBr/04_dynamics/11`-`13`, written 2026-09-28.**
+      Jacobi transform (water's geometry, Br departing, surface continued
+      beyond its raster box), relaxation and propagation importing water's
+      Propagator / RTProp, with the cross-section factor 2 fixed and the
+      EXACT sum rule, Int (sigma/E) dE = 4 pi^2 |mu|^2 / 3c, checked every run
+      (1.0000 in both 1D and 3D; the f form needed an energy and was 6% off
+      in 3D for want of chi_0's kinetic energy).
+
+      Validated on a laptop TEST grid (256 x 24 x 24, two states): nu3 618.9
+      cm-1 against 620.2 observed; nu2 1171.8 (coarse grid) against 1162.6;
+      3D band 443 nm, FWHM 0.575 eV, red HWHM 0.272 -- the bend and O-H add
+      ~1% to the 1D width, so the 3D band stays with Barnes 1996, not with
+      Ingham / JPL / IUPAC. Production run (256 x 48 x 48, four states) is
+      the EVO's.
+
+      A 96-point R grid made the packet look TRAPPED -- S(t) never decayed,
+      the band collapsed to a spike -- because heavy Br off the wall needs
+      momenta ~50 /bohr and the grid carried 30. Aliasing that looks like
+      physics; 11 now checks it and says what nR is needed.
+
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101
       CPU-s/point) and not especially balanced. Compare on 02's cut before

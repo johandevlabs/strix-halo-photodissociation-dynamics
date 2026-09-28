@@ -1,0 +1,60 @@
+==============================================================================
+== HOX Phase 2 -- OH(X 2Pi) curve and E(Br): the HOBr a 3A" asymptote
+== cc-pvtz-dk, x2c, r(O-H) 0.7-1.4 A in 29 points
+==============================================================================
+
+  Br(2P):  UCCSD(T) -2604.69154554 Ha   NEVPT2 -2604.66581185 Ha  CAS(5,3)
+           difference +0.700 eV (NEVPT2 recovers less correlation; only its CONSTANCY matters)
+
+      r/A     E_uccsdt/Ha     E_nevpt2/Ha   diff/eV   t/s
+    0.700    -75.56920884    -75.53812169     0.846  25.6
+    0.725    -75.60038669    -75.56958445     0.838  36.5
+    0.750    -75.62573407    -75.59520667     0.831   9.8
+    0.775    -75.64614695    -75.61588382     0.824  14.9
+    0.800    -75.66238026    -75.63236945     0.817  11.3
+    0.825    -75.67507181    -75.64530060     0.810  16.5
+    0.850    -75.68476182    -75.65521509     0.804   9.7
+    0.875    -75.69190842    -75.66257082     0.798  15.2
+    0.900    -75.69690110    -75.66775505     0.793  20.1
+    0.925    -75.70007132    -75.67109659     0.788  23.8
+    0.950    -75.70170165    -75.67287455     0.784  13.2
+    0.975    -75.70203338    -75.67333124     0.781  20.3
+    1.000    -75.70127297    -75.67267535     0.778  19.4
+    1.025    -75.69959738    -75.67108531     0.776  17.8
+    1.050    -75.69715861    -75.66871481     0.774  21.3
+    1.075    -75.69408748    -75.66569705     0.773  18.9
+    1.100    -75.69049680    -75.66214108     0.772  25.2
+    1.125    -75.68648394    -75.65814268     0.771  21.6
+    1.150    -75.68213309    -75.65378603     0.771  15.5
+    1.175    -75.67751703    -75.64914592     0.772  17.6
+    1.200    -75.67269871    -75.64428794     0.773  16.1
+    1.225    -75.66773258    -75.63926852     0.775  18.9
+    1.250    -75.66266567    -75.63413718     0.776  19.3
+    1.275    -75.65753861    -75.62893640     0.778  19.3
+    1.300    -75.65238646    -75.62370395     0.780  17.7
+    1.325    -75.64723940    -75.61847195     0.783  14.9
+    1.350    -75.64212342    -75.61326889     0.785  23.5
+    1.375    -75.63706083    -75.60811910     0.788  19.2
+    1.400    -75.63207077    -75.60304363     0.790  16.0
+
+  wrote /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_fragments.csv
+
+==============================================================================
+== verdict
+==============================================================================
+  UCCSD(T)  re 0.9719 A (obs 0.9697)   omega_e 3707 cm-1 (obs 3738)   well depth over this range 1.904 eV
+  NEVPT2    re 0.9745 A (obs 0.9697)   omega_e 3742 cm-1 (obs 3738)   well depth over this range 1.913 eV
+  (the range stops at 1.4 A, well inside dissociation, so the last column is not De;
+   obs De 4.62 eV is quoted for scale only. All three measured values are from memory.)
+
+  NEVPT2 - UCCSD(T) across the curve: 0.771 to 0.846 eV, spread 0.075 eV
+  A CONSTANT difference is what the splice needs: it means the two families agree on
+  the shape of the spectator coordinate and differ only by a fixed offset.
+
+  asymptote at r(O-H) = 0.9750 A:
+    UCCSD(T)  E(Br) + V_OH = -2680.39357892 Ha
+    NEVPT2    E(Br) + V_OH = -2680.33914309 Ha
+  05's fragment check (UCCSD(T), no x2c consistency check) gave -536.71407 Ha;
+  the triplet at 4.0 A sat 28 meV from it.
+
+  total 556 s

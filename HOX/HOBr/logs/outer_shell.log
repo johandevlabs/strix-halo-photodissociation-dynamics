@@ -1,0 +1,133 @@
+==============================================================================
+== HOX Phase 2 -- HOBr multireference outer shell of the a 3A" surface
+==============================================================================
+  r(O-Br) 2.25-3.85 A, 17 points (overlaps the raster below 2.40)
+  r(O-H)  0.8-1.25 A, 10 points
+  angle   75.0-135.0 deg, 7 points
+  total   1190 geometries, CAS(10,6) SA-4 + SC-NEVPT2, cc-pvtz-dk
+  estimate 7 CPU-hours = 0.2 h on 30 workers at 20 s/point
+  0 already in /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/hobr_outer_shell.csv, 1190 to run
+
+  10/1190  ok=10 warn=0 bad=0  3706 pts/h  eta 19.1 min
+  20/1190  ok=20 warn=0 bad=0  6829 pts/h  eta 10.3 min
+  30/1190  ok=30 warn=0 bad=0  9099 pts/h  eta 7.6 min
+  40/1190  ok=40 warn=0 bad=0  7625 pts/h  eta 9.0 min
+  50/1190  ok=50 warn=0 bad=0  9276 pts/h  eta 7.4 min
+  60/1190  ok=60 warn=0 bad=0  10491 pts/h  eta 6.5 min
+  70/1190  ok=70 warn=0 bad=0  8852 pts/h  eta 7.6 min
+  80/1190  ok=80 warn=0 bad=0  9784 pts/h  eta 6.8 min
+  90/1190  ok=90 warn=0 bad=0  10762 pts/h  eta 6.1 min
+  100/1190  ok=100 warn=0 bad=0  9902 pts/h  eta 6.6 min
+  110/1190  ok=110 warn=0 bad=0  10354 pts/h  eta 6.3 min
+  120/1190  ok=120 warn=0 bad=0  10990 pts/h  eta 5.8 min
+  130/1190  ok=130 warn=0 bad=0  10559 pts/h  eta 6.0 min
+  140/1190  ok=140 warn=0 bad=0  10726 pts/h  eta 5.9 min
+  150/1190  ok=150 warn=0 bad=0  10967 pts/h  eta 5.7 min
+  160/1190  ok=160 warn=0 bad=0  10811 pts/h  eta 5.7 min
+  170/1190  ok=170 warn=0 bad=0  10837 pts/h  eta 5.6 min
+  180/1190  ok=180 warn=0 bad=0  11074 pts/h  eta 5.5 min
+  190/1190  ok=190 warn=0 bad=0  11101 pts/h  eta 5.4 min
+  200/1190  ok=200 warn=0 bad=0  11342 pts/h  eta 5.2 min
+  210/1190  ok=210 warn=0 bad=0  11205 pts/h  eta 5.2 min
+  220/1190  ok=220 warn=0 bad=0  11288 pts/h  eta 5.2 min
+  230/1190  ok=230 warn=0 bad=0  11328 pts/h  eta 5.1 min
+  240/1190  ok=240 warn=0 bad=0  11217 pts/h  eta 5.1 min
+  250/1190  ok=250 warn=0 bad=0  11325 pts/h  eta 5.0 min
+  260/1190  ok=260 warn=0 bad=0  11538 pts/h  eta 4.8 min
+  270/1190  ok=270 warn=0 bad=0  11240 pts/h  eta 4.9 min
+  280/1190  ok=280 warn=0 bad=0  11393 pts/h  eta 4.8 min
+  290/1190  ok=290 warn=0 bad=0  11434 pts/h  eta 4.7 min
+  300/1190  ok=300 warn=0 bad=0  11184 pts/h  eta 4.8 min
+  310/1190  ok=310 warn=0 bad=0  11329 pts/h  eta 4.7 min
+  320/1190  ok=320 warn=0 bad=0  11520 pts/h  eta 4.5 min
+  330/1190  ok=330 warn=0 bad=0  11263 pts/h  eta 4.6 min
+  340/1190  ok=340 warn=0 bad=0  11413 pts/h  eta 4.5 min
+  350/1190  ok=350 warn=0 bad=0  11513 pts/h  eta 4.4 min
+  360/1190  ok=360 warn=0 bad=0  11163 pts/h  eta 4.5 min
+  370/1190  ok=370 warn=0 bad=0  11284 pts/h  eta 4.4 min
+  380/1190  ok=380 warn=0 bad=0  11455 pts/h  eta 4.2 min
+  390/1190  ok=390 warn=0 bad=0  11374 pts/h  eta 4.2 min
+  400/1190  ok=400 warn=0 bad=0  11303 pts/h  eta 4.2 min
+  410/1190  ok=410 warn=0 bad=0  11460 pts/h  eta 4.1 min
+  420/1190  ok=420 warn=0 bad=0  11369 pts/h  eta 4.1 min
+  430/1190  ok=430 warn=0 bad=0  11211 pts/h  eta 4.1 min
+  440/1190  ok=440 warn=0 bad=0  11343 pts/h  eta 4.0 min
+  450/1190  ok=450 warn=0 bad=0  11403 pts/h  eta 3.9 min
+  460/1190  ok=460 warn=0 bad=0  11281 pts/h  eta 3.9 min
+  470/1190  ok=470 warn=0 bad=0  11351 pts/h  eta 3.8 min
+  480/1190  ok=480 warn=0 bad=0  11363 pts/h  eta 3.7 min
+  490/1190  ok=490 warn=0 bad=0  11359 pts/h  eta 3.7 min
+  500/1190  ok=500 warn=0 bad=0  11207 pts/h  eta 3.7 min
+  510/1190  ok=510 warn=0 bad=0  11269 pts/h  eta 3.6 min
+  520/1190  ok=520 warn=0 bad=0  11305 pts/h  eta 3.6 min
+  530/1190  ok=530 warn=0 bad=0  11203 pts/h  eta 3.5 min
+  540/1190  ok=540 warn=0 bad=0  11294 pts/h  eta 3.5 min
+  550/1190  ok=550 warn=0 bad=0  11333 pts/h  eta 3.4 min
+  560/1190  ok=560 warn=0 bad=0  11297 pts/h  eta 3.3 min
+  570/1190  ok=570 warn=0 bad=0  11193 pts/h  eta 3.3 min
+  580/1190  ok=580 warn=0 bad=0  11287 pts/h  eta 3.2 min
+  590/1190  ok=590 warn=0 bad=0  11270 pts/h  eta 3.2 min
+  600/1190  ok=600 warn=0 bad=0  11185 pts/h  eta 3.2 min
+  610/1190  ok=610 warn=0 bad=0  11278 pts/h  eta 3.1 min
+  620/1190  ok=620 warn=0 bad=0  11312 pts/h  eta 3.0 min
+  630/1190  ok=630 warn=0 bad=0  11228 pts/h  eta 3.0 min
+  640/1190  ok=640 warn=0 bad=0  11233 pts/h  eta 2.9 min
+  650/1190  ok=650 warn=0 bad=0  11262 pts/h  eta 2.9 min
+  660/1190  ok=660 warn=0 bad=0  11245 pts/h  eta 2.8 min
+  670/1190  ok=670 warn=0 bad=0  11206 pts/h  eta 2.8 min
+  680/1190  ok=680 warn=0 bad=0  11264 pts/h  eta 2.7 min
+  690/1190  ok=690 warn=0 bad=0  11258 pts/h  eta 2.7 min
+  700/1190  ok=700 warn=0 bad=0  11226 pts/h  eta 2.6 min
+  710/1190  ok=710 warn=0 bad=0  11160 pts/h  eta 2.6 min
+  720/1190  ok=720 warn=0 bad=0  11176 pts/h  eta 2.5 min
+  730/1190  ok=730 warn=0 bad=0  11152 pts/h  eta 2.5 min
+  740/1190  ok=740 warn=0 bad=0  11144 pts/h  eta 2.4 min
+  750/1190  ok=750 warn=0 bad=0  11201 pts/h  eta 2.4 min
+  760/1190  ok=760 warn=0 bad=0  11172 pts/h  eta 2.3 min
+  770/1190  ok=770 warn=0 bad=0  11153 pts/h  eta 2.3 min
+  780/1190  ok=780 warn=0 bad=0  11156 pts/h  eta 2.2 min
+  790/1190  ok=790 warn=0 bad=0  11153 pts/h  eta 2.2 min
+  800/1190  ok=800 warn=0 bad=0  11128 pts/h  eta 2.1 min
+  810/1190  ok=810 warn=0 bad=0  11170 pts/h  eta 2.0 min
+  820/1190  ok=820 warn=0 bad=0  11162 pts/h  eta 2.0 min
+  830/1190  ok=830 warn=0 bad=0  11149 pts/h  eta 1.9 min
+  840/1190  ok=840 warn=0 bad=0  11184 pts/h  eta 1.9 min
+  850/1190  ok=850 warn=0 bad=0  11104 pts/h  eta 1.8 min
+  860/1190  ok=860 warn=0 bad=0  11130 pts/h  eta 1.8 min
+  870/1190  ok=870 warn=0 bad=0  11115 pts/h  eta 1.7 min
+  880/1190  ok=880 warn=0 bad=0  11125 pts/h  eta 1.7 min
+  890/1190  ok=890 warn=0 bad=0  11120 pts/h  eta 1.6 min
+  900/1190  ok=900 warn=0 bad=0  11133 pts/h  eta 1.6 min
+  910/1190  ok=910 warn=0 bad=0  11134 pts/h  eta 1.5 min
+  920/1190  ok=920 warn=0 bad=0  11095 pts/h  eta 1.5 min
+  930/1190  ok=930 warn=0 bad=0  11086 pts/h  eta 1.4 min
+  940/1190  ok=940 warn=0 bad=0  11143 pts/h  eta 1.3 min
+  950/1190  ok=950 warn=0 bad=0  11077 pts/h  eta 1.3 min
+  960/1190  ok=960 warn=0 bad=0  11120 pts/h  eta 1.2 min
+  970/1190  ok=970 warn=0 bad=0  11107 pts/h  eta 1.2 min
+  980/1190  ok=980 warn=0 bad=0  11116 pts/h  eta 1.1 min
+  990/1190  ok=990 warn=0 bad=0  11055 pts/h  eta 1.1 min
+  1000/1190  ok=1000 warn=0 bad=0  11065 pts/h  eta 1.0 min
+  1010/1190  ok=1010 warn=0 bad=0  11072 pts/h  eta 1.0 min
+  1020/1190  ok=1020 warn=0 bad=0  11076 pts/h  eta 0.9 min
+  1030/1190  ok=1030 warn=0 bad=0  11049 pts/h  eta 0.9 min
+  1040/1190  ok=1040 warn=0 bad=0  11093 pts/h  eta 0.8 min
+  1050/1190  ok=1050 warn=0 bad=0  11053 pts/h  eta 0.8 min
+  1060/1190  ok=1060 warn=0 bad=0  11023 pts/h  eta 0.7 min
+  1070/1190  ok=1070 warn=0 bad=0  11042 pts/h  eta 0.7 min
+  1080/1190  ok=1080 warn=0 bad=0  11053 pts/h  eta 0.6 min
+  1090/1190  ok=1090 warn=0 bad=0  11016 pts/h  eta 0.5 min
+  1100/1190  ok=1100 warn=0 bad=0  11046 pts/h  eta 0.5 min
+  1110/1190  ok=1110 warn=0 bad=0  11055 pts/h  eta 0.4 min
+  1120/1190  ok=1120 warn=0 bad=0  11022 pts/h  eta 0.4 min
+  1130/1190  ok=1130 warn=0 bad=0  11015 pts/h  eta 0.3 min
+  1140/1190  ok=1140 warn=0 bad=0  11007 pts/h  eta 0.3 min
+  1150/1190  ok=1150 warn=0 bad=0  10995 pts/h  eta 0.2 min
+  1160/1190  ok=1160 warn=0 bad=0  11000 pts/h  eta 0.2 min
+  1170/1190  ok=1170 warn=0 bad=0  11056 pts/h  eta 0.1 min
+  1180/1190  ok=1180 warn=0 bad=0  11045 pts/h  eta 0.1 min
+  1190/1190  ok=1190 warn=0 bad=0  11064 pts/h  eta 0.0 min
+
+done: 1190 ok, 0 warned, 0 failed, 6.5 min
+measured 10 CPU-s per point (was assuming 20)
+-> the full 1190-point shell is 3 CPU-hours = 0.1 h on 30 workers

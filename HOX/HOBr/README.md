@@ -196,9 +196,13 @@ from.
       computed band matches Barnes**, to 1 nm and 4%.
 - [ ] Read Ingham (1998) and Barnes (1996): why did the evaluators choose
       Ingham, and how was Br2 (strong near 415 nm) subtracted in each?
-- [ ] **3D dynamics** (`04_dynamics/11`-`13`): written and validated on a
-      test grid -- ν₃ 618.9 cm⁻¹ against 620.2 observed, and the 3D band
-      443 nm / 0.575 eV, still Barnes's band. Production run on the EVO.
+- [x] **3D dynamics** (`04_dynamics/11`-`13`), EVO production run: band
+      443 nm, FWHM 0.575 eV, and scaled to Barnes's f its peak is Barnes's
+      measured σ. **σ(298)/σ(220): −3% to +3% over 440-500 nm, +12% to +43%
+      in the red wing.**
+- [ ] **Non-Condon**: μ_SOC across the Franck-Condon window, the one
+      remaining approximation that reaches the temperature ratio.
+- [ ] Phase 3: does the red wing matter for J(HOBr)?
 
 ## Why the force field is not a detail here
 

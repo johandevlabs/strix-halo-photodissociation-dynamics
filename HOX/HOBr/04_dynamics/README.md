@@ -34,7 +34,7 @@ Water's propagators are imported rather than copied. What is HOBr's own:
   χ₀'s kinetic energy — 6% in 3D. The exact form ∫(σ/E) dE = 4π²|μ|²/3c needs
   none, and gives 1.0000 in both the 1D and 3D codes.
 
-## First look, from the test grid (to be replaced by the EVO run)
+## First look, from the test grid (superseded below)
 
 | | peak | FWHM | red HWHM |
 | --- | --- | --- | --- |
@@ -46,3 +46,20 @@ Water's propagators are imported rather than copied. What is HOBr's own:
 The bend and O-H stretch add ~1% to the width: the 3D band stays with Barnes.
 ν₃ from the 3D ground surface: 618.9 cm⁻¹ against 620.2 observed; ν₂ (coarse
 grid) 1171.8 against 1162.6.
+
+## Production run, EVO, 2026-09-29
+
+256 × 48 × 48, four states: ν₃ 618.9, ν₂ 1171.8, 2ν₃ 1230.1 cm⁻¹ (observed
+620.2, 1162.6). Band at 298 K: **443 nm, FWHM 0.575 eV** — identical to the
+test grid. Scaled to Barnes's integrated f, its peak is Barnes's measured
+8.9 × 10⁻²¹ cm²: position, width and height all match Barnes 1996.
+
+σ(298)/σ(220), Condon, stretch and bend hot bands:
+
+| nm | 440 | 457 | 480 | 500 | 520 | 550 |
+| --- | --- | --- | --- | --- | --- | --- |
+| as computed | 0.972 | 0.968 | 0.985 | 1.029 | 1.120 | 1.427 |
+| Ingham-aligned | 0.981 | 0.970 | 0.971 | 0.990 | 1.036 | 1.194 |
+
+−3% to +3% over 440-500 nm — negligible by `TASKS.md`'s threshold — and
++12% to +43% in the red wing, where σ is a fifth of the peak and less.

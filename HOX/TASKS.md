@@ -1824,7 +1824,7 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       17 the calculation follows -- HOCl's shoulder carries more intensity
       than spin-orbit borrowing gives it, or the decomposition over-assigns.
 
-- [ ] **3D dynamics, `HOBr/04_dynamics/11`-`13`, written 2026-09-28.**
+- [x] **3D dynamics, `HOBr/04_dynamics/11`-`13`, written 2026-09-28.**
       Jacobi transform (water's geometry, Br departing, surface continued
       beyond its raster box), relaxation and propagation importing water's
       Propagator / RTProp, with the cross-section factor 2 fixed and the
@@ -1843,6 +1843,53 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       the band collapsed to a spike -- because heavy Br off the wall needs
       momenta ~50 /bohr and the grid carried 30. Aliasing that looks like
       physics; 11 now checks it and says what nR is needed.
+
+- [x] **3D production run on the EVO, 2026-09-29: sigma(lambda, T) for HOBr.**
+      256 x 48 x 48 grid, four states, all converged:
+
+      | state | E - E0 | spread vs v0 (R, r, gamma) | observed |
+      | --- | --- | --- | --- |
+      | nu3 | 618.9 cm-1 | 3.00, 1.00, 1.06 | 620.2 |
+      | nu2 | 1171.8 | 1.04, 1.01, 2.96 | 1162.6 |
+      | 2nu3 | 1230.1 | 5.02, 1.00, 1.12 | -- |
+
+      Identical to the test grid, so the angular grid was converged there.
+      S(t) decayed to <= 1.3e-4 for every state; sum rule 1.0000.
+
+      **The band, 298 K: 443 nm, FWHM 0.575 eV, red HWHM 0.272 eV.** The bend
+      and O-H stretch add ~1% to the 1D width. Scaled to Barnes's integrated
+      f (x3.1) its peak is 8.9e-21 cm2 -- Barnes's measured 8.88e-21. So the
+      ab initio band reproduces Barnes 1996 in position (443 vs 437 nm),
+      width (0.575 vs 0.548 eV) and peak height, and misses the recommended
+      Ingham / JPL / IUPAC band (457 nm, 0.28 eV, 2.3e-20) by 14 nm, a factor
+      2 in width and a factor 2 in peak.
+
+      **The deliverable: sigma(298 K) / sigma(220 K)**, Condon, O-Br stretch
+      AND bend hot bands:
+
+      | nm | 400 | 420 | 440 | 457 | 480 | 500 | 520 | 550 |
+      | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+      | as computed (Barnes's position) | 1.014 | 0.988 | 0.972 | 0.968 | 0.985 | 1.029 | 1.120 | 1.427 |
+      | Ingham-aligned | 1.030 | 1.002 | 0.981 | 0.970 | 0.971 | 0.990 | 1.036 | 1.194 |
+      | sigma / peak | 0.50 | 0.83 | 1.00 | 0.94 | 0.66 | 0.38 | 0.18 | 0.04 |
+
+      Against TASKS.md's impact threshold (>= 10-15% over 440-500 nm matters,
+      < 5% negligible): **-3% to +3% over 440-500 nm on either reading --
+      negligible there.** The temperature dependence lives in the wings: +12%
+      at 520 nm and +43% at 550 nm (+4% / +19% Ingham-aligned), where sigma is
+      a fifth of the peak and less, and a smaller rise in the blue. Hot bands
+      move intensity from the centre to the wings, because v=1's node makes
+      its reflection broader.
+
+      What is left between this and a result:
+        (i)  Condon. A mu_SOC that varies across the FC window reweights
+             v=1's two lobes differently from v=0's one, which reaches the
+             wing ratios directly. The one remaining approximation that
+             touches the ratio; 04 at a handful of geometries measures it.
+        (ii) the band position, i.e. which measurement is right. It decides
+             which column above applies.
+        (iii) whether the red wing matters for J(HOBr) -- Phase 3.
+      The absolute f (3-4x low) cancels in every ratio above.
 
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101

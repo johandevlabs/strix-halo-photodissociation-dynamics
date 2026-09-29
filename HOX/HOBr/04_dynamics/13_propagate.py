@@ -104,8 +104,10 @@ def main():
     rho0 /= rho0.sum()
     vert = float((rho0 * V_ex).sum() - energies[0])
     mu = np.sqrt(3.0 * F_CALC / (2.0 * vert))
-    print(f"FC-averaged vertical from v0 {vert * HARTREE2EV:.3f} eV = "
-          f"{NM_EV / (vert * HARTREE2EV):.0f} nm; Condon |mu| from f {F_CALC:.2e}")
+    # <V_ex> - E0, not the band centre: the band's first moment is
+    # <H_ex> - E0, which adds chi_0's kinetic energy (~0.17 eV here).
+    print(f"<V_ex> - E0 over v0: {vert * HARTREE2EV:.3f} eV (the band centre adds "
+          f"chi_0's kinetic energy); Condon |mu| from f {F_CALC:.2e}")
 
     S_all = []
     for v in range(n):

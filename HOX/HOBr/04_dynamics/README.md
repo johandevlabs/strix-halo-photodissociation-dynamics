@@ -63,3 +63,12 @@ test grid. Scaled to Barnes's integrated f, its peak is Barnes's measured
 
 −3% to +3% over 440-500 nm — negligible by `TASKS.md`'s threshold — and
 +12% to +43% in the red wing, where σ is a fifth of the peak and less.
+
+## Non-Condon, EVO, 2026-09-29
+
+μ(r_OBr, θ) from `01_method/14`: |μ|² falls with r(O-Br), −4.2 Å⁻¹. Band at
+298 K **435.4 nm, FWHM 0.588 eV, red HWHM 0.278 eV** (Condon: 443.2 / 0.575 /
+0.272; Barnes 1996: 437 / 0.548 / 0.282). σ(298)/σ(220) at fixed wavelength
+changed by ≤ 0.004 — in the reflection picture μ(r_E)² multiplies every
+vibrational state at a given energy alike, so a varying dipole moves the band
+and leaves the ratio.

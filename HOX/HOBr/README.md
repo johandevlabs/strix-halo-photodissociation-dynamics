@@ -10,6 +10,26 @@ cm². Impact threshold from [`../TASKS.md`](../TASKS.md): if σ over 440-500 nm
 changes by ≥10-15% between 220 K and 298 K it materially affects polar
 J(HOBr); below 5% the honest conclusion is that it is negligible.
 
+## Result, 2026-09-29
+
+3D quantum dynamics on an ab initio ã³A″ surface, non-Condon SOC dipole,
+O-Br stretch and bend hot bands:
+
+| nm | 420 | 440 | 457 | 480 | 500 | 520 | 550 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| σ(298 K)/σ(220 K) | 0.988 | 0.972 | 0.968 | 0.984 | 1.029 | 1.120 | 1.423 |
+
+- **Temperature dependence over 440-500 nm: −3% to +3% — negligible** by the
+  impact threshold. It appears in the red wing (+12% at 520 nm, +42% at 550),
+  where σ is an eighth of the peak and less.
+- **The computed band — 435 nm, FWHM 0.59 eV — reproduces Barnes 1996
+  (437 nm, 0.55 eV), not the Ingham 1998 band that JPL and IUPAC recommend
+  (457 nm, 0.28 eV).** The same chain put HOCl's band at 373 nm against 372
+  measured, and reproduces HOBr's ν₃ and ν₂ to 0.2% and 0.8%.
+- The borrowed f is 3-4× low; it cancels in every ratio.
+
+Details and every caveat: `../TASKS.md`, Phase 2.
+
 ## What HOBr inherits, and what it cannot
 
 Most of `HOCl/01_method/` does not need repeating — those runs settled
@@ -194,16 +214,15 @@ from.
       measurements of the visible band disagree -- Ingham (and JPL/IUPAC)
       457 nm and 0.28 eV wide, Barnes 437 nm and 0.55 eV -- **and the
       computed band matches Barnes**, to 1 nm and 4%.
-- [ ] Read Ingham (1998) and Barnes (1996): why did the evaluators choose
-      Ingham, and how was Br2 (strong near 415 nm) subtracted in each?
 - [x] **3D dynamics** (`04_dynamics/11`-`13`), EVO production run: band
       443 nm, FWHM 0.575 eV, and scaled to Barnes's f its peak is Barnes's
       measured σ. **σ(298)/σ(220): −3% to +3% over 440-500 nm, +12% to +43%
       in the red wing.**
-- [ ] **Non-Condon** (`01_method/14` + `04_dynamics/13 --mu-scan`): written.
-      Testing showed a varying μ barely touches the fixed-wavelength ratio
-      (reflection: μ(r_E)² cancels between vibrational states at each
-      energy) but MOVES the band -- so this now bears on Barnes vs Ingham.
+- [x] **Non-Condon**: |μ|² falls with r(O-Br) (−4.2 Å⁻¹); the band moves
+      8 nm blue to **435 nm, red HWHM 0.278 eV — Barnes 1996 to 1.6 nm and
+      1%**; σ(298)/σ(220) unchanged to 0.004.
+- [ ] Read Ingham 1998 and Barnes 1996 (Br₂ subtraction; why the evaluators
+      chose Ingham).
 - [ ] Phase 3: does the red wing matter for J(HOBr)?
 
 ## Why the force field is not a detail here

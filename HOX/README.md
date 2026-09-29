@@ -9,8 +9,11 @@ measured or computed for any hypohalous acid band.
 **Status.** Phase 0 (premise) and Phase 0.5 (toolchain) are done. HOCl — the
 validation case, where a measured band exists at 380 nm — has its ã 3A"
 surface built and spliced to the asymptote; propagation and σ(λ, T) are still
-to come. HOBr has started, at the two things that gate it: the Br basis, and
-the geometry and force field.
+to come. **HOBr is done to σ(λ, T)**: 3D quantum dynamics on a spliced
+CCSD(T)/EOM/NEVPT2 surface with a non-Condon SOC dipole. The temperature
+dependence is negligible over 440-500 nm (−3% to +3%) and lives in the red
+wing; and the computed band reproduces Barnes 1996, not the band JPL and
+IUPAC recommend. See `HOBr/README.md`.
 
 ## Layout
 

@@ -19,7 +19,7 @@ could say something new.
 | folder | subject | status |
 | --- | --- | --- |
 | [`water/`](water/) | H2O / HDO / D2O A-band photodissociation | **complete and validated** |
-| [`HOX/`](HOX/) | HOCl / HOBr / HOI triplet-band photodissociation | **in progress** — SOC toolchain validated, the HOCl a 3A" surface built; propagation and HOBr still to come |
+| [`HOX/`](HOX/) | HOCl / HOBr / HOI triplet-band photodissociation | **HOBr σ(λ, T) done** — temperature dependence negligible over 440-500 nm; computed band sides with Barnes 1996 against the recommended data |
 
 Each folder has its own README describing what is there and how far it got.
 Completeness varies by design; this repo grows as work happens.

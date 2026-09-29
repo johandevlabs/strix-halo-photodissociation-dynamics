@@ -1891,7 +1891,7 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
         (iii) whether the red wing matters for J(HOBr) -- Phase 3.
       The absolute f (3-4x low) cancels in every ratio above.
 
-- [ ] **Non-Condon, `HOBr/01_method/14_mu_soc_scan.py` + `13 --mu-scan`,
+- [x] **Non-Condon, `HOBr/01_method/14_mu_soc_scan.py` + `13 --mu-scan`,
       written 2026-09-29.** 04's SOC calculation at 11 geometries (r(O-Br)
       1.66-2.01 A and r_eq, bend at 90 / 115 deg), the active space FIXED at
       CAS(12,7) by 07's projection count so AVAS cannot switch size inside
@@ -1912,6 +1912,61 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
 
       Checked offline: 14's report recovers a synthetic slope exactly; a
       constant-mu scan through 13 gives the Condon band and sum rule 1.0000.
+
+- [x] **Non-Condon run on the EVO, 2026-09-29 -- the HOBr result.**
+
+      *The dipole falls with r(O-Br):* d ln|mu|^2/dr = -4.23 /A, |mu|^2 from
+      1.98x its equilibrium value at 1.66 A to 0.47x at 2.01 A, +/-18% across
+      chi_0. Bend: 0.88 at 90 deg, 1.09 at 115. The fixed CAS(12,7) selection
+      is clean everywhere (last orbital in: projection 0.13-0.31; first out:
+      0.000). The three components trade weight along r (99% in one at
+      1.66 A, 38/61% at 2.01) -- which does not matter within reflection,
+      where sigma is sum_k |mu_k(r_E)|^2 and that IS sqrt(sum|mu_k|^2)
+      squared.
+
+      *The band moved 8 nm blue*, as a falling mu must: **435.4 nm, FWHM
+      0.588 eV, red HWHM 0.278 eV**, against Barnes 1996's 437 nm / 0.548 /
+      0.282 -- within 1.6 nm, and the uncontaminated red half-width within
+      1%. The recommended band (Ingham / JPL / IUPAC: 457 nm, 0.28 eV) is now
+      22 nm and a factor 2 in width away.
+
+      *The temperature ratio did not move*: sigma(298)/sigma(220) at fixed
+      wavelength changed by at most 0.004 from the Condon run, the reflection
+      cancellation holding with the real dipole.
+
+      **HOBr, final (3D, non-Condon, O-Br stretch and bend hot bands):**
+
+      | nm | 400 | 420 | 440 | 457 | 480 | 500 | 520 | 550 |
+      | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+      | sigma(298)/sigma(220) | 1.014 | 0.988 | 0.972 | 0.968 | 0.984 | 1.029 | 1.120 | 1.423 |
+      | sigma/peak, 298 K | 0.63 | 0.92 | 0.99 | 0.86 | 0.53 | 0.28 | 0.12 | 0.03 |
+
+      By the impact threshold set at the start (>= 10-15% over 440-500 nm
+      matters, < 5% is negligible): **the temperature dependence of the
+      visible band is negligible where the band carries its intensity, -3%
+      to +3% over 440-500 nm**, and appears only in the red wing, +12% at
+      520 and +42% at 550 nm, where sigma is an eighth of the peak and less.
+      That is "still publishable, still useful, less interesting" in
+      TASKS.md's own words -- with the red wing as the one place a J-value
+      calculation (Phase 3) could still find it matters.
+
+      **The more interesting result is the band itself.** An ab initio band
+      from a validated chain -- CCSD(T) ground surface reproducing nu3 and
+      nu2 to 0.2% and 0.8%, EOM-CCSD triplet, spliced to the asymptote, 3D
+      quantum dynamics, non-Condon SOC dipole -- lands on Barnes 1996 and not
+      on the band the JPL and IUPAC evaluations recommend, which atmospheric
+      models use. Same method, HOCl: 373 nm against 372 measured.
+
+      Open, in order of what they would change:
+        (i)  Ingham 1998 and Barnes 1996, read: why the evaluators chose
+             Ingham, and how each removed Br2 (strong near 415 nm) -- the
+             obvious way to distort a weak band sitting next to it.
+        (ii) Phase 3: J(HOBr) with the recommended band against the computed
+             (Barnes-like) one, at high solar zenith angle. If the shape
+             difference moves J, that matters more than the temperature
+             dependence does.
+        (iii) the absolute f, 3-4x low: the coupling or missing lenders, not
+             the lenders' dipoles. Cancels in every ratio above.
 
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101

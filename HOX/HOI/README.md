@@ -63,9 +63,18 @@ stops at 490 nm, and its red end is fixed by an I₂ subtraction scaled at
 (`05_atmosphere/15_j_hoi_triplet.py`, log in `logs/`).
 
 The one real constraint is Bauer's 532 nm photolysis, which found no OH:
-σ(532) < ~1e-20 cm², but only if HO + I is open at 532 nm. Bauer's
-threshold is 582 nm and IUPAC's is 507 nm, so D₀(HO–I) is the next
-calculation. Details are in `TASKS.md`; paper notes are in
-`../references/README.md`.
+σ(532) < ~1e-20 cm², but only if HO + I is open at 532 nm. It is:
+`01_method/06_d0.py` gives D₀(HO–I) = 2.07–2.18 eV (CCSD(T)/CBS, spin-orbit
+and zero-point corrected, calibrated on HOCl's measured D₀). That is a
+threshold of 570–600 nm, and it agrees with Bauer's 582 nm, not IUPAC's
+507 nm.
+
+**So the calculations and the 532 nm null disagree by 3–4×.** Ours
+(f 1.5e-4) and Minaev's (1.6–2.5e-4) both put 3–4e-20 cm² at 532 nm.
+Meeting Bauer's bound needs f ≲ 4e-5, less than HOBr's measured triplet
+band. An OH action spectrum over 500–600 nm, as Barnes did for HOBr, would
+settle it, and it avoids the I₂ subtraction. The J(HOI) stakes: +6–11% at
+the bound, +20–50% at the computed f. Details are in `TASKS.md`; paper
+notes are in `../references/README.md`.
 
 Offline test: `python 01_method/tests/test_hoi_report.py`.

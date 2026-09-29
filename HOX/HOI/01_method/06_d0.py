@@ -33,9 +33,14 @@ Then, all in the output:
            vibration and OH's 2Pi1/2 level, to compare with the dH298-based
            thresholds of Bauer and IUPAC
 
-CONTROL: HOCl, whose D0 is measured -- 19 289.7 cm-1 (2.3916 eV) from
-state-resolved overtone predissociation (Rizzo and co-workers), QUOTED FROM
-MEMORY, verify before citing. HOBr is computed alongside for the trend.
+CONTROL: HOCl, whose D0 is measured: 19 288.8 +- 0.6 cm-1 (2.3915 eV),
+overtone-overtone double resonance on 6 nu_OH, "Unimolecular Dissociation of
+HOCl Near Threshold", J. Phys. Chem. A, doi:10.1021/jp972668e (checked
+2026-09-29). HOBr is computed alongside for the trend.
+
+RESULT (2026-09-29, logs/d0.log): HOCl calc - obs -0.068 (fc) / -0.052 (ae)
+eV. HOI D0 2.015 (fc) / 2.110 (ae) eV at CBS, ~2.07-2.18 corrected by HOCl's
+underbinding: HO + I is open at 532 nm, by 0.15-0.25 eV.
 
 Resumable: every energy goes to HOI/data/d0.csv.
     python 06_d0.py 2>&1 | tee ../logs/d0.log
@@ -71,7 +76,7 @@ M_O, M_H = 15.9949146221, 1.0078250319
 MOLECULES = {
     "HOCl": dict(halogen="Cl", geom=(1.7069, 0.9648, 101.88),
                  harm=(769.4, 1279.8, 3817.9), so_mol_meV=0.5,
-                 obs_d0_cm=19289.7),
+                 obs_d0_cm=19288.8),
     "HOBr": dict(halogen="Br", geom=(1.8357, 0.9646, 102.02),
                  harm=(632.4, 1199.4, 3868.6), so_mol_meV=10.8),
     "HOI": dict(halogen="I", geom=(1.9907, 0.9694, 104.65),
@@ -265,7 +270,7 @@ def report(rows, molecules, bases, frozens):
                  " = 507 nm)" if x == "I" else ""))
         if "obs_d0_cm" in sp:
             obs = sp["obs_d0_cm"] / HARTREE2CM * HARTREE2EV
-            print(f"  CONTROL: measured D0 {obs:.4f} eV (from memory, verify) "
+            print(f"  CONTROL: measured D0 {obs:.4f} eV (doi:10.1021/jp972668e) "
                   f"-> calc - obs {best['d0'] - obs:+.3f} eV "
                   f"({(best['d0'] - obs) * EV2KJ:+.1f} kJ/mol)")
         if x == "I":

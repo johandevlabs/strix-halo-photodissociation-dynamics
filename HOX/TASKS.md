@@ -2282,7 +2282,50 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       and all-electron, for HOCl (control: measured D0 19 289.7 cm-1, from
       memory), HOBr and HOI; OH from a 5-point scan; ZPE harmonic; atomic
       SO measured, molecular SO from 04; dH298 for Bauer's and IUPAC's
-      thresholds. Bookkeeping checked offline on synthetic energies. (1) Read Minaev 1999 and Bauer 1998 in full [done, above]: what
+      thresholds. Bookkeeping checked offline on synthetic energies.
+
+- [x] **D0(HO-X): HO + I is open at 532 nm, so Bauer's null is a real
+      bound -- and the calculations exceed it. 2026-09-29.**
+      `HOI/logs/d0.log`, CCSD(T)/CBS(TZ,QZ)-DK, frozen core / all-electron:
+
+      | | D0 fc | D0 ae | measured | dH298 (fc) |
+      | --- | --- | --- | --- | --- |
+      | HOCl | 2.323 | 2.340 | 2.3915 | 229 kJ/mol |
+      | HOBr | 2.108 | 2.179 | | 208 |
+      | HOI  | 2.015 | 2.110 | | 199 |
+
+      Control: HOCl underbinds by 0.05-0.07 eV (measured D0 19 288.8 +-
+      0.6 cm-1, doi:10.1021/jp972668e, now verified). Correcting by that,
+      **D0(HO-I) = 2.07-2.18 eV, threshold 570-600 nm**, and 532 nm (2.331
+      eV) lies 0.15-0.25 eV above it. ZPE -0.11 eV, atomic SO -0.32 eV
+      (iodine's is the big term), molecular SO +0.05 eV. The fc-ae spread
+      (0.07-0.10 eV for Br and I) is the core error bar and the largest
+      uncertainty. The triplet vertical (2.40 eV) sits 0.2-0.3 eV above
+      D0, as a repulsive state must.
+
+      *Side result: the thresholds.* Our dH298(HO-I) is ~205-215 kJ/mol
+      after the HOCl correction. That supports Bauer's 582 nm (206 kJ/mol)
+      and is 20-30 kJ/mol below IUPAC 2007's 236 kJ/mol (507 nm). Worth
+      raising with IUPAC-literate readers; not checked against IUPAC's
+      thermochemistry tables yet.
+
+      **So the tension is real.** With HO + I open at 532 nm, Bauer's null
+      means sigma(532) < ~1e-20 cm2 (from Phi(OH) = 1 and their
+      sensitivity, which also saw the 355 nm band cleanly). Two independent
+      calculations -- ours (QD-NEVPT2 state interaction, f 1.5e-4) and
+      Minaev's (MCSCF quadratic response, 1.6-2.5e-4) -- put the a3A" band
+      near 520-550 nm at 3-4e-20 cm2, 3-4x over the bound. Meeting it needs
+      f <~ 4e-5: LESS than HOBr's measured 5-6e-5, with twice the SOC
+      constant. Either the calculations overestimate HOI's triplet
+      intensity by ~4x (ours underestimates HOBr's by 3-4x; Minaev
+      matches HOBr), or Bauer's single 532 nm null is weaker than it looks.
+      J(HOI): a band at the bound adds 6-11% at SZA 0-60 (up to ~60% at
+      85 deg, direct beam); at the computed f, 20-50%.
+
+      *What would settle it:* an OH action spectrum of HOI over 500-600 nm,
+      as Barnes et al. (1996) did for HOBr. It measures dissociation
+      directly and never touches the I2 subtraction that limits absorption
+      spectroscopy there. (1) Read Minaev 1999 and Bauer 1998 in full [done, above]: what
       Minaev computed for the 3A" band's f and position, and how Bauer
       handled I2 at 460-490 nm. (2) The 3A" band from HOBr's pipeline,
       SOC entering the surface (c^2 ~20%): 1D band model on an O-I cut

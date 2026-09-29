@@ -13,6 +13,8 @@
   computed f, further red              1.5e-04  600  0.40  3.9e-20  1.2e-20    1.39  1.41  1.52  2.29  4.60
   f x4, narrow                         6.0e-04  600  0.28  2.2e-19  1.9e-20    2.62  2.70  3.17  6.33 15.79
   f x4, further red                    6.0e-04  620  0.40  1.5e-19  2.3e-20    2.55  2.63  3.11  6.37 16.58
+  --- inside Bauer's 532 nm bound ---
+  f 4e-5 (s(532) ~1e-20)               4.0e-05  540  0.40  1.0e-20  1.0e-20    1.08  1.09  1.11  1.24  1.59
 
   --- noRay: no net Rayleigh loss (bluest); J / J(Bauer) at SZA 0, 30, 60, 80, 85 ---
   case                                       f   nm  FWHM     peak   s(532)       0    30    60    80    85
@@ -24,6 +26,8 @@
   computed f, further red              1.5e-04  600  0.40  3.9e-20  1.2e-20    1.27  1.27  1.27  1.25  1.23
   f x4, narrow                         6.0e-04  600  0.28  2.2e-19  1.9e-20    2.14  2.13  2.12  2.03  1.95
   f x4, further red                    6.0e-04  620  0.40  1.5e-19  2.3e-20    2.09  2.09  2.07  2.01  1.94
+  --- inside Bauer's 532 nm bound ---
+  f 4e-5 (s(532) ~1e-20)               4.0e-05  540  0.40  1.0e-20  1.0e-20    1.06  1.06  1.06  1.06  1.05
 
   Reading it. With the computed f, a triplet band anywhere in 530-620 nm
   raises J(HOI) by 20-50% at high and mid sun; with 4x the f, 2-3x. At low

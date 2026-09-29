@@ -53,6 +53,8 @@ CASES = [
     ("computed f, further red", 1.5e-4, 600, 0.40),
     ("f x4, narrow", 6.0e-4, 600, 0.28),
     ("f x4, further red", 6.0e-4, 620, 0.40),
+    ("--- inside Bauer's 532 nm bound ---", None, None, None),
+    ("f 4e-5 (s(532) ~1e-20)", 4.0e-5, 540, 0.40),
 ]
 SZA = (0, 30, 60, 80, 85)
 

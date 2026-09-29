@@ -41,8 +41,9 @@ HOBr numbers are trusted. ~3 min.
 
 The report ends in a two-state estimate of the singlet admixture and a
 verdict on whether one spin-free surface plus borrowed intensity is the right
-model -- added for HOI, whose visible band is ~20x HOBr's
-(HOI/01_method/04_soc_vertical.py registers HOI and runs main() here).
+model -- added for HOI, where the triplet mixes with a singlet only ~0.5 eV
+above it (HOI/01_method/04_soc_vertical.py registers HOI and runs main()
+here).
 
 Usage:
     python 04_soc_vertical.py 2>&1 | tee ../logs/soc_vertical.log
@@ -319,18 +320,24 @@ def report(spec, e_soc, osc, e_sf, tol):
     print(f"      components span {spread_cm:.0f} cm-1 against a "
           f"{gap_next:.3f} eV gap to the next SOC state")
 
-    # ---- against measurement
-    lo, hi = spec["f_obs_vis"]
+    # ---- against measurement. f_obs_vis is None where the triplet band has
+    # not been measured (HOI: the measured 407 nm band is the 1A" + 3A'
+    # band, HOI/01_method/05_eom_vertical.py).
     print(f"\n  against measurement:")
-    print(f"      visible band  calc {f_c:.2e}   obs {lo:.1e}-{hi:.1e}   "
-          f"calc/obs {f_c / hi:.2f}-{f_c / lo:.2f}")
-    print(f"      UV band       calc {f_uv:.2e}   obs {spec['f_obs_uv']:.1e}   "
-          f"calc/obs {f_uv / spec['f_obs_uv']:.2f}   (states "
+    if spec["f_obs_vis"] is not None:
+        lo, hi = spec["f_obs_vis"]
+        print(f"      triplet band  calc {f_c:.2e}   obs {lo:.1e}-{hi:.1e}   "
+              f"calc/obs {f_c / hi:.2f}-{f_c / lo:.2f}")
+    else:
+        print(f"      triplet band  calc {f_c:.2e}   NOT MEASURED (predicted "
+              f"near {NM_PER_EV / centroid:.0f} nm, before calibration)")
+    print(f"      lender band   calc {f_uv:.2e}   obs {spec['f_obs_uv']:.1e} "
+          f"at {spec['uv_nm']:.0f} nm   calc/obs "
+          f"{f_uv / spec['f_obs_uv']:.2f}   (states "
           + ", ".join(f"{NM_PER_EV / e:.0f}" for e, _ in uv) + " nm)")
-    if f_uv > 0:
-        print(f"      visible/UV    calc {f_c / f_uv:.2f}   obs "
-              f"{lo / spec['f_obs_uv']:.2f}-{hi / spec['f_obs_uv']:.2f}   "
-              f"(measured: HOCl 0.11, HOBr 0.07-0.10, HOI 0.5-0.6)")
+    if f_uv > 0 and spec["f_obs_vis"] is not None:
+        print(f"      triplet/lender calc {f_c / f_uv:.2f}   obs "
+              f"{lo / spec['f_obs_uv']:.2f}-{hi / spec['f_obs_uv']:.2f}")
     xi = FINE_STRUCTURE_CM.get(spec["halogen"])
     if xi:
         print(f"      perturbative scaling from HOBr's computed 1.5e-5: "

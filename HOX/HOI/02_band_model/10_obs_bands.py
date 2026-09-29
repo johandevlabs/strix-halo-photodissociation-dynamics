@@ -9,12 +9,14 @@ HOBr/02_band_model/10_compare_obs.py does for HOBr. Two bands for HOI (the
 spectra stop at 280 nm), three for HOCl (the 240 nm band sets the UV band's
 blue wing).
 
-The number that matters is the ratio of the visible band's f to the UV
-band's. For HOCl and HOBr it is ~0.1: a triplet borrowing a little from the
-singlet above it. For HOI it is ~0.6. HOI/HOBr visible f is ~20x, where
-scaling HOBr's borrowing by the iodine/bromine spin-orbit constant squared
-gives ~4x. That is what HOI's gate run tests: whether the visible band is
-still "a triplet with borrowed intensity" or two strongly mixed states.
+For HOCl and HOBr the reddest band is the triplet (3A") band, borrowing a
+little from the singlet above it: visible/UV f ~0.1. HOI's reddest measured
+band has visible/UV ~0.6 and f ~20x HOBr's triplet band. This was first read
+as a triplet band gone strongly mixed. It is not a triplet band:
+01_method/05_eom_vertical.py (and Minaev, JPCA 103, 7294 (1999)) put HOI's
+407 nm band on 1A" (+ 3A') and 340 nm on 1A' -- HOBr's 352 and 284 nm bands,
+red-shifted. HOI's own triplet band is predicted near 520-600 nm and has not
+been measured (05_atmosphere/15_j_hoi_triplet.py).
 
 Pure numpy/scipy on cached files -- runs anywhere.
     python 10_obs_bands.py

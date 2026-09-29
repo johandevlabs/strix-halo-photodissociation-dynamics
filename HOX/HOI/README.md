@@ -46,13 +46,21 @@ because of it. A same-basis HOBr run showed the change is harmless.)
 **Geometry:** `01_method/01_geometry.py`, CCSD(T): r(O-I) 1.9907 Å, r(O-H)
 0.9694 Å, 104.65°.
 
-## First result: an assignment problem
+## Result so far: HOI's triplet band has not been measured
 
-The gate run (`logs/soc_vertical*.log`) computes the lowest band at ~521 nm
-with f 1.7e-4. The measured spectrum has nothing there (2e-22 cm² at
-500 nm), only bands at 407 and 340 nm. Either the calculation is ~0.6 eV too
-low for iodine, or the 407 nm band is not the triplet band. The mixing
-verdict waits on that. `01_method/05_eom_vertical.py` checks the energies
-with EOM-CCSD across HOCl, HOBr and HOI. Details are in `TASKS.md`.
+EOM-CCSD across the series (`01_method/05_eom_vertical.py`), calibrated on
+HOCl and HOBr, assigns the measured bands. **407 nm is the 1A″ band, with
+³A′ under it, and 340 nm is 1A′**: HOBr's 352 and 284 nm bands, red-shifted.
+The offsets are +0.11 and +0.17 eV, as for HOBr. Calling 407 nm the
+triplet band would need −0.63 eV. This matches Minaev, J. Phys. Chem. A
+103, 7294 (1999), doi:10.1021/jp990203d.
+
+So the "visible band 20× HOBr's" in the table above compares different
+states. HOI's ³A″ band is computed at 516 nm (f 1.5e-4, singlet admixture
+~20%). Calibrated, that is ~530–560 nm, beyond every measurement (Bauer
+stops at 490 nm). Bauer's red wing (8.5e-22 cm² at 490 nm) allows such a
+band only if it lies at 560–620 nm or is narrow. If it is there, J(HOI) is
+20–50% larger at high sun (`05_atmosphere/15_j_hoi_triplet.py`, log in
+`logs/`). Details are in `TASKS.md`.
 
 Offline test: `python 01_method/tests/test_hoi_report.py`.

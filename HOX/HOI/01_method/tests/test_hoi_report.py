@@ -47,8 +47,9 @@ out = buf.getvalue()
 print(out[out.index("mixing, two-state"):])
 check("c^2 ~ 40%", "c^2 ~ 40." in out)
 check("verdict strongly mixed", "STRONGLY MIXED" in out)
-check("compared with HOI's measured bands", "obs 9.6e-04-1.2e-03" in out
-      and "obs 1.9e-03" in out)
+check("triplet band reported as not measured", "NOT MEASURED" in out)
+check("lender band against the measured 407 nm band",
+      "obs 1.2e-03 at 407 nm" in out)
 check("no HOBr-only band-model line", "would sit near" not in out)
 check("SOC-squared scaling from HOBr", "(xi/xi_Br)^2 x 1.5e-5 = 6.4e-05" in out)
 

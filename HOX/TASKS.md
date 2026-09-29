@@ -2113,6 +2113,9 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       worked for HOCl and HOBr misses by ~15x. And the band sits BLUER than
       HOBr's, not redder. Both point to the visible band being a strongly
       spin-orbit-mixed state rather than a triplet borrowing a little.
+      **[Superseded, see the EOM entry below: the 407 nm band is not the
+      triplet band at all, so this comparison was between different
+      states.]**
 
 - [ ] **The gate: is HOI perturbative?** `HOI/01_method/04_soc_vertical.py`,
       which registers HOI in HOBr's `04` and runs it (HOBr's scripts load
@@ -2183,6 +2186,68 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       calibrate it. EOM matching 04 for HOI -> the calculation is robust and
       the assignment is the question (and the literature on it is the next
       thing to read); EOM ~0.6 eV above 04 -> 04 is broken for iodine.
+
+- [x] **Answer: the measured HOI bands are singlet bands; HOI's triplet
+      band has not been measured. 2026-09-29.** `HOI/logs/eom_vertical.log`,
+      cc-pvtz-dk, T1 diagnostics 0.006-0.007, every root w1 >= 0.89:
+
+      | EOM-CCSD, eV | T A" | S A" | T A' | S A' |
+      | --- | --- | --- | --- | --- |
+      | HOCl | 3.473 | 4.402 | 4.536 | 5.527 |
+      | HOBr | 2.870 | 3.696 | 3.713 | 4.591 |
+      | HOI  | 2.415 | 3.161 | 2.983 | 3.819 |
+
+      EOM minus measured, where the assignment is known: HOCl T A" +0.10,
+      S A" +0.40, S A' +0.30; HOBr T A" +0.16 (Ingham) / +0.03 (Barnes),
+      S A" +0.18, S A' +0.22. HOI read as B (407 = S A", 340 = S A'):
+      **+0.11 and +0.17** -- HOBr's offsets. Read as A (407 = T A"):
+      **-0.63**, against a method that is 0.03-0.40 too HIGH everywhere
+      else. B it is. EOM's HOI T A" (2.415) matches QD-NEVPT2's (2.42)
+      to 5 meV, so 04 is not broken for iodine.
+
+      New for HOI: T A' (2.98) falls BELOW S A" (3.16); in HOBr the two are
+      degenerate (3.71 / 3.70). So 3A' sits under the 407 nm band and, with
+      iodine's SOC, borrows heavily from 1A": 04's 368 nm state, f 2.2e-3.
+      This is Minaev's picture (J. Phys. Chem. A 103, 7294 (1999),
+      doi:10.1021/jp990203d): 3A' <- X contributes significantly near 400
+      nm, and 3A" <- X is a weak long-wavelength tail (~450-560 nm). Not
+      yet read in full: the abstract, as a search returned it.
+
+      04 in cc-pvtz-dk at the computed geometry (`soc_vertical_dk_n10.log`)
+      matches the x2c-tzvpall run: triplet 2.384/2.387/2.439 eV, centroid
+      516 nm, f 1.52e-4, c^2 ~20%. The lender band (439-368 nm states,
+      f 2.9e-3) against the measured 407 nm band (1.17e-3): 2.5x, like
+      HOBr's lenders (1.75-2x). The report now handles an unmeasured
+      triplet band (`f_obs_vis=None`).
+
+      **HOI's triplet band.** Computed 516 nm, f 1.5e-4; calibrated by
+      HOCl/HOBr (0.06-0.19 eV too high) ~530-560 nm; f possibly 3-4x more,
+      as for HOBr. No measurement covers it: Bauer stops at 490 nm, Rowley
+      at 470, JPL at 480. And the red wing is a constraint: Bauer's
+      sigma(490) = 8.5e-22 cm2, where a band at 530-550 nm with HOBr's
+      computed width would give 1-2e-20. A band at 560-620 nm, or as narrow
+      as Ingham's HOBr band (0.28 eV), passes. Bauer made HOI from OH + I2
+      and calibrated against I2 loss (per the abstract), and I2's visible
+      band peaks right there, so the red end rests on an I2 correction.
+      Jenkin (1991), the outlier, has 9.8e-21 at 500 nm, 40x Bauer's.
+
+      *For J(HOI)* (`HOI/05_atmosphere/15_j_hoi_triplet.py`, HOBr's
+      clear-sky model): bands Bauer's wing allows raise J by 21-27%
+      (no-Rayleigh-loss) to 35-52% (direct beam) at SZA 0-60 with the
+      computed f, and ~2-3x with 4x the f. Low sun, direct beam: 2-16x.
+      A sensitivity, not a J -- but it says HOI beyond 490 nm matters.
+
+      *So the HOI gate's verdict* is about the right thing after all -- the
+      3A" band's mixing, c^2 ~20%, BORDERLINE -- but that band is a
+      prediction with no measurement to test it, and the reason to build its
+      surface is the J question above.
+
+- [ ] **HOI next.** (1) Read Minaev 1999 and Bauer 1998 in full: what
+      Minaev computed for the 3A" band's f and position, and how Bauer
+      handled I2 at 460-490 nm. (2) The 3A" band from HOBr's pipeline,
+      SOC entering the surface (c^2 ~20%): 1D band model on an O-I cut
+      first, as for HOBr, to get the width and the 490 nm wing, then decide
+      on 3D. (3) Whether anyone has measured HOI beyond 490 nm.
 
 ---
 

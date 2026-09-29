@@ -200,8 +200,10 @@ from.
       443 nm, FWHM 0.575 eV, and scaled to Barnes's f its peak is Barnes's
       measured σ. **σ(298)/σ(220): −3% to +3% over 440-500 nm, +12% to +43%
       in the red wing.**
-- [ ] **Non-Condon**: μ_SOC across the Franck-Condon window, the one
-      remaining approximation that reaches the temperature ratio.
+- [ ] **Non-Condon** (`01_method/14` + `04_dynamics/13 --mu-scan`): written.
+      Testing showed a varying μ barely touches the fixed-wavelength ratio
+      (reflection: μ(r_E)² cancels between vibrational states at each
+      energy) but MOVES the band -- so this now bears on Barnes vs Ingham.
 - [ ] Phase 3: does the red wing matter for J(HOBr)?
 
 ## Why the force field is not a detail here

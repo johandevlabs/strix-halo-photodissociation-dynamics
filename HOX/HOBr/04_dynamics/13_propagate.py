@@ -60,6 +60,40 @@ _spec.loader.exec_module(water09)
 RTProp = water09.RTProp
 
 
+def mu_from_scan(path, d, rho0):
+    """|mu(r_OBr, theta)| on the Jacobi grid from 14's scan.
+
+    Separable: ln|mu|^2 quadratic in r_OBr (fitted to the scan at theta_eq,
+    held at its end values beyond the scan), times a piecewise-linear factor
+    in theta from the bend points at r_eq (held beyond them). r_OH is not
+    scanned: it carries no thermal population, and its zero-point spread is
+    the same at every temperature.
+    """
+    rows = [r for r in csv.DictReader(open(path)) if not r["status"].startswith("fail")]
+    r_eq, th_eq = 1.8357, 102.02
+    ref = min(rows, key=lambda r: abs(float(r["r_ox_A"]) - r_eq)
+              + abs(float(r["theta_deg"]) - th_eq) / 100)
+    m2_eq = float(ref["mu2_au"])
+    rr = [r for r in rows if abs(float(r["theta_deg"]) - th_eq) < 0.5]
+    x = np.array([float(r["r_ox_A"]) for r in rr]) - r_eq
+    y = np.log(np.array([float(r["mu2_au"]) for r in rr]) / m2_eq)
+    c = np.polyfit(x, y, 2)
+    bend = sorted([(float(r["theta_deg"]), float(r["mu2_au"]) / m2_eq) for r in rows
+                   if abs(float(r["r_ox_A"]) - r_eq) < 1e-3])
+    xr = np.clip(d["r_ox_A"] - r_eq, x.min(), x.max())
+    g = np.exp(np.polyval(c, xr))
+    h = np.interp(d["theta_deg"], [b[0] for b in bend], [b[1] for b in bend])
+    mu = np.sqrt(m2_eq * g * h)
+    mu_mean = float(np.sqrt((rho0 * mu ** 2).sum()))
+    print(f"mu from {Path(path).name}: {len(rr)} points along O-Br, "
+          f"{len(bend)} in the bend; d ln|mu|^2/dr {c[1]:+.2f} /A; "
+          f"|mu|^2 across the bend points "
+          + ", ".join(f"{t:.0f} deg {v:.2f}" for t, v in bend))
+    print(f"         <|mu|^2>^1/2 over chi_0 {mu_mean:.3e} au "
+          f"(|mu| at the minimum {np.sqrt(m2_eq):.3e})")
+    return mu
+
+
 def band_stats(E_ev, s):
     i = int(np.argmax(s))
     lo = E_ev[:i][s[:i] <= s[i] / 2]
@@ -82,9 +116,15 @@ def main():
     p.add_argument("--eta", type=float, default=0.02)
     p.add_argument("--temperatures", type=float, nargs="+",
                    default=[200.0, 220.0, 250.0, 298.0])
-    p.add_argument("--out", default=str(DATA / "sigma_hobr_3d.npz"))
-    p.add_argument("--png", default=str(DATA / "sigma_hobr_3d.png"))
+    p.add_argument("--mu-scan", default=None,
+                   help="14's CSV: propagate with mu(r_OBr, theta) from it "
+                        "instead of Condon, and compare with the Condon run")
+    p.add_argument("--out", default=None)
+    p.add_argument("--png", default=None)
     args = p.parse_args()
+    tag = "_noncondon" if args.mu_scan else ""
+    args.out = args.out or str(DATA / f"sigma_hobr_3d{tag}.npz")
+    args.png = args.png or str(DATA / f"sigma_hobr_3d{tag}.png")
 
     d = np.load(args.jacobi)
     sd = np.load(args.states)
@@ -104,6 +144,8 @@ def main():
     rho0 /= rho0.sum()
     vert = float((rho0 * V_ex).sum() - energies[0])
     mu = np.sqrt(3.0 * F_CALC / (2.0 * vert))
+    if args.mu_scan:
+        mu = mu_from_scan(args.mu_scan, d, rho0)
     # <V_ex> - E0, not the band centre: the band's first moment is
     # <H_ex> - E0, which adds chi_0's kinetic energy (~0.17 eV here).
     print(f"<V_ex> - E0 over v0: {vert * HARTREE2EV:.3f} eV (the band centre adds "
@@ -111,7 +153,7 @@ def main():
 
     S_all = []
     for v in range(n):
-        phi0 = (mu * chis[v]).astype(complex)
+        phi0 = (mu * chis[v]).astype(complex)       # mu scalar, or on the grid
         psi = phi0.copy()
         S = np.empty(args.nsteps + 1, dtype=complex)
         S[0] = prop.dot(phi0, psi)
@@ -141,8 +183,11 @@ def main():
     # form with f, 2 pi^2 f / c, needs an energy to turn f into |mu|^2, and
     # using <V_ex> - E0 for it (no kinetic energy) left it 6% off in 3D --
     # chi_0's <T> is half of a 0.32 eV zero-point energy. No energy here.
-    sr = float(np.trapezoid(sig_v[0] / E, E) / (4 * np.pi ** 2 * mu ** 2 / (3 * C_AU)))
-    print(f"\nsum rule, v0: Int (sigma/E) dE / (4 pi^2 mu^2 / 3c) = {sr:.4f}"
+    # S(0) = <mu chi|mu chi>, which is |mu|^2 for Condon and the right
+    # generalisation when mu varies over the grid.
+    s0 = float(S_all[0][0].real)
+    sr = float(np.trapezoid(sig_v[0] / E, E) / (4 * np.pi ** 2 * s0 / (3 * C_AU)))
+    print(f"\nsum rule, v0: Int (sigma/E) dE / (4 pi^2 S(0) / 3c) = {sr:.4f}"
           + ("" if abs(sr - 1) < 0.02 else "   !! the absolute scale is wrong"))
     sig_v = np.clip(sig_v * BOHR2_TO_CM2, 0.0, None)
     E_ev = E * HARTREE2EV
@@ -193,6 +238,35 @@ def main():
         print("  'as computed' is the read if Barnes's band position is right "
               "(the 3D band is where it\n  is); 'Ingham-aligned' shifts it "
               "rigidly onto 457 nm first.")
+
+    cpath = DATA / "sigma_hobr_3d.npz"
+    if args.mu_scan and cpath.exists() and 220.0 in out and 298.0 in out:
+        c = np.load(cpath)
+        same = ("energies" in c.files and len(c["energies"]) == len(energies)
+                and np.allclose(c["energies"], energies))
+        if not same:
+            print("\n  !! the Condon reference used different vibrational states "
+                  "(or a different grid);\n     the far wings depend on the hot "
+                  "bands included, so read the comparison with care.")
+        if "sigma_220K" in c.files and "sigma_298K" in c.files:
+            print("\n  non-Condon against Condon, sigma(298)/sigma(220) as computed:")
+            print(f"    {'nm':>6}{'Condon':>9}{'mu(q)':>9}{'change':>9}")
+            for lam in (420, 440, 457, 480, 500, 520, 550):
+                e = NM_EV / lam
+                rc = (np.interp(e, c["E_eV"], c["sigma_298K"])
+                      / np.interp(e, c["E_eV"], c["sigma_220K"]))
+                rn = (np.interp(e, E_ev, out[298.0])
+                      / np.interp(e, E_ev, out[220.0]))
+                print(f"    {lam:6.0f}{rc:9.3f}{rn:9.3f}{rn - rc:+9.3f}")
+            # Why this is expected to be small: in the reflection picture each
+            # energy E maps to one turning point r_E, so |mu(r_E)|^2 multiplies
+            # every vibrational state's sigma at that E alike and cancels from
+            # a fixed-wavelength ratio. mu(q) moves the BAND; the ratio only
+            # through departures from reflection. Tested: a +4 /A slope in
+            # ln|mu|^2 moved the band 7 nm and the ratios by < 0.3%.
+            pc, _, fc, _ = band_stats(c["E_eV"], c["sigma_298K"])
+            print(f"    band at 298 K: Condon {NM_EV / pc:.1f} nm / {fc:.3f} eV, "
+                  f"mu(q) {NM_EV / pk:.1f} nm / {fw:.3f} eV")
 
     np.savez_compressed(args.out, E_eV=E_ev, sigma_v=sig_v, energies=energies,
                         labels=np.array(labels), t_au=t, S=S_all,

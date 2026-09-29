@@ -1891,6 +1891,28 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
         (iii) whether the red wing matters for J(HOBr) -- Phase 3.
       The absolute f (3-4x low) cancels in every ratio above.
 
+- [ ] **Non-Condon, `HOBr/01_method/14_mu_soc_scan.py` + `13 --mu-scan`,
+      written 2026-09-29.** 04's SOC calculation at 11 geometries (r(O-Br)
+      1.66-2.01 A and r_eq, bend at 90 / 115 deg), the active space FIXED at
+      CAS(12,7) by 07's projection count so AVAS cannot switch size inside
+      the window as it did for HOCl. 13 builds mu(r_OBr, theta) on the Jacobi
+      grid from it (ln|mu|^2 quadratic in r_OBr, linear in theta) and
+      compares with the Condon run.
+
+      **Found in testing, and it changes what the scan is for:** a synthetic
+      +4 /A slope in ln|mu|^2 (|mu|^2 +/-17% across chi_0) moved the band 7 nm
+      red and changed sigma(298)/sigma(220) at fixed wavelength by < 0.3%.
+      That is the reflection principle: each energy maps to one turning
+      point, so |mu(r_E)|^2 multiplies every vibrational state's sigma at
+      that energy alike and cancels from a fixed-wavelength ratio. Non-Condon
+      effects move the BAND, not the temperature ratio. So the scan matters
+      less for the deliverable than expected and MORE for the band-position
+      question: a mu rising with r_OBr moves the computed band red, towards
+      Ingham's 457 nm; falling, towards 437 and Barnes.
+
+      Checked offline: 14's report recovers a synthetic slope exactly; a
+      constant-mu scan through 13 gives the Condon band and sum rule 1.0000.
+
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101
       CPU-s/point) and not especially balanced. Compare on 02's cut before

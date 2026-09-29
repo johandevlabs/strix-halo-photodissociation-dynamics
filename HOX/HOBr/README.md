@@ -22,10 +22,18 @@ O-Br stretch and bend hot bands:
 - **Temperature dependence over 440-500 nm: −3% to +3% — negligible** by the
   impact threshold. It appears in the red wing (+12% at 520 nm, +42% at 550),
   where σ is an eighth of the peak and less.
-- **The computed band — 435 nm, FWHM 0.59 eV — reproduces Barnes 1996
-  (437 nm, 0.55 eV), not the Ingham 1998 band that JPL and IUPAC recommend
-  (457 nm, 0.28 eV).** The same chain put HOCl's band at 373 nm against 372
-  measured, and reproduces HOBr's ν₃ and ν₂ to 0.2% and 0.8%.
+- **The computed band — 435 nm, FWHM 0.59 eV — sides with Barnes 1996
+  against the Ingham 1998 band that JPL and IUPAC recommend (457 nm,
+  0.28 eV).** The comparison that rests on measurement is the red side
+  (Barnes scanned only 440-650 nm): our red half-width matches Barnes to 1%;
+  Ingham's is half as wide. Rattigan 1996, the other absorption measurement,
+  also sits 3-4× below Ingham at 460-480 nm. The same chain put HOCl's band
+  at 373 nm against 372 measured, and reproduces HOBr's ν₃ and ν₂ to 0.2%
+  and 0.8%.
+- **For J(HOBr)** (first look, clear sky, `05_atmosphere/15_j_hobr.py`): the
+  temperature dependence is negligible (< 1% to SZA 85). The band SHAPE is
+  not: with the computed band in place of the recommended one, J is 6-14%
+  lower at high sun and up to 30-45% lower at SZA 85-88.
 - The borrowed f is 3-4× low; it cancels in every ratio.
 
 Details and every caveat: `../TASKS.md`, Phase 2.
@@ -223,7 +231,10 @@ from.
       1%**; σ(298)/σ(220) unchanged to 0.004.
 - [ ] Read Ingham 1998 and Barnes 1996 (Br₂ subtraction; why the evaluators
       chose Ingham).
-- [ ] Phase 3: does the red wing matter for J(HOBr)?
+- [x] Phase 3, first look (`05_atmosphere/15_j_hobr.py`): T-dependence of J
+      negligible; band shape moves J 6-45% at low sun.
+- [ ] TUV with snow albedo and a real ozone profile, for actual J values.
+- [ ] Read Ingham 1998, Barnes 1996, Rattigan 1996.
 
 ## Why the force field is not a detail here
 
@@ -238,3 +249,39 @@ fundamentals rather than assuming the surface will come out right.
 It also means the **O-X stretch, not the bend, is the mode that carries the
 temperature dependence** — and since the stretch is the dissociation
 coordinate, it is the one coordinate the model treats most carefully.
+
+## References
+
+The visible-band measurements, with methods as recorded by the MPI-Mainz
+atlas (the papers themselves not yet read):
+
+- T. Ingham, D. Bauer, J. Landgraf and J. N. Crowley, "Ultraviolet-visible
+  absorption cross sections of gaseous HOBr", *J. Phys. Chem. A* **102**,
+  3293-3298 (1998). doi:[10.1021/jp980272c](https://doi.org/10.1021/jp980272c)
+  — absorption; HOBr made in situ from OH + Br₂; calibrated relative to Br₂.
+  The basis of the JPL and IUPAC recommendations.
+- R. J. Barnes, M. Lock, J. Coleman and A. Sinha, "Observation of a new
+  absorption band of HOBr and its atmospheric implications", *J. Phys. Chem.*
+  **100**, 453-457 (1996). doi:[10.1021/jp952445t](https://doi.org/10.1021/jp952445t)
+  — OH action spectrum, laser scanned 440-650 nm.
+- O. V. Rattigan, D. J. Lary, R. L. Jones and R. A. Cox, "UV-visible
+  absorption cross sections of gaseous Br₂O and HOBr", *J. Geophys. Res.*
+  **101**(D17), 23021-23033 (1996). doi:[10.1029/96JD02017](https://doi.org/10.1029/96JD02017)
+  — absorption, diode array.
+
+Evaluations and data sources:
+
+- S. P. Sander et al., "Chemical Kinetics and Photochemical Data for Use in
+  Atmospheric Studies, Evaluation No. 17", JPL Publication 10-6 (2011).
+- R. Atkinson et al., "Evaluated kinetic and photochemical data for
+  atmospheric chemistry: Volume III", *Atmos. Chem. Phys.* **7**, 981-1191
+  (2007). doi:[10.5194/acp-7-981-2007](https://doi.org/10.5194/acp-7-981-2007)
+- H. Keller-Rudek, G. K. Moortgat, R. Sander and R. Sörensen, "The MPI-Mainz
+  UV/VIS spectral atlas of gaseous molecules of atmospheric interest",
+  *Earth Syst. Sci. Data* **5**, 365-373 (2013).
+  doi:[10.5194/essd-5-365-2013](https://doi.org/10.5194/essd-5-365-2013)
+- K. Chance and R. L. Kurucz, *J. Quant. Spectrosc. Radiat. Transfer* **111**,
+  1289-1295 (2010) — solar reference spectrum.
+- A. Serdyuchenko et al., "High spectral resolution ozone absorption
+  cross-sections – Part 2: Temperature dependence", *Atmos. Meas. Tech.* **7**,
+  625-636 (2014). doi:[10.5194/amt-7-625-2014](https://doi.org/10.5194/amt-7-625-2014)

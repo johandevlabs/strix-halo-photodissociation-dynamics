@@ -1968,6 +1968,81 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
         (iii) the absolute f, 3-4x low: the coupling or missing lenders, not
              the lenders' dipoles. Cancels in every ratio above.
 
+- [x] **The measurements, read properly -- and a correction, 2026-09-29.**
+      The MPI-Mainz atlas records each dataset's method:
+        Ingham 1998   ABSORPTION; HOBr made in situ from OH + Br2, spectrum
+                      from a diode camera after the photolysis pulse, cross
+                      sections calibrated RELATIVE TO Br2.
+        Barnes 1996   ACTION SPECTRUM: OH yield monitored while a laser
+                      (0.2 cm-1) is scanned over 440-650 nm only.
+        Rattigan 1996 ABSORPTION, diode array, 0.6 nm, 5-nm averages to 510 nm.
+
+      **Correction:** Barnes measured nothing blue of 440 nm, so their "437
+      nm peak" is where their fitted Gaussian peaks, not an observation. The
+      comparison that stands on measurement is the RED side, where our band's
+      red half-width matches Barnes to 1% and Ingham's is half as wide.
+      Earlier entries leaned on the peak position; this one replaces them.
+
+      Two things strengthen the case rather than weaken it:
+        - Barnes's method is blind to Br2, which absorbs ~25x more strongly
+          than HOBr's peak right next to the band (Br2 peaks near 415 nm) --
+          and Br2 is present in Ingham's cell AND is their calibration
+          reference.
+        - Rattigan, the other absorption measurement, resolves no separate
+          band and sits 3-4x BELOW Ingham at 460-480 nm, within ~20% of the
+          computed band there:
+
+      | nm | Ingham / JPL | Rattigan | Barnes | computed (f=Barnes) |
+      | --- | --- | --- | --- | --- |
+      | 460 | 2.3e-20 | 6.1e-21 | 7.4e-21 | 6.6e-21 |
+      | 480 | 1.3e-20 | 3.4e-21 | 4.9e-21 | 4.3e-21 |
+      | 520 | 4.2e-22 | -- | 1.3e-21 | 9.7e-22 |
+      | 550 | 6.0e-24 | -- | 3.9e-22 | 2.1e-22 |
+
+      So: two of three measurements and the calculation against the one the
+      evaluations recommend. None of the papers has been read yet -- this is
+      from the atlas's summaries -- and that is the next step before any
+      claim.
+
+- [x] **Phase 3, first look: J(HOBr), 2026-09-29.** `HOBr/05_atmosphere/
+      15_j_hobr.py`: clear-sky surface actinic flux from Chance & Kurucz
+      (2010) with Rayleigh (Hansen & Travis) and ozone (Serdyuchenko 2014,
+      300 DU), diffuse light BRACKETED between direct-beam-only (reddest) and
+      no-Rayleigh-loss (bluest); the UV bands from Ingham's decomposition
+      with the visible band swapped. Ingham's fitted band reproduces JPL's J
+      to 0.2-1%, which checks the decomposition.
+
+      J with a different visible band, relative to JPL-2010:
+
+      | SZA | computed, f=Ingham (shape only) | computed, f=Barnes | Barnes |
+      | --- | --- | --- | --- |
+      | 0 | 0.92-0.94 | 0.86-0.90 | 0.87-0.91 |
+      | 60 | 0.89-0.94 | 0.81-0.89 | 0.83-0.90 |
+      | 80 | 0.78-0.94 | 0.67-0.89 | 0.71-0.90 |
+      | 85 | 0.70-0.94 | 0.57-0.89 | 0.63-0.90 |
+
+      (range = direct-beam to no-Rayleigh-loss.) **If the band is where the
+      calculation and Barnes put it, the recommended data overestimate
+      J(HOBr) by ~6-14% at high sun and by up to ~30-45% at SZA 85-88** in
+      the direct-beam limit. The effect is not the red tail -- sigma x F is
+      small there -- but the band's centre of weight: Ingham's band stands
+      tall at 440-500 nm, where low-sun light survives; ours and Barnes's
+      put the intensity bluer and broader.
+
+      The visible band's share of J under JPL: 25-33% at high sun, rising to
+      28% (bluest) - 85% (reddest) at SZA 85. The literature's "up to 50% at
+      high SZA" lies inside that bracket, a sanity check on the flux model.
+
+      Temperature, J(220 K)/J(298 K) from this work's visible band: 1.001 to
+      SZA 80, 0.993 at 85, 0.967 at 88 (direct) -- negligible, as the cross
+      sections implied.
+
+      **So the question has changed.** The temperature dependence this
+      project was built to find is negligible for J. The band SHAPE -- which
+      measurement is right -- moves J(HOBr) by 6-45% at the low sun where
+      polar bromine chemistry happens. Next: TUV with snow albedo and a real
+      ozone profile for actual numbers; and the three papers, read.
+
 - [ ] **Open: frozen core for HOBr.** Correlating Br's 28 core electrons in
       a valence basis is most of the 5x cost over HOCl (532 vs 101
       CPU-s/point) and not especially balanced. Compare on 02's cut before

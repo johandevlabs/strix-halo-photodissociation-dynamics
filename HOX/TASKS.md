@@ -2325,7 +2325,46 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       *What would settle it:* an OH action spectrum of HOI over 500-600 nm,
       as Barnes et al. (1996) did for HOBr. It measures dissociation
       directly and never touches the I2 subtraction that limits absorption
-      spectroscopy there. (1) Read Minaev 1999 and Bauer 1998 in full [done, above]: what
+      spectroscopy there.
+
+- [ ] **HOI 1D band model on the spin-orbit states (in progress,
+      2026-09-29).** Turns "3-4e-20 at 532 nm" into a computed band with a
+      calibration behind it.
+      - `HOI/01_method/02_oi_cut.py`: HOBr's 02 registered for HOI --
+        CCSD(T) ground + EOM triplets along r(O-I), 1.60-3.40 A, cc-pvtz-dk.
+        (HOBr's 02 now takes a default molecule, argparse overrides and a
+        per-molecule data dir; `04`'s `qd_nevpt2` takes `verbose`.)
+      - `HOI/01_method/07_soc_scan.py`: the lowest 8 SOC states (energy and f)
+        and the spin-free states at 21 radii 1.75-2.70 A, 04's method, fixed
+        CAS(12,7), 10 roots. ~75 min.
+      - `HOI/02_band_model/11_band_soc_1d.py` (local): each SOC state
+        propagated on V_S + dE_k(r) with its own mu_k(r), summed; per-state
+        sum rule; **calibrated on Bauer's two measured bands** (states 4-8),
+        and the shift applied to the triplet (states 1-3) at 532 nm; EOM-
+        anchored triplet as a second estimate. Checked on synthetic surfaces
+        (sum rule 1.000 for all 8 states).
+
+- [ ] **DEFERRED (noted 2026-09-29, do not lose): the HOBr f deficit, via
+      Minaev's mechanism.** Ours 1.5e-5 against measured 4.7-6.2e-5, and
+      Minaev's 7-8e-5. His dominant lender is 4 1A' at ~9 eV (sigma* <-
+      sigma, M ~ 1 au), plus orbital relaxation in quadratic response. Ours
+      is flat from 6 to 16 roots and in full valence, so the missing lenders
+      are outside CAS(12,7). To try: more virtuals (Minaev's CAS(12,9));
+      MRCI/SO-CASPT2-style lenders; or a response-type SOC transition moment
+      (e.g. TD-DFT/SOC or EOM-CC with SOC) as an independent check of the
+      triplet's borrowed f for HOCl/HOBr/HOI together. Matters for the
+      absolute sigma (the ratios cancel), and for how far to trust the HOI
+      triplet's f against Bauer's 532 nm bound.
+
+- [ ] **DEFERRED (noted 2026-09-29, do not lose): the write-up for the
+      atmospheric-chemistry colleague.** Form not chosen yet (Claude doc /
+      web page / markdown in the repo) -- ask Johan. Content: HOBr (the
+      Barnes-vs-Ingham band shape, the negligible temperature dependence
+      over 440-500 nm, the J(HOBr) consequences, all references with DOIs);
+      then HOI (the measured bands are singlet bands; the triplet band is
+      unmeasured; theory vs Bauer's 532 nm null; D0 favours Bauer's
+      threshold over IUPAC's; J(HOI) +6-11% to +20-50%; the experiment that
+      would settle it: an OH action spectrum over 500-600 nm). (1) Read Minaev 1999 and Bauer 1998 in full [done, above]: what
       Minaev computed for the 3A" band's f and position, and how Bauer
       handled I2 at 460-490 nm. (2) The 3A" band from HOBr's pipeline,
       SOC entering the surface (c^2 ~20%): 1D band model on an O-I cut

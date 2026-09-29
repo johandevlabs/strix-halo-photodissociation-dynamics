@@ -287,9 +287,12 @@ def report_one(basis, rows, spec, nroots):
     # the 0.014 A between 1.85 and HOBr's 1.836 is worth 75 meV, i.e. 12 nm.
     vert = float(np.interp(spec["r_eq"], rr, om))
     slope = float(np.interp(spec["r_eq"], rr, np.gradient(om, rr)))
+    obs = spec.get("obs_nm")
     print(f"\n  vertical at r = {spec['r_eq']:.4f} A: {vert:.3f} eV "
-          f"= {NM_PER_EV / vert:.0f} nm, against {spec['obs_nm']:.0f} nm "
-          f"measured ({100 * (NM_PER_EV / vert - spec['obs_nm']) / spec['obs_nm']:+.1f}%)")
+          f"= {NM_PER_EV / vert:.0f} nm"
+          + (f", against {obs:.0f} nm measured "
+             f"({100 * (NM_PER_EV / vert - obs) / obs:+.1f}%)" if obs else
+             " (triplet band not measured)"))
     print(f"  slope there: {slope:.3f} eV/A  "
           f"(HOCl's EOM-CCSD reference was -6.965)")
     is_app = np.array([('"' in r.get("root0_sym", "")) for r in good])
@@ -421,11 +424,13 @@ def maybe_plot(res, bases, path):
     print(f"\n  wrote {path}")
 
 
-def main():
+def main(default="HOBr", doc=__doc__, **defaults):
+    """defaults: argparse overrides for a molecule registered from outside
+    (HOI/01_method/02_oi_cut.py)."""
     p = argparse.ArgumentParser(
-        description=__doc__,
+        description=doc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--molecule", default="HOBr", choices=sorted(MOLECULES))
+    p.add_argument("--molecule", default=default, choices=sorted(MOLECULES))
     p.add_argument("--bases", nargs="+",
                    default=["cc-pvtz-dk", "aug-cc-pvtz-dk"])
     p.add_argument("--geom", nargs=2, type=float, default=None,
@@ -444,12 +449,14 @@ def main():
     p.add_argument("--memory", type=int, default=4000)
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--report-only", action="store_true")
+    p.set_defaults(**defaults)
     args = p.parse_args()
 
     spec = MOLECULES[args.molecule]
     r_oh, theta = args.geom if args.geom else (spec["r_oh"], spec["theta"])
-    csv_path = args.csv or str(DATA / f"{args.molecule.lower()}_obr_cut.csv")
-    png_path = args.png or str(DATA / f"{args.molecule.lower()}_obr_cut.png")
+    stem = spec.get("stem", f"{args.molecule.lower()}_obr_cut")
+    csv_path = args.csv or str(spec.get("data", DATA) / f"{stem}.csv")
+    png_path = args.png or str(spec.get("data", DATA) / f"{stem}.png")
     os.makedirs(os.path.dirname(os.path.abspath(csv_path)), exist_ok=True)
 
     radii = build_radii(spec["r_eq"], args)

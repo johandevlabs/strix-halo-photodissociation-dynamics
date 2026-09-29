@@ -189,7 +189,7 @@ def build_reference(spec, basis, geom, cas, nroots, max_cycle, minao, verbose):
     return mol, mf, mc
 
 
-def qd_nevpt2(mf, mc, soc):
+def qd_nevpt2(mf, mc, soc, verbose=4):
     """QD-NEVPT2 on the given reference, with SOC (soc='DKH1' ...) or without
     (soc=None). Returns (energies, osc)."""
     import prism.interface
@@ -200,7 +200,7 @@ def qd_nevpt2(mf, mc, soc):
     nevpt.method_type = "qd"
     if soc is not None:
         nevpt.soc = soc
-    nevpt.verbose = 4
+    nevpt.verbose = verbose
     res = nevpt.kernel()
     osc = None
     if isinstance(res, tuple):

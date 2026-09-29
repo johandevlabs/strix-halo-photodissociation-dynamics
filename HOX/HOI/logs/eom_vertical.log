@@ -1,0 +1,67 @@
+========================================================================
+== EOM-CCSD verticals, singlets and triplets, cc-pvtz-dk, x2c, 6 roots each
+========================================================================
+
+  HOCl: nao 78, T1 diagnostic 0.0072, CCSD 5 s
+
+  HOBr: nao 87, T1 diagnostic 0.0063, CCSD 9 s
+
+  HOI: nao 96, T1 diagnostic 0.0060, CCSD 17 s
+
+== HOCl   measured bands: 368 nm (3.37 eV), 310 nm (4.00 eV), 237 nm (5.23 eV)
+                eV      nm  sym      w1   excitation
+  triplet    3.473   357.0  A"     0.95   H-0 (A") -> L+0 (A')
+  singlet    4.402   281.7  A"     0.95   H-0 (A") -> L+0 (A')
+  triplet    4.536   273.3  A'     0.95   H-1 (A') -> L+0 (A')
+  singlet    5.527   224.3  A'     0.94   H-1 (A') -> L+0 (A')
+  triplet    7.127   174.0  A"     0.94   H-3 (A") -> L+0 (A')
+  triplet    7.415   167.2  A'     0.96   H-2 (A') -> L+0 (A')
+  singlet    7.920   156.5  A"     0.92   H-3 (A") -> L+0 (A')
+  triplet    7.923   156.5  A"     0.94   H-0 (A") -> L+1 (A')
+  singlet    8.212   151.0  A"     0.95   H-0 (A") -> L+1 (A')
+  triplet    9.304   133.3  A'     0.93   H-1 (A') -> L+1 (A')
+  singlet    9.609   129.0  A'     0.94   H-1 (A') -> L+1 (A')
+  singlet    9.921   125.0  A'     0.92   H-2 (A') -> L+0 (A')
+
+== HOBr   measured bands: 457 nm (2.71 eV), 352 nm (3.52 eV), 284 nm (4.37 eV)
+                eV      nm  sym      w1   excitation
+  triplet    2.870   432.0  A"     0.95   H-0 (A") -> L+0 (A')
+  singlet    3.696   335.4  A"     0.95   H-0 (A") -> L+0 (A')
+  triplet    3.713   333.9  A'     0.95   H-1 (A') -> L+0 (A')
+  singlet    4.591   270.1  A'     0.94   H-1 (A') -> L+0 (A')
+  triplet    6.068   204.3  A"     0.93   H-3 (A") -> L+0 (A')
+  triplet    6.320   196.2  A'     0.96   H-2 (A') -> L+0 (A')
+  singlet    6.734   184.1  A"     0.91   H-3 (A") -> L+0 (A')
+  triplet    7.791   159.1  A"     0.94   H-0 (A") -> L+1 (A')
+  singlet    8.069   153.7  A"     0.95   H-0 (A") -> L+1 (A')
+  singlet    8.944   138.6  A'     0.90   H-2 (A') -> L+0 (A')
+  triplet    8.950   138.5  A'     0.93   H-1 (A') -> L+1 (A')
+  singlet    9.185   135.0  A'     0.94   H-1 (A') -> L+1 (A')
+
+== HOI   measured bands: 407 nm (3.05 eV), 340 nm (3.65 eV)
+                eV      nm  sym      w1   excitation
+  triplet    2.415   513.4  A"     0.95   H-0 (A") -> L+0 (A')
+  triplet    2.983   415.6  A'     0.95   H-1 (A') -> L+0 (A')
+  singlet    3.161   392.2  A"     0.95   H-0 (A") -> L+0 (A')
+  singlet    3.819   324.6  A'     0.95   H-1 (A') -> L+0 (A')
+  triplet    5.492   225.8  A"     0.93   H-3 (A") -> L+0 (A')
+  triplet    5.688   218.0  A'     0.95   H-2 (A') -> L+0 (A')
+  singlet    6.103   203.2  A"     0.91   H-3 (A") -> L+0 (A')
+  triplet    7.583   163.5  A"     0.93   H-0 (A") -> L+1 (A')
+  singlet    7.831   158.3  A"     0.95   H-0 (A") -> L+1 (A')
+  singlet    8.080   153.4  A'     0.89   H-2 (A') -> L+0 (A')
+  triplet    8.407   147.5  A'     0.93   H-1 (A') -> L+1 (A')
+  singlet    8.617   143.9  A'     0.94   H-1 (A') -> L+1 (A')
+
+== lowest root of each kind, eV
+              T A"    S A"    T A'    S A'
+  HOCl       3.473   4.402   4.536   5.527
+  HOBr       2.870   3.696   3.713   4.591
+  HOI        2.415   3.161   2.983   3.819
+
+  Reading it. For HOCl and HOBr, T A" is the visible band and S A" the
+  next; their EOM-minus-measured offsets calibrate the method. Apply the
+  same offsets to HOI: if T A" lands near 407 nm, reading A holds and 04's
+  energies are too low for iodine; if S A" lands near 407 nm, reading B
+  holds and the missing ~500 nm triplet band is the question. 04 for HOI:
+  T1 2.42, S1 2.88, T2 3.17, S2 3.72 eV (x2c-tzvpall, QD-NEVPT2).

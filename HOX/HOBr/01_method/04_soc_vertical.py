@@ -91,8 +91,8 @@ FINE_STRUCTURE_CM = {"Cl": 882.35, "Br": 3685.24, "I": 7602.97}
 def resolve_basis_for(halogen, name):
     """The basis for gto.M: the plain name when PySCF knows it for all three
     elements, else per element from basis-set-exchange -- and if an element
-    has it nowhere, say so by name ('cc-pvtz-dk has no I') instead of
-    failing deep inside PySCF. H-O-X has an even electron count: spin 0."""
+    has it nowhere, say so by name instead of failing deep inside PySCF.
+    H-O-X has an even electron count: spin 0."""
     try:
         gto.M(atom=f"{halogen} 0 0 0; O 0 0 2; H 0 0 3", basis=name,
               spin=0, verbose=0)
@@ -111,8 +111,9 @@ def resolve_basis_for(halogen, name):
                 name, elements=[el], fmt="nwchem", header=False))
         except Exception as exc:
             raise RuntimeError(f"basis {name!r} has no {el} in PySCF or "
-                               f"basis-set-exchange ({exc}). For iodine use "
-                               f"x2c-tzvpall; see HOI/README.md.")
+                               f"basis-set-exchange ({exc}); "
+                               f"toolchain/02_soc_atoms.py --sweep lists "
+                               f"what the element does have.")
     return out
 
 

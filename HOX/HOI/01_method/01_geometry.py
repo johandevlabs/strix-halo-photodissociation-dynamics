@@ -6,9 +6,10 @@ HOBr/01_method/01_geometry.py does the work (x2c CCSD(T) on a 3x3x3 grid,
 full quadratic fit, frequencies from the fitted Hessian); this file
 registers HOI and runs it, writing to HOI/data/hoi_geometry.csv.
 
-Start RECALLED (r(O-I) ~1.99 A). No observed fundamentals entered: none
+Start RECALLED (r(O-I) ~1.99 A); the first run (x2c-tzvpall, 2026-09-29)
+found 1.9907 A, 0.9694 A, 104.65 deg. No observed fundamentals entered: none
 checked against a source yet, and a recalled number in the calc/obs column
-would look like a test. Basis x2c-tzvpall (see 04_soc_vertical.py).
+would look like a test. Default basis cc-pvtz-dk, HOBr's (it has iodine).
 
 Usage (from this directory):
     python 01_geometry.py 2>&1 | tee ../logs/geometry.log
@@ -38,4 +39,4 @@ def load():
 
 
 if __name__ == "__main__":
-    load().main(default="HOI", default_basis="x2c-tzvpall", doc=__doc__)
+    load().main(default="HOI", default_basis="cc-pvtz-dk", doc=__doc__)

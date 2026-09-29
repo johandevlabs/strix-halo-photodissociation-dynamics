@@ -39,11 +39,20 @@ singlet admixture (c² = triplet SOC shift / gap; HOBr 2.0%):
   the surface.
 - **STRONGLY MIXED** (> 20%): coupled spin-orbit states in the dynamics.
 
-**Basis:** cc-pvtz-dk has no iodine anywhere. The default is x2c-tzvpall,
-which is all-electron and contracted for X2C. A same-basis HOBr run bridges
-the change.
+**Basis:** cc-pvtz-dk, as for HOBr. (An earlier version of this file said
+it has no iodine. That was wrong; the first gate run used x2c-tzvpall
+because of it. A same-basis HOBr run showed the change is harmless.)
 
-**Geometry:** recalled for now; `01_method/01_geometry.py` computes it
-(CSV to `data/`).
+**Geometry:** `01_method/01_geometry.py`, CCSD(T): r(O-I) 1.9907 Å, r(O-H)
+0.9694 Å, 104.65°.
+
+## First result: an assignment problem
+
+The gate run (`logs/soc_vertical*.log`) computes the lowest band at ~521 nm
+with f 1.7e-4. The measured spectrum has nothing there (2e-22 cm² at
+500 nm), only bands at 407 and 340 nm. Either the calculation is ~0.6 eV too
+low for iodine, or the 407 nm band is not the triplet band. The mixing
+verdict waits on that. `01_method/05_eom_vertical.py` checks the energies
+with EOM-CCSD across HOCl, HOBr and HOI. Details are in `TASKS.md`.
 
 Offline test: `python 01_method/tests/test_hoi_report.py`.

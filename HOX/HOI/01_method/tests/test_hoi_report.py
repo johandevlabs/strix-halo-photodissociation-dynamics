@@ -26,7 +26,7 @@ def check(label, cond):
 
 check("HOI registered alongside HOBr and HOCl",
       set(m.MOLECULES) == {"HOBr", "HOCl", "HOI"})
-check("HOI basis x2c-tzvpall", m.MOLECULES["HOI"]["basis"] == "x2c-tzvpall")
+check("HOI basis cc-pvtz-dk, HOBr's", m.MOLECULES["HOI"]["basis"] == "cc-pvtz-dk")
 
 HA = 27.211386
 rel = np.array([0.0, 2.9015, 2.9021, 2.9084, 3.5881, 3.6751, 3.6849, 3.8128,

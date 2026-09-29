@@ -2124,15 +2124,65 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       BORDERLINE (5-20%) -> SOC-corrected surface; STRONGLY MIXED (> 20%) ->
       coupled spin-orbit states in the dynamics.
 
-      *Basis.* cc-pvtz-dk has no iodine, in PySCF or basis-set-exchange.
-      All-electron candidates: x2c-tzvpall/qzvpall, sapporo-dkh3-tzp,
-      ano-rcc, dyall-v3z, jorge-tzp-dkh (def2-tzvp has an ECP for I:
-      rejected). Default x2c-tzvpall. Since HOBr ran with cc-pvtz-dk, a
-      same-basis HOBr run (x2c-tzvpall) bridges the two -- otherwise a
-      basis change would be read as a halogen trend.
+      *Basis.* The first version of this entry said cc-pvtz-dk has no
+      iodine. **Wrong**: the EVO resolves it (see below), so the gate ran in
+      x2c-tzvpall unnecessarily, and HOI now defaults to cc-pvtz-dk, HOBr's.
 
-      *Geometry.* Recalled (r(O-I) 1.99 A, 0.964 A, 104 deg);
-      `HOI/01_method/01_geometry.py` computes it. The gate's question does not hinge on it.
+- [x] **First EVO runs. 2026-09-29.** Logs in `HOI/logs/`,
+      `toolchain/logs/soc_atoms_i_sweep.log`,
+      `HOBr/logs/soc_vertical_x2c_n10.log`.
+
+      *Iodine atom, DKH1 2P splitting against 7603 cm-1:* sapporo-dkh3-tzp
+      -6.5%, cc-pvtz-dk and ano-rcc -7.7%, dyall-v3z -8.0%, x2c-tzvpall
+      -8.4%, x2c-qzvpall -8.6%, jorge-tzp-dkh -27%; def2 (ECP) fail. The
+      same ~-7 to -8% as Br: SOC ~8% low, f ~16% low, an error bar.
+
+      *Geometry* (CCSD(T)/x2c-tzvpall): r(O-I) 1.9907 A, r(O-H) 0.9694 A,
+      104.65 deg; the recalled start was within 0.001 A. Harmonic 583,
+      1104, 3842 cm-1; the O-I stretch's v=1 holds 6.0% at 298 K, 2.2% at
+      220 K. Worst T1 0.007.
+
+      *HOBr bridge* (x2c-tzvpall, 10 roots): 429.0 nm, f 1.63e-5, c^2 2.2%,
+      against 426.9 nm, 1.54e-5 in cc-pvtz-dk. The basis change is harmless.
+
+      *HOI gate* (x2c-tzvpall, 6 and 10 roots, consistent): spin-free T1
+      2.42 eV, S1 2.88, T2 3.17, S2 3.72. With SOC: lowest three states
+      2.36-2.42 eV (521-527 nm), spread 433-488 cm-1, f 1.7e-4 -- 11x
+      HOBr's; SOC shift -25 to -37 meV; ground state lowered 55 meV;
+      c^2 17-20% -> the script says BORDERLINE. Then 444 nm (f 7e-4), 411
+      and 404 nm (weak), 374 nm (2.2e-3), 327 nm (8.7e-3).
+
+      **But the computed spectrum does not match the measured one, and that
+      comes before any verdict on mixing.** Measured, HOI has exactly two
+      bands between 280 and 500 nm -- 407 and 340 nm -- and falls to
+      ~1e-21 cm2 at both ends (Bauer: 2.2e-22 at 500 nm, 7.7e-22 at 280).
+      The computed lowest band, f 1.7e-4 at 521 nm, would put ~3e-20 at
+      500 nm: 100x what is there. Two readings, each breaking something:
+
+        A. 407 nm is the triplet band, as for HOCl and HOBr. Then every
+           computed state is ~0.6 eV too low, where for HOCl and HOBr they
+           were 0.1-0.2 eV too HIGH, and CASSCF alone already gives T1 at
+           2.60 eV. And HOI's triplet band would sit blue of HOBr's, against
+           the trend HOCl 368 -> HOBr 457 nm.
+        B. 407 nm is the singlet 1A" band (HOBr's 352 red-shifted, as the
+           trend says) and 340 nm the next (HOBr's 284). The computed
+           energies are then off by ~0.2-0.3 eV, like HOBr's, and the f
+           roughly match (444 nm 7e-4 vs 1.1e-3; 374 nm 2.2e-3 vs 1.85e-3).
+           But the triplet band computed near 500 nm is not in the data, and
+           the computed 327 nm state (f 8.7e-3) has nothing to match either.
+
+      The vis/UV f ratio and the whole "~20x HOBr's visible f" argument of
+      the entry above assume reading A. Until the assignment is settled,
+      neither they nor the BORDERLINE verdict mean anything.
+
+- [ ] **Which state is which band: EOM-CCSD across the series.**
+      `HOI/01_method/05_eom_vertical.py`: EOM-CCSD singlets and triplets at
+      the minimum for HOCl, HOBr and HOI in one basis (cc-pvtz-dk), each
+      root labelled by symmetry and dominant excitation. It shares nothing
+      with 04 but basis and geometry, and the assigned HOCl and HOBr bands
+      calibrate it. EOM matching 04 for HOI -> the calculation is robust and
+      the assignment is the question (and the literature on it is the next
+      thing to read); EOM ~0.6 eV above 04 -> 04 is broken for iodine.
 
 ---
 

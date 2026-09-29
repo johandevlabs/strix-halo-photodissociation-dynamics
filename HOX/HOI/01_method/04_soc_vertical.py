@@ -18,20 +18,19 @@ HOBr 2.0%) and a verdict:
     BORDERLINE     5-20%        same pipeline, SOC in the surface
     STRONGLY MIXED > 20%        coupled spin-orbit states in the dynamics
 
-Basis x2c-tzvpall: cc-pvtz-dk has no iodine in PySCF or basis-set-exchange,
-def2-tzvp has an ECP (X2CAMF needs the core), and x2c-tzvpall is
-all-electron, contracted for X2C, and was the best DKH1 basis in the Br
-sweep. HOBr was run with cc-pvtz-dk, so run HOBr in x2c-tzvpall as well
-before reading a Br -> I trend.
+Basis cc-pvtz-dk, HOBr's. It DOES have iodine (an earlier note here said
+otherwise -- wrong; the EVO resolves it, toolchain/logs/soc_atoms_i_sweep.log:
+2P splitting -7.7%, against -8.4% for x2c-tzvpall, which the first gate run
+used). The HOBr bridge run showed the basis change moves nothing that
+matters: 429.0 nm / f 1.63e-5 in x2c-tzvpall against 426.9 / 1.54e-5.
+def2-tzvp has an ECP for I and is rejected (X2CAMF needs the core).
 
-Geometry RECALLED (r(O-I) ~1.99 A) until 01_geometry.py replaces it
-(--geom R_OI R_OH THETA). The gate's question does not hinge on it.
+Geometry: 01_geometry.py's CCSD(T)/x2c-tzvpall minimum (the recalled start
+was within 0.001 A and 0.7 deg).
 
 Usage (from this directory):
-    python 04_soc_vertical.py 2>&1 | tee ../logs/soc_vertical.log
-    python 04_soc_vertical.py --nroots 10 2>&1 | tee ../logs/soc_vertical_n10.log
-    python ../../HOBr/01_method/04_soc_vertical.py --basis x2c-tzvpall \\
-        --nroots 10 2>&1 | tee ../../HOBr/logs/soc_vertical_x2c_n10.log
+    python 04_soc_vertical.py --nroots 10 2>&1 | tee ../logs/soc_vertical_dk_n10.log
+    python 04_soc_vertical.py --basis x2c-tzvpall --nroots 10   # the first run
 """
 import importlib.util
 import sys
@@ -41,8 +40,9 @@ HOBR04 = (Path(__file__).resolve().parents[2] / "HOBr" / "01_method"
           / "04_soc_vertical.py")
 
 # Measured: 02_band_model/10_obs_bands.py (Rowley 1999 low, Bauer 1998 high).
-HOI = dict(halogen="I", avas=["I 5p", "O 2p"], basis="x2c-tzvpall",
-           geom=(1.99, 0.964, 104.0),
+# Geometry: logs/geometry.log, CCSD(T)/x2c-tzvpall.
+HOI = dict(halogen="I", avas=["I 5p", "O 2p"], basis="cc-pvtz-dk",
+           geom=(1.9907, 0.9694, 104.65),
            obs_nm=407.0, f_obs_vis=(9.6e-4, 1.17e-3),
            uv_nm=340.0, f_obs_uv=1.85e-3)
 

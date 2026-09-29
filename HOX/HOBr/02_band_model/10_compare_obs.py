@@ -15,7 +15,8 @@ cached in HOBr/data/obs/:
   Ingham (1998)      260-600 nm, three resolved bands
   JPL-2010, IUPAC    recommendations, which follow Ingham in the visible
   Barnes (1996)      380-600 nm; reported as a single Gaussian band
-  Rattigan (1996)    240-510 nm; resolves no separate visible band
+  Rattigan (1996)    240-510 nm; the atlas's 5-nm averages show no separate
+                     peak, though IUPAC 2007 says Rattigan observed the band
 
 What is compared:
 

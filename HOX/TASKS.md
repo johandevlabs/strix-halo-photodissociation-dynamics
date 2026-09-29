@@ -1999,6 +1999,15 @@ halogen being light has to be rechecked, because Br's SOC is 4x Cl's.
       | 520 | 4.2e-22 | -- | 1.3e-21 | 9.7e-22 |
       | 550 | 6.0e-24 | -- | 3.9e-22 | 2.1e-22 |
 
+      **Correction after reading IUPAC 2007 (HOX/references/):** the
+      evaluation says Rattigan et al. DID observe the ~457 nm band; "no
+      separate band" was my reading of the atlas's 5-nm averages, which
+      show only a monotonic fall. Rattigan's values at 460-480 nm still sit
+      3-4x below Ingham's. IUPAC chose Ingham because in situ generation
+      avoided the Br2O/Br2 impurities that plague the Br2O + H2O method
+      Rattigan used; it cites Barnes only as evidence the band exists and
+      does not discuss the shape disagreement. See HOX/references/README.md.
+
       So: two of three measurements and the calculation against the one the
       evaluations recommend. None of the papers has been read yet -- this is
       from the atlas's summaries -- and that is the next step before any

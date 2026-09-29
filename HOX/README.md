@@ -52,3 +52,5 @@ Two exceptions run locally on NumPy/SciPy alone, with no PySCF:
 
 The numbers, the caveats attached to each, and the several checks that were
 wrong before they were right, are all in [`TASKS.md`](TASKS.md).
+
+Literature filed in the repo (open-licence only) is in [`references/`](references/).

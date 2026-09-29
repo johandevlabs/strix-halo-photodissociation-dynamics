@@ -234,7 +234,10 @@ from.
 - [x] Phase 3, first look (`05_atmosphere/15_j_hobr.py`): T-dependence of J
       negligible; band shape moves J 6-45% at low sun.
 - [ ] TUV with snow albedo and a real ozone profile, for actual J values.
-- [ ] Read Ingham 1998, Barnes 1996, Rattigan 1996.
+- [x] IUPAC 2007 datasheet read (`../references/`): Ingham chosen for
+      avoiding Br₂O/Br₂ impurities; Barnes cited only for the band's
+      existence; the shape disagreement is not discussed.
+- [ ] Read Ingham 1998, Barnes 1996, Rattigan 1996 themselves.
 
 ## Why the force field is not a detail here
 
@@ -273,6 +276,8 @@ Evaluations and data sources:
 
 - S. P. Sander et al., "Chemical Kinetics and Photochemical Data for Use in
   Atmospheric Studies, Evaluation No. 17", JPL Publication 10-6 (2011).
+- (filed as `../references/Atkinson2007_IUPAC_VolIII_acp-7-981-2007.pdf`;
+  notes in `../references/README.md`)
 - R. Atkinson et al., "Evaluated kinetic and photochemical data for
   atmospheric chemistry: Volume III", *Atmos. Chem. Phys.* **7**, 981-1191
   (2007). doi:[10.5194/acp-7-981-2007](https://doi.org/10.5194/acp-7-981-2007)

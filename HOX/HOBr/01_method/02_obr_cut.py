@@ -202,14 +202,37 @@ def _stamp(row, t0):
     return row
 
 
-def _init_worker(counter):
+_LIMITS = None
+
+
+def _init_worker(counter, threads=1):
+    """Pin each worker to its own block of `threads` cores. The env block at
+    the top fixed BLAS/OpenMP at one thread before the pool forked, so a
+    worker that should use more raises its own limits here (threadpoolctl
+    for BLAS if installed, pyscf.lib for PySCF's OpenMP kernels)."""
+    global _LIMITS
     with counter.get_lock():
         idx = counter.value
         counter.value += 1
+    ncpu = os.cpu_count() or 1
     try:
-        os.sched_setaffinity(0, {idx % os.cpu_count()})
+        os.sched_setaffinity(0, {(idx * threads + j) % ncpu
+                                 for j in range(threads)})
     except (AttributeError, OSError):
         pass
+    if threads > 1:
+        for v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+            os.environ[v] = str(threads)
+        try:
+            from threadpoolctl import threadpool_limits
+            _LIMITS = threadpool_limits(limits=threads)
+        except ImportError:
+            pass
+        try:
+            from pyscf import lib
+            lib.num_threads(threads)
+        except Exception:
+            pass
 
 
 def load_done(path, nroots):
@@ -446,7 +469,11 @@ def main(default="HOBr", doc=__doc__, **defaults):
     p.add_argument("--csv", default=None)
     p.add_argument("--png", default=None)
     p.add_argument("--nproc", type=int, default=os.cpu_count() or 1)
-    p.add_argument("--memory", type=int, default=4000)
+    p.add_argument("--memory", type=int, default=4000,
+                   help="MB per worker (PySCF max_memory); keep nproc x "
+                        "memory under the machine's RAM")
+    p.add_argument("--threads", type=int, default=1,
+                   help="cores per worker; nproc x threads <= cores")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--report-only", action="store_true")
     p.set_defaults(**defaults)
@@ -470,6 +497,7 @@ def main(default="HOBr", doc=__doc__, **defaults):
           f"angle = {theta:.2f} deg")
     print("=" * 72)
     print(f"  {len(radii)} radii x {len(args.bases)} bases = {len(grid)} points")
+    print(f"  {args.nproc} workers x {args.threads} threads x {args.memory} MB")
     if args.dry_run:
         print(f"  radii: {', '.join(f'{r:.2f}' for r in radii)}")
         return
@@ -492,7 +520,7 @@ def main(default="HOBr", doc=__doc__, **defaults):
                 w.writeheader()
             with ctx.Pool(min(args.nproc, len(tasks)),
                           initializer=_init_worker,
-                          initargs=(counter,)) as pool:
+                          initargs=(counter, args.threads)) as pool:
                 for i, row in enumerate(
                         pool.imap_unordered(compute_point, tasks), 1):
                     w.writerow(row)

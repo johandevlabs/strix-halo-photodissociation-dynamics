@@ -42,7 +42,9 @@ def load():
 
 
 if __name__ == "__main__":
-    # 16 workers, not one per core: HOI points peak above 2.2 GB resident
-    # each, and 31 of them pushed the EVO (93 GB visible) into swap.
+    # 8 workers x 4 cores x 10 GB. One worker per core (31 x ~6 GB once
+    # EOM's Davidson subspace grows) exhausted the EVO's 93 GB and the run
+    # was killed before a single point finished (2026-09-30).
     load().main(default="HOI", doc=__doc__, bases=["cc-pvtz-dk"],
-                rmin=1.60, rfine=2.80, rmax=3.40, nproc=16)
+                rmin=1.60, rfine=2.80, rmax=3.40, nproc=8, threads=4,
+                memory=10000)

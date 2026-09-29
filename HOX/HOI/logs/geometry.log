@@ -1,0 +1,67 @@
+========================================================================
+== HOI equilibrium geometry and harmonic force field
+== CCSD(T)/x2c-tzvpall with x2c, 3x3x3 grid, quadratic fit
+========================================================================
+
+  round 1: 27 points, 27 to compute
+    [1/27] 1.99, 0.934, 107.0: ok (79.9 s)
+    [2/27] 1.99, 0.964, 107.0: ok (81.64 s)
+    [3/27] 1.99, 0.964, 101.0: ok (85.67 s)
+    [4/27] 1.99, 0.964, 104.0: ok (86.24 s)
+    [5/27] 1.99, 0.994, 101.0: ok (86.78 s)
+    [6/27] 2.02, 0.994, 101.0: ok (113.82 s)
+    [7/27] 2.02, 0.994, 104.0: ok (115.51 s)
+    [8/27] 1.96, 0.994, 107.0: ok (119.78 s)
+    [9/27] 1.99, 0.934, 101.0: ok (119.93 s)
+    [10/27] 2.02, 0.994, 107.0: ok (120.46 s)
+    [11/27] 1.99, 0.934, 104.0: ok (123.31 s)
+    [12/27] 2.02, 0.934, 107.0: ok (147.31 s)
+    [13/27] 1.96, 0.964, 104.0: ok (148.47 s)
+    [14/27] 2.02, 0.964, 107.0: ok (148.91 s)
+    [15/27] 1.96, 0.994, 104.0: ok (150.49 s)
+    [16/27] 1.96, 0.964, 101.0: ok (150.72 s)
+    [17/27] 2.02, 0.964, 101.0: ok (150.79 s)
+    [18/27] 1.96, 0.934, 104.0: ok (151.2 s)
+    [19/27] 1.99, 0.994, 107.0: ok (151.34 s)
+    [20/27] 2.02, 0.934, 101.0: ok (152.13 s)
+    [21/27] 1.96, 0.994, 101.0: ok (152.3 s)
+    [22/27] 1.96, 0.934, 101.0: ok (152.34 s)
+    [23/27] 2.02, 0.964, 104.0: ok (152.4 s)
+    [24/27] 1.96, 0.934, 107.0: ok (152.67 s)
+    [25/27] 1.99, 0.994, 104.0: ok (153.32 s)
+    [26/27] 2.02, 0.934, 104.0: ok (154.1 s)
+    [27/27] 1.96, 0.964, 107.0: ok (154.54 s)
+  round done in 2.6 min
+
+  27 of 27 points usable
+  worst T1 diagnostic 0.0070
+
+  quadratic fit rms residual 0.094 meV (how far the surface departs from a quadratic over this grid)
+  stationary point moved from the grid centre by +0.0007 A, +0.0054 A, +0.651 deg
+
+  equilibrium geometry (CCSD(T)/x2c-tzvpall, x2c):
+      r(O-I) = 1.9907 A
+      r(O-H)  = 0.9694 A
+      angle   = 104.65 deg
+
+  harmonic frequencies, cm-1 (ascending):
+            calc   obs fund.  calc/obs   assignment
+           582.7         nan       nan   nu3  O-I stretch
+          1103.8         nan       nan   nu2  bend
+          3841.7         nan       nan   nu1  O-H stretch
+
+  Harmonic frequencies should land a few percent ABOVE the observed
+  fundamentals: anharmonicity is negative, and for X-H stretches it is worth
+  4-6%. A ratio below 1.00, or above ~1.10, means the fit or the force field
+  is wrong rather than merely approximate.
+
+  v=1 populations from the CALCULATED frequencies:
+                        mode     220 K     298 K
+            nu3  O-I stretch     2.21%     6.00%
+                   nu2  bend     0.07%     0.48%
+            nu1  O-H stretch     0.00%     0.00%
+      (this is what sigma(lambda, T) is a Boltzmann average over;
+       the O-X stretch dominates and it IS the dissociation
+       coordinate, so the 1D model already carries it)
+
+  csv: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOI/data/hoi_geometry.csv

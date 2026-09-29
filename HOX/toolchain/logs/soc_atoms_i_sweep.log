@@ -1,0 +1,48 @@
+
+========================================================================
+== I: basis sweep against 7602.97 cm-1 observed
+========================================================================
+  def2-tzvp [pyscf] DKH1                   FAILED RuntimeError: I: ROHF did not converge
+  unc-def2-tzvp [pyscf] DKH1               FAILED RuntimeError: I: ROHF did not converge
+  def2-qzvp [pyscf] DKH1                   FAILED RuntimeError: I: ROHF did not converge
+  unc-def2-qzvp [pyscf] DKH1               FAILED RuntimeError: I: ROHF did not converge
+  x2c-tzvpall [pyscf] DKH1                 nao   60    6967.68 cm-1    -8.4%    16.8 s
+  x2c-qzvpall [pyscf] DKH1                 nao  112    6951.16 cm-1    -8.6%    61.7 s
+  cc-pvtz-dk [pyscf] DKH1                  nao   52    7020.26 cm-1    -7.7%    21.1 s
+  aug-cc-pvtz-dk [pyscf] DKH1              nao   68    6999.81 cm-1    -7.9%    28.7 s
+  sapporo-dkh3-tzp [pyscf] DKH1            nao   52    7107.74 cm-1    -6.5%    16.3 s
+  ano-rcc [pyscf] DKH1                     nao  139    7020.52 cm-1    -7.7%    55.9 s
+  dyall-v3z [pyscf] DKH1                   nao  173    6993.35 cm-1    -8.0%    43.9 s
+  jorge-tzp-dkh [pyscf] DKH1               nao   73    5545.80 cm-1   -27.1%    16.5 s
+
+========================================================================
+== sweep summary, ranked by |error|
+========================================================================
+ atom              basis          soc   nao   calc/cm-1      err   wall/s
+    I   sapporo-dkh3-tzp         DKH1    52     7107.74    -6.5%     16.3
+    I            ano-rcc         DKH1   139     7020.52    -7.7%     55.9
+    I         cc-pvtz-dk         DKH1    52     7020.26    -7.7%     21.1
+    I     aug-cc-pvtz-dk         DKH1    68     6999.81    -7.9%     28.7
+    I          dyall-v3z         DKH1   173     6993.35    -8.0%     43.9
+    I        x2c-tzvpall         DKH1    60     6967.68    -8.4%     16.8
+    I        x2c-qzvpall         DKH1   112     6951.16    -8.6%     61.7
+    I      jorge-tzp-dkh         DKH1    73     5545.80   -27.1%     16.5
+
+  not usable:
+      I def2-tzvp            DKH1         fail:RuntimeError
+      I unc-def2-tzvp        DKH1         fail:RuntimeError
+      I def2-qzvp            DKH1         fail:RuntimeError
+      I unc-def2-qzvp        DKH1         fail:RuntimeError
+
+Choosing from this table. The winner is not simply the smallest error: the
+basis has to be affordable in the MOLECULE, where nao roughly triples (H + O
+on top of the halogen) and the raster is thousands of points. A set that is
+2% better and 4x more expensive is the wrong trade for a band whose intensity
+is already uncertain by an order of magnitude (03's f was 10-25x low for
+HOCl). Take the cheapest basis inside a few percent, and record the rest as
+the error bar on the SOC.
+
+Comparing DKH1 against breit-pauli on the SAME basis separates the two error
+sources: if they agree, the residual belongs to the basis, and a better basis
+is the only way forward. If they differ by as much as the error itself, the
+SOC operator is also in play.

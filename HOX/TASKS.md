@@ -2277,7 +2277,12 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       I with spin-orbit corrections (I: -1/3 of 7603 cm-1) and ZPE, as HOBr's
       `03_surfaces/08_fragments.py` does for the asymptote; with HOBr as the
       check. This decides whether Bauer's 532 nm null bounds the triplet
-      band. (1) Read Minaev 1999 and Bauer 1998 in full [done, above]: what
+      band. **Script: `HOI/01_method/06_d0.py`** -- CCSD(T)/x2c in
+      cc-pvtz-dk and cc-pvqz-dk with X^-3 CBS, frozen core (through (n-1)d)
+      and all-electron, for HOCl (control: measured D0 19 289.7 cm-1, from
+      memory), HOBr and HOI; OH from a 5-point scan; ZPE harmonic; atomic
+      SO measured, molecular SO from 04; dH298 for Bauer's and IUPAC's
+      thresholds. Bookkeeping checked offline on synthetic energies. (1) Read Minaev 1999 and Bauer 1998 in full [done, above]: what
       Minaev computed for the 3A" band's f and position, and how Bauer
       handled I2 at 460-490 nm. (2) The 3A" band from HOBr's pipeline,
       SOC entering the surface (c^2 ~20%): 1D band model on an O-I cut

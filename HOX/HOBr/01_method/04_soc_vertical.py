@@ -39,8 +39,17 @@ CONTROL: `--molecule HOCl --basis def2-tzvp` should reproduce HOCl's 03 --
 vertical 3.4475 eV, summed f ~8.9e-7 -- and checks the adaptation before the
 HOBr numbers are trusted. ~3 min.
 
+HOI (third question, 2026-09-29): IS THE BAND STILL PERTURBATIVE? HOI's
+visible band carries f ~1e-3, ~20x HOBr's, where the SOC-squared scaling of
+HOBr gives ~4x (HOI/README.md). The report now ends in a two-state estimate
+of the singlet admixture and a verdict on whether one spin-free surface plus
+borrowed intensity is still the right model. Default basis x2c-tzvpall:
+cc-pvtz-dk has no iodine.
+
 Usage:
     python 04_soc_vertical.py 2>&1 | tee ../logs/soc_vertical.log
+    python 04_soc_vertical.py --molecule HOI --nroots 10 \
+        2>&1 | tee ../../HOI/logs/soc_vertical.log
     python 04_soc_vertical.py --molecule HOCl --basis def2-tzvp   # control
     python 04_soc_vertical.py --cas 7 12                          # CAS(12,7)
     python 04_soc_vertical.py --avas "Br 4p" "O 2p" "H 1s" --nroots 12
@@ -57,19 +66,69 @@ HARTREE2EV = 27.211386245988
 NM_PER_EV = 1239.841984
 
 MOLECULES = {
+    # Measured band f: Gaussian fits in energy to the cached spectra,
+    # f = 1.1296e12 Int sigma dnu (02_band_model/10_compare_obs.py for HOBr;
+    # the same decomposition of HOBr/data/obs/HOCl_* and HOI/data/obs/).
+    # vis = the weak triplet-derived band, uv = the singlet band above it,
+    # compared with the computed SOC states from the band's top to 1.3 eV
+    # above its centroid (HOCl 4.36-4.43, HOBr 3.60-3.82 eV; the next strong
+    # band is 1.6-1.9 eV up).
+    #
     # 01_geometry.py, CCSD(T)/cc-pvtz-dk
-    "HOBr": dict(halogen="Br", avas=["Br 4p", "O 2p"],
+    "HOBr": dict(halogen="Br", avas=["Br 4p", "O 2p"], basis="cc-pvtz-dk",
                  geom=(1.8357, 0.9646, 102.02),
-                 obs_nm=457.0, obs_sigma=2.3e-20,
-                 f_target=1.3e-4,            # 03's band model, a floor
-                 fwhm_ev=0.566),             # 03's 1D band, for the f(obs) estimate
+                 obs_nm=457.0, f_obs_vis=(4.7e-5, 6.2e-5),   # Barnes, Ingham
+                 uv_nm=352.0, f_obs_uv=6.5e-4),
     # HOCl's 03, for the control run
-    "HOCl": dict(halogen="Cl", avas=["Cl 3p", "O 2p"],
+    "HOCl": dict(halogen="Cl", avas=["Cl 3p", "O 2p"], basis="def2-tzvp",
                  geom=(1.6891, 0.9644, 102.96),
-                 obs_nm=380.0, obs_sigma=4e-21,
-                 f_target=None, fwhm_ev=None,
+                 obs_nm=368.0, f_obs_vis=(3.3e-5, 3.4e-5),   # Barnes, JPL
+                 uv_nm=310.0, f_obs_uv=3.0e-4,
                  ref_vertical=3.4475, ref_f=8.9e-7),
+    # HOI: geometry RECALLED, a starting value only (r(O-I) ~1.99 A from
+    # memory of microwave / ab initio work -- verify, and replace with
+    # 01_geometry.py's). The gate question -- how strongly mixed the states
+    # are -- does not hinge on a few hundredths of an angstrom. cc-pvtz-dk
+    # has NO iodine (PySCF or basis-set-exchange), so the default is
+    # x2c-tzvpall: all-electron, contracted for the X2C Hamiltonian we run,
+    # and the best DKH1 basis in the Br sweep (-4.9%).
+    "HOI": dict(halogen="I", avas=["I 5p", "O 2p"], basis="x2c-tzvpall",
+                geom=(1.99, 0.964, 104.0),
+                obs_nm=407.0, f_obs_vis=(9.6e-4, 1.17e-3),    # Rowley, Bauer
+                uv_nm=340.0, f_obs_uv=1.85e-3),
 }
+
+# Atomic 2P fine structure (cm-1), for the SOC-squared scaling line; the
+# toolchain's table, NIST values quoted from memory there too.
+FINE_STRUCTURE_CM = {"Cl": 882.35, "Br": 3685.24, "I": 7602.97}
+
+
+def resolve_basis_for(halogen, name):
+    """The basis for gto.M: the plain name when PySCF knows it for all three
+    elements, else per element from basis-set-exchange -- and if an element
+    has it nowhere, say so by name ('cc-pvtz-dk has no I') instead of
+    failing deep inside PySCF. H-O-X has an even electron count: spin 0."""
+    try:
+        gto.M(atom=f"{halogen} 0 0 0; O 0 0 2; H 0 0 3", basis=name,
+              spin=0, verbose=0)
+        return name
+    except Exception as exc:
+        first = exc
+    try:
+        import basis_set_exchange as bse
+    except ImportError:
+        raise RuntimeError(f"basis {name!r}: not in PySCF ({first}) and "
+                           f"basis-set-exchange is not installed")
+    out = {}
+    for el in (halogen, "O", "H"):
+        try:
+            out[el] = gto.basis.parse(bse.get_basis(
+                name, elements=[el], fmt="nwchem", header=False))
+        except Exception as exc:
+            raise RuntimeError(f"basis {name!r} has no {el} in PySCF or "
+                               f"basis-set-exchange ({exc}). For iodine use "
+                               f"x2c-tzvpall; see HOI/README.md.")
+    return out
 
 
 def geometry(halogen, r_ox, r_oh, theta):
@@ -104,6 +163,7 @@ def report_reference_spins(mc):
 
 
 def build_reference(spec, basis, geom, cas, nroots, max_cycle, minao, verbose):
+    basis = resolve_basis_for(spec["halogen"], basis)
     mol = gto.M(atom=geometry(spec["halogen"], *geom), basis=basis, spin=0,
                 charge=0, symmetry=False, unit="Angstrom", verbose=verbose)
     if mol.has_ecp():
@@ -223,6 +283,7 @@ def report(spec, e_soc, osc, e_sf, tol):
              if gap_next < 3 * (ev_c.max() - ev_c.min()) + 0.05 else ""))
 
     # ---- spin-orbit shift of the band
+    i_t = None
     if e_sf is not None and e_sf.size:
         e0_sf = float(e_sf.min())
         t_abs = centroid / HARTREE2EV + e0
@@ -240,29 +301,70 @@ def report(spec, e_soc, osc, e_sf, tol):
         print(f"  -> SOC shifts the a 3A\" band by {shift * 1000:+.0f} meV: "
               f"{NM_PER_EV / vert_sf:.1f} -> {NM_PER_EV / centroid:.1f} nm "
               f"({NM_PER_EV / centroid - NM_PER_EV / vert_sf:+.1f} nm)")
-        if spec["f_target"] is not None:
+        if spec["halogen"] == "Br":
             print(f"     03's 1D band peaked at 437 nm with a spin-free surface;"
                   f" moved by this shift\n     it would sit near "
                   f"{NM_PER_EV / (NM_PER_EV / 437.0 + shift):.0f} nm, "
                   f"against {spec['obs_nm']:.0f} nm measured.")
 
-    # ---- the intensity against what the band needs
-    print()
-    if spec["f_target"] is not None:
-        wcm = spec["fwhm_ev"] / HARTREE2EV * 219474.63
-        f_obs = 1.1296e12 * 1.0645 * spec["obs_sigma"] * wcm
-        print(f"  f against measurement:")
-        print(f"      computed (sum of 3 components)   {f_c:.3e}")
-        print(f"      needed by 03's band model         {spec['f_target']:.1e}"
-              f"  (a floor)   calc/needed {f_c / spec['f_target']:.2f}")
-        print(f"      Gaussian estimate, Ingham peak x 03's width "
-              f"{f_obs:.2e}   calc/obs {f_c / f_obs:.2f}")
-        print("      (the SOC is ~7% low at this basis and operator -- the "
-              "toolchain sweep --\n       so f carries ~14% from that alone. "
-              "HOCl's equivalent came out 10-25x low.)")
-    else:
+    # ---- how mixed are the states? A two-state estimate.
+    # Second-order SOC lowers the triplet by |V|^2/gap and mixes in the
+    # lender with weight c^2 ~ |V|^2/gap^2 = |shift|/gap, which lends it
+    # f ~ c^2 f(lender). HOBr (n10 log): 15 meV / 0.747 eV, c^2 ~ 2.0%,
+    # predicts f 2.6e-5 against 1.5e-5 computed -- the picture holds to 2x. Where c^2 is tens of percent the
+    # triplet is no longer "a triplet borrowing a little": the band needs
+    # coupled spin-orbit states, not one spin-free surface.
+    c2 = gap = None
+    if e_sf is not None and e_sf.size:
+        t_shift = abs((centroid / HARTREE2EV + e0) - e_sf[i_t]) * HARTREE2EV
+        above = e_sf[e_sf > e_sf[i_t] + 1e-6]
+        if above.size:
+            gap = (above.min() - e_sf[i_t]) * HARTREE2EV
+            c2 = t_shift / gap if gap > 0 else float("nan")
+    uv = [(e, fi) for e, fi in zip(rel[1:], f)
+          if ev_c.max() + 1e-6 < e < centroid + 1.3]
+    f_uv = float(sum(fi for _, fi in uv))
+    print(f"\n  mixing, two-state estimate:")
+    if c2 is not None:
+        print(f"      triplet lowered by SOC {t_shift * 1000:.0f} meV; gap to "
+              f"the next spin-free state {gap:.3f} eV")
+        print(f"      singlet admixture c^2 ~ {c2:.1%}; predicts f ~ c^2 f(UV) "
+              f"= {c2 * f_uv:.2e} against {f_c:.2e} computed")
+    print(f"      components span {spread_cm:.0f} cm-1 against a "
+          f"{gap_next:.3f} eV gap to the next SOC state")
+
+    # ---- against measurement
+    lo, hi = spec["f_obs_vis"]
+    print(f"\n  against measurement:")
+    print(f"      visible band  calc {f_c:.2e}   obs {lo:.1e}-{hi:.1e}   "
+          f"calc/obs {f_c / hi:.2f}-{f_c / lo:.2f}")
+    print(f"      UV band       calc {f_uv:.2e}   obs {spec['f_obs_uv']:.1e}   "
+          f"calc/obs {f_uv / spec['f_obs_uv']:.2f}   (states "
+          + ", ".join(f"{NM_PER_EV / e:.0f}" for e, _ in uv) + " nm)")
+    if f_uv > 0:
+        print(f"      visible/UV    calc {f_c / f_uv:.2f}   obs "
+              f"{lo / spec['f_obs_uv']:.2f}-{hi / spec['f_obs_uv']:.2f}   "
+              f"(measured: HOCl 0.11, HOBr 0.07-0.10, HOI 0.5-0.6)")
+    xi = FINE_STRUCTURE_CM.get(spec["halogen"])
+    if xi:
+        print(f"      perturbative scaling from HOBr's computed 1.5e-5: "
+              f"(xi/xi_Br)^2 x 1.5e-5 = "
+              f"{(xi / FINE_STRUCTURE_CM['Br']) ** 2 * 1.5e-5:.1e}")
+
+    if c2 is not None:
+        verdict = ("PERTURBATIVE -- one spin-free surface plus borrowed "
+                   "intensity, as for HOCl and HOBr" if c2 < 0.05 and
+                   gap_next > 3 * spread_cm / 8065.5 else
+                   "BORDERLINE -- the HOBr pipeline, but SOC must enter the "
+                   "surface (at least a SOC-corrected V_T along the raster)"
+                   if c2 < 0.20 else
+                   "STRONGLY MIXED -- coupled spin-orbit states in the "
+                   "dynamics; one spin-free surface is the wrong model")
+        print(f"\n  -> {verdict}")
+
+    if "ref_vertical" in spec:
         label = "CONTROL" if spec.get("is_control", True) else "comparison"
-        print(f"  {label} against HOCl's 03: vertical {centroid:.4f} eV "
+        print(f"\n  {label} against HOCl's 03: vertical {centroid:.4f} eV "
               f"(03: {spec['ref_vertical']}), summed f {f_c:.2e} "
               f"(03: {spec['ref_f']:.1e})")
         if not spec.get("is_control", True):
@@ -280,7 +382,9 @@ def main():
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--molecule", default="HOBr", choices=sorted(MOLECULES))
-    p.add_argument("--basis", default="cc-pvtz-dk")
+    p.add_argument("--basis", default=None,
+                   help="default per molecule: cc-pvtz-dk (HOBr), def2-tzvp "
+                        "(HOCl), x2c-tzvpall (HOI -- cc-pvtz-dk has no I)")
     p.add_argument("--soc", default="DKH1")
     p.add_argument("--geom", nargs=3, type=float, default=None,
                    metavar=("R_OX", "R_OH", "THETA"))
@@ -303,6 +407,7 @@ def main():
     args = p.parse_args()
 
     spec = dict(MOLECULES[args.molecule])
+    args.basis = args.basis or spec["basis"]
     if args.avas:
         spec["avas"] = list(args.avas)
     geom = tuple(args.geom) if args.geom else spec["geom"]

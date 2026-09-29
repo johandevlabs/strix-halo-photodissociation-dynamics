@@ -66,7 +66,7 @@ ANG2BOHR = 1.8897261254578281
 # molecules: 79Br is 78.918 against an average of 79.904, a 1.2% mass
 # difference and ~0.6% on the O-Br stretch.
 MASS = {"H": 1.0078250319, "O": 15.9949146221,
-        "Cl": 34.968852682, "Br": 78.9183376}
+        "Cl": 34.968852682, "Br": 78.9183376, "I": 126.904473}
 
 # Starting geometries and observed fundamentals.
 #
@@ -84,6 +84,15 @@ MOLECULES = {
                  start=(1.834, 0.961, 102.3),
                  obs_fundamental=(620.23, 1162.57, 3614.90),
                  obs_geom=None),
+    # HOI: start RECALLED (r(O-I) ~1.99 A), no fundamentals entered -- none
+    # checked against a source yet, and a recalled number in the calc/obs
+    # column would look like a test. Basis: cc-pvtz-dk has no iodine; run
+    # with --basis x2c-tzvpall. Results go to HOX/HOI/data/.
+    "HOI": dict(halogen="I",
+                start=(1.99, 0.964, 104.0),
+                obs_fundamental=None,
+                obs_geom=None,
+                data=DATA.parents[1] / "HOI" / "data"),
 }
 
 FIELDS = ["basis", "r_ox_A", "r_oh_A", "theta_deg", "nbf", "e_hf_Ha",
@@ -341,7 +350,8 @@ def report(molecule, rows, args):
               f"{coords[2]-o[2]:+.2f})")
 
     freq = frequencies(spec["halogen"], coords, H)
-    obs = np.array(spec["obs_fundamental"], float)
+    obs = (np.array(spec["obs_fundamental"], float)
+           if spec["obs_fundamental"] else np.full(3, np.nan))
     print(f"\n  harmonic frequencies, cm-1 (ascending):")
     print(f"      {'calc':>10}{'obs fund.':>12}{'calc/obs':>10}   assignment")
     names = [f"nu3  O-{spec['halogen']} stretch", "nu2  bend",
@@ -391,7 +401,8 @@ def main():
     args = p.parse_args()
 
     spec = MOLECULES[args.molecule]
-    csv_path = args.csv or str(DATA / f"{args.molecule.lower()}_geometry.csv")
+    csv_path = args.csv or str(spec.get("data", DATA)
+                               / f"{args.molecule.lower()}_geometry.csv")
     # git does not track empty directories, so HOBr/data/ does not exist on a
     # fresh clone and the first append dies at the very end of the first round
     # -- after every point has been computed. Make it rather than assume it.

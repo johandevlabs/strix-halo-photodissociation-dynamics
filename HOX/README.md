@@ -23,6 +23,7 @@ IUPAC recommend. See `HOBr/README.md`.
 | [`toolchain/`](toolchain/) | the SOC stack (Prism + socutils) and its validation against atomic fine structure. Shared by every halogen. |
 | [`HOCl/`](HOCl/) | the HOCl work, by approach: method selection, the 1D band model, the surfaces. |
 | [`HOBr/`](HOBr/) | the actual target. What HOCl's method decisions do and do not carry over, and why the Br basis is the first gate. |
+| [`HOI/`](HOI/) | started: the measured bands, and the gate run on whether HOI's visible band is still perturbative in spin-orbit coupling. |
 | [`docs/deep-review-claude.md`](docs/deep-review-claude.md) | literature review with citations |
 
 

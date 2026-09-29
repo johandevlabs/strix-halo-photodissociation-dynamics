@@ -1,0 +1,39 @@
+
+== HOI: bands, reddest first (nm, peak cm2, FWHM eV, f)
+  Bauer(1998)    280-500 nm  rms 1.7e-21
+       406.8  3.27e-19  0.371  1.17e-03
+       340.4  3.84e-19  0.496  1.85e-03
+      visible/UV f = 0.64
+  IUPAC(2007)    280-490 nm  rms 1.7e-21
+       406.8  3.27e-19  0.370  1.17e-03
+       340.4  3.84e-19  0.497  1.85e-03
+      visible/UV f = 0.63
+  JPL-2010(2011) 280-480 nm  rms 1.8e-21
+       405.9  3.05e-19  0.361  1.07e-03
+       339.2  3.90e-19  0.486  1.84e-03
+      visible/UV f = 0.58
+  Rowley(1999)   280-480 nm  rms 2.0e-21
+       405.0  2.84e-19  0.349  9.59e-04
+       338.1  3.97e-19  0.476  1.83e-03
+      visible/UV f = 0.52
+  Jenkin(1991)   294-500 nm  rms 3.5e-20
+       409.5  2.45e-19  0.304  7.23e-04
+       340.6  1.79e-19  0.564  9.81e-04
+      visible/UV f = 0.74
+
+== HOCl: bands, reddest first (nm, peak cm2, FWHM eV, f)
+  Barnes(1998)   200-550 nm  rms 9.4e-21
+       367.9  7.70e-21  0.446  3.33e-05
+       309.9  5.60e-20  0.561  3.04e-04
+       236.8  1.76e-19  1.086  1.86e-03
+      visible/UV f = 0.11
+  JPL-2010(2011) 200-420 nm  rms 1.2e-20
+       367.3  7.76e-21  0.456  3.43e-05
+       309.8  5.61e-20  0.557  3.03e-04
+       236.8  1.76e-19  1.087  1.86e-03
+      visible/UV f = 0.11
+
+  HOI: Bauer, IUPAC (numerically Bauer's) and JPL agree to 10%; Rowley's
+  visible band is 18% weaker; Jenkin (1991) is the outlier (half the UV
+  band, fit rms 20x the others). HOBr, from 10_compare_obs.py: visible f
+  4.7-6.2e-5 (Barnes, Ingham), 352 nm band 6.5e-4, ratio 0.07-0.10.

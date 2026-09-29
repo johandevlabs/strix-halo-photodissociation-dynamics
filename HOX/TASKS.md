@@ -2098,6 +2098,41 @@ Marine iodine chemistry and new particle formation. Per Minaev, the triplet
 **dominates** the visible absorption in HOI, so SOC is not a perturbation.
 Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
 
+- [x] **What the measurements say. 2026-09-29.** `HOI/02_band_model/10_obs_bands.py`
+      on five cached spectra (`HOI/data/obs/`), the same Gaussian
+      decomposition as HOBr's `10_compare_obs.py`:
+
+      | | visible band | f | UV band | f | vis/UV |
+      | --- | --- | --- | --- | --- | --- |
+      | HOCl (Barnes 1998, JPL) | 368 nm | 3.4e-5 | 310 nm | 3.0e-4 | 0.11 |
+      | HOBr (Ingham, Barnes 1996) | 437-457 nm | 4.7-6.2e-5 | 352 nm | 6.5e-4 | 0.07-0.10 |
+      | HOI (Bauer, JPL, Rowley) | 407 nm | 0.96-1.17e-3 | 340 nm | 1.85e-3 | 0.52-0.64 |
+
+      HOI's visible band is ~20x HOBr's. Scaling HOBr's computed 1.5e-5 by
+      (xi_I / xi_Br)^2 = 4.26 gives 6.4e-5 -- the perturbative picture that
+      worked for HOCl and HOBr misses by ~15x. And the band sits BLUER than
+      HOBr's, not redder. Both point to the visible band being a strongly
+      spin-orbit-mixed state rather than a triplet borrowing a little.
+
+- [ ] **The gate: is HOI perturbative?** `HOBr/01_method/04_soc_vertical.py
+      --molecule HOI`, now generic over the series. New in its report: a
+      two-state mixing estimate (triplet SOC shift / gap to the next
+      spin-free state = singlet admixture c^2; HOBr 2.0%), the
+      computed UV lenders against the measured UV band, the vis/UV ratio,
+      and a verdict: PERTURBATIVE (c^2 < 5%) -> HOBr's pipeline as is;
+      BORDERLINE (5-20%) -> SOC-corrected surface; STRONGLY MIXED (> 20%) ->
+      coupled spin-orbit states in the dynamics.
+
+      *Basis.* cc-pvtz-dk has no iodine, in PySCF or basis-set-exchange.
+      All-electron candidates: x2c-tzvpall/qzvpall, sapporo-dkh3-tzp,
+      ano-rcc, dyall-v3z, jorge-tzp-dkh (def2-tzvp has an ECP for I:
+      rejected). Default x2c-tzvpall. Since HOBr ran with cc-pvtz-dk, a
+      same-basis HOBr run (x2c-tzvpall) bridges the two -- otherwise a
+      basis change would be read as a halogen trend.
+
+      *Geometry.* Recalled (r(O-I) 1.99 A, 0.964 A, 104 deg); `01_geometry.py
+      --molecule HOI` computes it. The gate's question does not hinge on it.
+
 ---
 
 ## Known risks

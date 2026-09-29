@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# publisher-copyrighted papers: local copies only, never pushed (HOX/references/README.md)
+HOX/references/licensed/

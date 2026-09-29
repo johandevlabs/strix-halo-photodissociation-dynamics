@@ -2242,7 +2242,42 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       prediction with no measurement to test it, and the reason to build its
       surface is the J question above.
 
-- [ ] **HOI next.** (1) Read Minaev 1999 and Bauer 1998 in full: what
+- [x] **Minaev 1999 and Bauer 1998 read. 2026-09-29.** Local copies in
+      `references/licensed/` (gitignored: ACS copyright); notes in
+      `references/README.md`. Three things change:
+
+      1. **Bauer's red wing is not a constraint.** The I2-loss subtraction
+         was scaled to the post-flash absorption at 500 nm, which books any
+         HOI absorption there as I2 loss. The published spectrum is the
+         two-Gaussian fit, and our atlas file reproduces it exactly. The
+         "8.5e-22 at 490 nm, 10-100x below the band's wing" argument in the
+         entry above is withdrawn.
+      2. **The real constraint is Bauer's 532 nm photolysis:** no OH, so
+         sigma(532) < ~1e-20 cm2 -- if HO + I is open at 532 nm. Bauer's
+         threshold is 582 +- 20 nm; IUPAC's datasheet gives 507 nm
+         (236 kJ/mol). Every triplet band in `15_j_hoi_triplet.py` puts
+         1.2-15e-20 at 532 nm. A band on a repulsive state absorbs nothing
+         below D0 (from v = 0), so **D0(HO-I) decides it**. Below 2.33 eV,
+         the computed band is 1.2-4x over Bauer's bound. Above it, the null is
+         silent -- but then the triplet vertical (2.40 eV with SOC, before
+         the HOCl/HOBr calibration that moves it lower) would have to sit
+         above D0, and the calculation would be wrong about the triplet
+         instead.
+      3. **Minaev agrees on HOI and beats us on HOBr.** a3A" f: Minaev HOCl
+         4-6e-6, HOBr 7-8e-5, HOI 1.6-2.5e-4 (3-21G only); ours 8.9e-7,
+         1.5e-5, 1.5e-4; measured HOCl 3.3e-5, HOBr 4.7-6.2e-5. His
+         mechanism: the triplet borrows mostly from 4 1A' at ~9 eV
+         (sigma* <- sigma, M ~ 1 au), and quadratic response sums over all
+         states, including orbital relaxation outside the CAS. Our HOBr f
+         stays flat from 6 to 16 roots (to 10.7 eV) and in full valence, so
+         the missing lenders, if that is the deficit, are outside CAS(12,7).
+         A lead for the HOBr f question, not a result.
+
+- [ ] **HOI next.** (0) **D0(HO-I)**, CCSD(T) HOI minimum against OH +
+      I with spin-orbit corrections (I: -1/3 of 7603 cm-1) and ZPE, as HOBr's
+      `03_surfaces/08_fragments.py` does for the asymptote; with HOBr as the
+      check. This decides whether Bauer's 532 nm null bounds the triplet
+      band. (1) Read Minaev 1999 and Bauer 1998 in full [done, above]: what
       Minaev computed for the 3A" band's f and position, and how Bauer
       handled I2 at 460-490 nm. (2) The 3A" band from HOBr's pipeline,
       SOC entering the surface (c^2 ~20%): 1D band model on an O-I cut

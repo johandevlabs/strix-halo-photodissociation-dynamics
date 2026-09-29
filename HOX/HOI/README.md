@@ -58,9 +58,14 @@ triplet band would need −0.63 eV. This matches Minaev, J. Phys. Chem. A
 So the "visible band 20× HOBr's" in the table above compares different
 states. HOI's ³A″ band is computed at 516 nm (f 1.5e-4, singlet admixture
 ~20%). Calibrated, that is ~530–560 nm, beyond every measurement (Bauer
-stops at 490 nm). Bauer's red wing (8.5e-22 cm² at 490 nm) allows such a
-band only if it lies at 560–620 nm or is narrow. If it is there, J(HOI) is
-20–50% larger at high sun (`05_atmosphere/15_j_hoi_triplet.py`, log in
-`logs/`). Details are in `TASKS.md`.
+stops at 490 nm, and its red end is fixed by an I₂ subtraction scaled at
+500 nm). If the band is there, J(HOI) is 20–50% larger at high sun
+(`05_atmosphere/15_j_hoi_triplet.py`, log in `logs/`).
+
+The one real constraint is Bauer's 532 nm photolysis, which found no OH:
+σ(532) < ~1e-20 cm², but only if HO + I is open at 532 nm. Bauer's
+threshold is 582 nm and IUPAC's is 507 nm, so D₀(HO–I) is the next
+calculation. Details are in `TASKS.md`; paper notes are in
+`../references/README.md`.
 
 Offline test: `python 01_method/tests/test_hoi_report.py`.

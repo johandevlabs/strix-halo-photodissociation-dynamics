@@ -1,32 +1,33 @@
 ==============================================================================
 == J(HOI) with a triplet band added to Bauer (1998), clear sky, O3 300 DU
 ==============================================================================
-  Bauer sigma(490 nm) = 8.5e-22 cm2: the constraint
+  Bauer sigma(490 nm) = 8.5e-22 cm2 (the fit's tail, not a bound); sigma(532) < ~1e-20 if OH + I is open at 532 nm
 
   --- direct: direct beam only (reddest); J / J(Bauer) at SZA 0, 30, 60, 80, 85 ---
-  case                                       f   nm  FWHM     peak   s(490)       0    30    60    80    85
-  as computed, HOBr-like width         1.5e-04  530  0.40  3.9e-20  2.1e-20    1.30  1.31  1.39  1.84  2.99
-  as computed, broad                   1.5e-04  540  0.55  2.8e-20  1.7e-20    1.31  1.33  1.41  1.92  3.29
-  f x4 (HOBr's shortfall)              6.0e-04  540  0.40  1.5e-19  6.0e-20    2.25  2.31  2.64  4.64  9.83
-  --- allowed by Bauer at 490 nm ---
-  computed f, Ingham width             1.5e-04  563  0.28  5.5e-20  1.2e-21    1.35  1.36  1.46  2.05  3.66
-  computed f, further red              1.5e-04  600  0.40  3.9e-20  9.3e-22    1.39  1.41  1.52  2.29  4.60
-  f x4, narrow                         6.0e-04  600  0.28  2.2e-19  1.1e-22    2.62  2.70  3.17  6.33 15.79
-  f x4, further red                    6.0e-04  620  0.40  1.5e-19  1.2e-21    2.55  2.63  3.11  6.37 16.58
+  case                                       f   nm  FWHM     peak   s(532)       0    30    60    80    85
+  as computed, HOBr-like width         1.5e-04  530  0.40  3.9e-20  3.9e-20    1.30  1.31  1.39  1.84  2.99
+  as computed, broad                   1.5e-04  540  0.55  2.8e-20  2.8e-20    1.31  1.33  1.41  1.92  3.29
+  f x4 (HOBr's shortfall)              6.0e-04  540  0.40  1.5e-19  1.5e-19    2.25  2.31  2.64  4.64  9.83
+  --- further red / narrower ---
+  computed f, Ingham width             1.5e-04  563  0.28  5.5e-20  3.1e-20    1.35  1.36  1.46  2.05  3.66
+  computed f, further red              1.5e-04  600  0.40  3.9e-20  1.2e-20    1.39  1.41  1.52  2.29  4.60
+  f x4, narrow                         6.0e-04  600  0.28  2.2e-19  1.9e-20    2.62  2.70  3.17  6.33 15.79
+  f x4, further red                    6.0e-04  620  0.40  1.5e-19  2.3e-20    2.55  2.63  3.11  6.37 16.58
 
   --- noRay: no net Rayleigh loss (bluest); J / J(Bauer) at SZA 0, 30, 60, 80, 85 ---
-  case                                       f   nm  FWHM     peak   s(490)       0    30    60    80    85
-  as computed, HOBr-like width         1.5e-04  530  0.40  3.9e-20  2.1e-20    1.22  1.22  1.22  1.21  1.20
-  as computed, broad                   1.5e-04  540  0.55  2.8e-20  1.7e-20    1.23  1.23  1.22  1.21  1.20
-  f x4 (HOBr's shortfall)              6.0e-04  540  0.40  1.5e-19  6.0e-20    1.91  1.91  1.90  1.86  1.81
-  --- allowed by Bauer at 490 nm ---
-  computed f, Ingham width             1.5e-04  563  0.28  5.5e-20  1.2e-21    1.25  1.25  1.25  1.23  1.21
-  computed f, further red              1.5e-04  600  0.40  3.9e-20  9.3e-22    1.27  1.27  1.27  1.25  1.23
-  f x4, narrow                         6.0e-04  600  0.28  2.2e-19  1.1e-22    2.14  2.13  2.12  2.03  1.95
-  f x4, further red                    6.0e-04  620  0.40  1.5e-19  1.2e-21    2.09  2.09  2.07  2.01  1.94
+  case                                       f   nm  FWHM     peak   s(532)       0    30    60    80    85
+  as computed, HOBr-like width         1.5e-04  530  0.40  3.9e-20  3.9e-20    1.22  1.22  1.22  1.21  1.20
+  as computed, broad                   1.5e-04  540  0.55  2.8e-20  2.8e-20    1.23  1.23  1.22  1.21  1.20
+  f x4 (HOBr's shortfall)              6.0e-04  540  0.40  1.5e-19  1.5e-19    1.91  1.91  1.90  1.86  1.81
+  --- further red / narrower ---
+  computed f, Ingham width             1.5e-04  563  0.28  5.5e-20  3.1e-20    1.25  1.25  1.25  1.23  1.21
+  computed f, further red              1.5e-04  600  0.40  3.9e-20  1.2e-20    1.27  1.27  1.27  1.25  1.23
+  f x4, narrow                         6.0e-04  600  0.28  2.2e-19  1.9e-20    2.14  2.13  2.12  2.03  1.95
+  f x4, further red                    6.0e-04  620  0.40  1.5e-19  2.3e-20    2.09  2.09  2.07  2.01  1.94
 
-  Reading it. Even the bands Bauer's red wing allows raise J(HOI) by 20-50%
-  with the computed f at high and mid sun, and by 2-3x if f is 4x larger,
-  as HOBr's shortfall suggests. At low sun, in the direct beam, much more:
-  the visible is all that is left. The direct / noRay bracket is wide there;
-  this is a sensitivity, and a case for measuring HOI beyond 490 nm.
+  Reading it. With the computed f, a triplet band anywhere in 530-620 nm
+  raises J(HOI) by 20-50% at high and mid sun; with 4x the f, 2-3x. At low
+  sun in the direct beam, much more. Every case puts > 1e-20 cm2 at 532 nm
+  unless the band is narrow and far red, so the case stands or falls with
+  D0(HO-I): below 2.33 eV Bauer's 532 nm null bounds the band, above it the
+  null is silent. A sensitivity, and a case for measuring HOI beyond 500 nm.

@@ -1,0 +1,41 @@
+grid (256, 48, 48) (R, r, gamma); V_gs min -0.0076 eV; dtau 1.0 au
+    v=0 step   2000  E =    2717.38 cm-1  dE =  2.25e-05 cm-1
+    v=0 converged in 2200 steps, 42 s
+    v=1 step   2000  E =    3339.73 cm-1  dE =  6.99e+00 cm-1
+    v=1 step   4000  E =    3336.25 cm-1  dE =  1.05e-04 cm-1
+    v=1 converged in 4400 steps, 93 s
+    v=2 step   2000  E =    3946.76 cm-1  dE =  7.01e-02 cm-1
+    v=2 step   4000  E =    3945.48 cm-1  dE =  1.93e-01 cm-1
+    v=2 step   6000  E =    3942.08 cm-1  dE =  4.96e-01 cm-1
+    v=2 step   8000  E =    3934.23 cm-1  dE =  1.05e+00 cm-1
+    v=2 step  10000  E =    3920.71 cm-1  dE =  1.53e+00 cm-1
+    v=2 step  12000  E =    3906.07 cm-1  dE =  1.30e+00 cm-1
+    v=2 step  14000  E =    3896.40 cm-1  dE =  6.97e-01 cm-1
+    v=2 step  16000  E =    3891.91 cm-1  dE =  2.88e-01 cm-1
+    v=2 step  18000  E =    3890.17 cm-1  dE =  1.06e-01 cm-1
+    v=2 step  20000  E =    3889.54 cm-1  dE =  3.76e-02 cm-1
+    v=2 step  22000  E =    3889.32 cm-1  dE =  1.31e-02 cm-1
+    v=2 step  24000  E =    3889.25 cm-1  dE =  4.54e-03 cm-1
+    v=2 step  26000  E =    3889.22 cm-1  dE =  1.57e-03 cm-1
+    v=2 step  28000  E =    3889.21 cm-1  dE =  5.45e-04 cm-1
+    v=2 step  30000  E =    3889.21 cm-1  dE =  1.88e-04 cm-1
+    v=2 step  32000  E =    3889.21 cm-1  dE =  6.52e-05 cm-1
+    v=2 step  34000  E =    3889.21 cm-1  dE =  2.25e-05 cm-1
+    v=2 converged in 34200 steps, 797 s
+    v=3 step   2000  E =    3947.46 cm-1  dE =  5.40e-04 cm-1
+    v=3 converged in 2800 steps, 73 s
+
+  ZPE above the surface minimum: 2779 cm-1
+   state  E-E0/cm-1  <dR2>/v0  <dr2>/v0  <dg2>/v0   assignment
+       0        0.0      1.00      1.00      1.00   v0
+       1      618.9      3.00      1.00      1.06   nu3 (O-Br stretch)
+       2     1171.8      1.04      1.01      2.96   nu2 (bend)
+       3     1230.1      5.02      1.00      1.12   2 nu3
+
+  against 01's harmonic frequencies and the observed fundamentals:
+    nu3 (O-Br stretch)      618.9 cm-1   harmonic 632.4, observed 620.2  (calc/obs 0.998)
+    nu2 (bend)             1171.8 cm-1   harmonic 1199.4, observed 1162.6  (calc/obs 1.008)
+  An anharmonic fundamental from the full surface should sit BELOW the harmonic value and
+  near the observed one; calc/obs well away from 1 means the surface or the grid is off.
+
+  wrote /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/vib_states_hobr.npz

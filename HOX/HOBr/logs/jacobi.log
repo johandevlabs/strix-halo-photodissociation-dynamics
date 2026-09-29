@@ -1,0 +1,8 @@
+OH Morse fit to 08's UCCSD(T) curve: De 4.71 eV, a 2.337 /A, re 0.9689 A; max residual 21.9 meV
+masses   departing 79Br, spectator H: mu_R 13.9889 amu, mu_r 0.9481 amu
+grid     256 x 48 x 48 = 589824 points; R 2.6-12.5 bohr, r 1.2-3.4 bohr
+         11.2% of points inside the valence raster; 0.0% of V_gs and 0.0% of V_ex at the cap
+V_gs min -0.0076 eV at R 3.493, r 1.809 bohr, gamma 103.0 deg (r_OBr 1.8365 A, r_OH 0.9570 A, theta 101.26 deg)
+V_ex - V_gs there 2.872 eV (06's check: 2.867 eV at 01's minimum)
+R grid   dR 0.0388 bohr: k_max 81 /bohr carries 3.49 eV along R; the packet needs ~0.85 eV
+wrote /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/data/jacobi_hobr.npz

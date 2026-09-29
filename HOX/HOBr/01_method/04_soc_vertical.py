@@ -39,17 +39,13 @@ CONTROL: `--molecule HOCl --basis def2-tzvp` should reproduce HOCl's 03 --
 vertical 3.4475 eV, summed f ~8.9e-7 -- and checks the adaptation before the
 HOBr numbers are trusted. ~3 min.
 
-HOI (third question, 2026-09-29): IS THE BAND STILL PERTURBATIVE? HOI's
-visible band carries f ~1e-3, ~20x HOBr's, where the SOC-squared scaling of
-HOBr gives ~4x (HOI/README.md). The report now ends in a two-state estimate
-of the singlet admixture and a verdict on whether one spin-free surface plus
-borrowed intensity is still the right model. Default basis x2c-tzvpall:
-cc-pvtz-dk has no iodine.
+The report ends in a two-state estimate of the singlet admixture and a
+verdict on whether one spin-free surface plus borrowed intensity is the right
+model -- added for HOI, whose visible band is ~20x HOBr's
+(HOI/01_method/04_soc_vertical.py registers HOI and runs main() here).
 
 Usage:
     python 04_soc_vertical.py 2>&1 | tee ../logs/soc_vertical.log
-    python 04_soc_vertical.py --molecule HOI --nroots 10 \
-        2>&1 | tee ../../HOI/logs/soc_vertical.log
     python 04_soc_vertical.py --molecule HOCl --basis def2-tzvp   # control
     python 04_soc_vertical.py --cas 7 12                          # CAS(12,7)
     python 04_soc_vertical.py --avas "Br 4p" "O 2p" "H 1s" --nroots 12
@@ -68,7 +64,7 @@ NM_PER_EV = 1239.841984
 MOLECULES = {
     # Measured band f: Gaussian fits in energy to the cached spectra,
     # f = 1.1296e12 Int sigma dnu (02_band_model/10_compare_obs.py for HOBr;
-    # the same decomposition of HOBr/data/obs/HOCl_* and HOI/data/obs/).
+    # HOI/02_band_model/10_obs_bands.py for HOCl).
     # vis = the weak triplet-derived band, uv = the singlet band above it,
     # compared with the computed SOC states from the band's top to 1.3 eV
     # above its centroid (HOCl 4.36-4.43, HOBr 3.60-3.82 eV; the next strong
@@ -85,17 +81,6 @@ MOLECULES = {
                  obs_nm=368.0, f_obs_vis=(3.3e-5, 3.4e-5),   # Barnes, JPL
                  uv_nm=310.0, f_obs_uv=3.0e-4,
                  ref_vertical=3.4475, ref_f=8.9e-7),
-    # HOI: geometry RECALLED, a starting value only (r(O-I) ~1.99 A from
-    # memory of microwave / ab initio work -- verify, and replace with
-    # 01_geometry.py's). The gate question -- how strongly mixed the states
-    # are -- does not hinge on a few hundredths of an angstrom. cc-pvtz-dk
-    # has NO iodine (PySCF or basis-set-exchange), so the default is
-    # x2c-tzvpall: all-electron, contracted for the X2C Hamiltonian we run,
-    # and the best DKH1 basis in the Br sweep (-4.9%).
-    "HOI": dict(halogen="I", avas=["I 5p", "O 2p"], basis="x2c-tzvpall",
-                geom=(1.99, 0.964, 104.0),
-                obs_nm=407.0, f_obs_vis=(9.6e-4, 1.17e-3),    # Rowley, Bauer
-                uv_nm=340.0, f_obs_uv=1.85e-3),
 }
 
 # Atomic 2P fine structure (cm-1), for the SOC-squared scaling line; the
@@ -377,14 +362,14 @@ def report(spec, e_soc, osc, e_sf, tol):
               "run before trusting HOBr.")
 
 
-def main():
+def main(default="HOBr", doc=__doc__):
     p = argparse.ArgumentParser(
-        description=__doc__,
+        description=doc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--molecule", default="HOBr", choices=sorted(MOLECULES))
+    p.add_argument("--molecule", default=default, choices=sorted(MOLECULES))
     p.add_argument("--basis", default=None,
-                   help="default per molecule: cc-pvtz-dk (HOBr), def2-tzvp "
-                        "(HOCl), x2c-tzvpall (HOI -- cc-pvtz-dk has no I)")
+                   help="default per molecule: " + ", ".join(
+                       f"{k} {v['basis']}" for k, v in MOLECULES.items()))
     p.add_argument("--soc", default="DKH1")
     p.add_argument("--geom", nargs=3, type=float, default=None,
                    metavar=("R_OX", "R_OH", "THETA"))

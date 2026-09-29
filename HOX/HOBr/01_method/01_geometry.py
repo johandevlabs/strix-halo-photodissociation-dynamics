@@ -66,7 +66,8 @@ ANG2BOHR = 1.8897261254578281
 # molecules: 79Br is 78.918 against an average of 79.904, a 1.2% mass
 # difference and ~0.6% on the O-Br stretch.
 MASS = {"H": 1.0078250319, "O": 15.9949146221,
-        "Cl": 34.968852682, "Br": 78.9183376, "I": 126.904473}
+        "Cl": 34.968852682, "Br": 78.9183376,
+        "I": 126.904473}                          # for HOI/01_method
 
 # Starting geometries and observed fundamentals.
 #
@@ -84,15 +85,6 @@ MOLECULES = {
                  start=(1.834, 0.961, 102.3),
                  obs_fundamental=(620.23, 1162.57, 3614.90),
                  obs_geom=None),
-    # HOI: start RECALLED (r(O-I) ~1.99 A), no fundamentals entered -- none
-    # checked against a source yet, and a recalled number in the calc/obs
-    # column would look like a test. Basis: cc-pvtz-dk has no iodine; run
-    # with --basis x2c-tzvpall. Results go to HOX/HOI/data/.
-    "HOI": dict(halogen="I",
-                start=(1.99, 0.964, 104.0),
-                obs_fundamental=None,
-                obs_geom=None,
-                data=DATA.parents[1] / "HOI" / "data"),
 }
 
 FIELDS = ["basis", "r_ox_A", "r_oh_A", "theta_deg", "nbf", "e_hf_Ha",
@@ -375,12 +367,12 @@ def report(molecule, rows, args):
           "       coordinate, so the 1D model already carries it)")
 
 
-def main():
+def main(default="HOBr", default_basis="def2-tzvp", doc=__doc__):
     p = argparse.ArgumentParser(
-        description=__doc__,
+        description=doc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--molecule", default="HOBr", choices=sorted(MOLECULES))
-    p.add_argument("--basis", default="def2-tzvp",
+    p.add_argument("--molecule", default=default, choices=sorted(MOLECULES))
+    p.add_argument("--basis", default=default_basis,
                    help="all-electron; the Br choice is settled by "
                         "toolchain/02_soc_atoms.py --sweep")
     p.add_argument("--center", nargs=3, type=float, default=None,

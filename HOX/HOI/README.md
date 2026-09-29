@@ -30,8 +30,8 @@ JPL-2010 recommendations.
 
 ## The gate
 
-`HOBr/01_method/04_soc_vertical.py --molecule HOI` -- the HOBr script, made
-generic. Its report ends in a verdict from a two-state estimate of the
+`01_method/04_soc_vertical.py` registers HOI in HOBr's `04` and runs it,
+as HOBr's scripts load HOCl's. The report ends in a verdict from a two-state estimate of the
 singlet admixture (c² = triplet SOC shift / gap; HOBr 2.0%):
 
 - **PERTURBATIVE** (c² < 5%): HOBr's pipeline carries over as is.
@@ -43,5 +43,7 @@ singlet admixture (c² = triplet SOC shift / gap; HOBr 2.0%):
 which is all-electron and contracted for X2C. A same-basis HOBr run bridges
 the change.
 
-**Geometry:** recalled for now; `HOBr/01_method/01_geometry.py --molecule
-HOI` computes it (CSV to `data/`).
+**Geometry:** recalled for now; `01_method/01_geometry.py` computes it
+(CSV to `data/`).
+
+Offline test: `python 01_method/tests/test_hoi_report.py`.

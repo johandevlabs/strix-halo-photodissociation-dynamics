@@ -2114,8 +2114,9 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       HOBr's, not redder. Both point to the visible band being a strongly
       spin-orbit-mixed state rather than a triplet borrowing a little.
 
-- [ ] **The gate: is HOI perturbative?** `HOBr/01_method/04_soc_vertical.py
-      --molecule HOI`, now generic over the series. New in its report: a
+- [ ] **The gate: is HOI perturbative?** `HOI/01_method/04_soc_vertical.py`,
+      which registers HOI in HOBr's `04` and runs it (HOBr's scripts load
+      HOCl's the same way). New in `04`'s report, for every molecule: a
       two-state mixing estimate (triplet SOC shift / gap to the next
       spin-free state = singlet admixture c^2; HOBr 2.0%), the
       computed UV lenders against the measured UV band, the vis/UV ratio,
@@ -2130,8 +2131,8 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       same-basis HOBr run (x2c-tzvpall) bridges the two -- otherwise a
       basis change would be read as a halogen trend.
 
-      *Geometry.* Recalled (r(O-I) 1.99 A, 0.964 A, 104 deg); `01_geometry.py
-      --molecule HOI` computes it. The gate's question does not hinge on it.
+      *Geometry.* Recalled (r(O-I) 1.99 A, 0.964 A, 104 deg);
+      `HOI/01_method/01_geometry.py` computes it. The gate's question does not hinge on it.
 
 ---
 

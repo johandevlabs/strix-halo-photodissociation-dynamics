@@ -71,19 +71,6 @@ check("visible calc/obs 0.25-0.33", "calc/obs 0.25-0.33" in o2)
 check("verdict perturbative", "PERTURBATIVE" in o2)
 check("predicts where 03's band would move", "would sit near" in o2)
 
-print("\n  a synthetic strongly mixed case (triplet 0.2 eV above its SOC states,"
-      " lender 0.5 eV beyond):")
-t_abs = e10[1:4].mean() + 0.2 / HA
-sf_mix = np.array([sf10[0], t_abs, t_abs + 0.5 / HA, t_abs + 0.6 / HA])
-buf = io.StringIO()
-with contextlib.redirect_stdout(buf):
-    m.report(m.MOLECULES["HOI"], e10, osc10, sf_mix, 0.05)
-o3 = buf.getvalue()
-check("c^2 ~ 40%", "c^2 ~ 40." in o3)
-check("verdict strongly mixed", "STRONGLY MIXED" in o3)
-check("no HOBr-only band-model line for HOI", "would sit near" not in o3)
-check("SOC-squared scaling line for iodine", "(xi/xi_Br)^2 x 1.5e-5 = 6.4e-05" in o3)
-
 print("\n  f exactly zero must be caught, not reported as a band:")
 buf = io.StringIO()
 with contextlib.redirect_stdout(buf):

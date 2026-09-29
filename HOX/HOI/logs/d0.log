@@ -1,0 +1,90 @@
+============================================================================
+== D0(HO-X), CCSD(T)/x2c, cc-pvtz-dk, cc-pvqz-dk, core fc/ae
+============================================================================
+  44 calculations to run
+    [1/44] OH   cc-pvtz-dk  fc  0.940  ok  3.5 s
+    [2/44] OH   cc-pvtz-dk  fc  0.955  ok  3.1 s
+    [3/44] OH   cc-pvtz-dk  fc  0.970  ok  2.9 s
+    [4/44] OH   cc-pvtz-dk  fc  0.985  ok  3.2 s
+    [5/44] OH   cc-pvtz-dk  fc  1.000  ok  3.2 s
+    [6/44] HOCl cc-pvtz-dk  fc     eq  ok  4.5 s
+    [7/44] HOBr cc-pvtz-dk  fc     eq  ok  4.6 s
+    [8/44] HOI  cc-pvtz-dk  fc     eq  ok  7.6 s
+    [9/44] Cl   cc-pvtz-dk  fc   atom  ok  2.3 s
+    [10/44] Br   cc-pvtz-dk  fc   atom  ok  2.8 s
+    [11/44] I    cc-pvtz-dk  fc   atom  ok  3.9 s
+    [12/44] OH   cc-pvtz-dk  ae  0.940  ok  3.1 s
+    [13/44] OH   cc-pvtz-dk  ae  0.955  ok  3.0 s
+    [14/44] OH   cc-pvtz-dk  ae  0.970  ok  3.1 s
+    [15/44] OH   cc-pvtz-dk  ae  0.985  ok  3.2 s
+    [16/44] OH   cc-pvtz-dk  ae  1.000  ok  3.2 s
+    [17/44] HOCl cc-pvtz-dk  ae     eq  ok  5.4 s
+    [18/44] HOBr cc-pvtz-dk  ae     eq  ok  10.4 s
+    [19/44] HOI  cc-pvtz-dk  ae     eq  ok  21.2 s
+    [20/44] Cl   cc-pvtz-dk  ae   atom  ok  2.4 s
+    [21/44] Br   cc-pvtz-dk  ae   atom  ok  4.8 s
+    [22/44] I    cc-pvtz-dk  ae   atom  ok  6.3 s
+    [23/44] OH   cc-pvqz-dk  fc  0.940  ok  6.6 s
+    [24/44] OH   cc-pvqz-dk  fc  0.955  ok  6.6 s
+    [25/44] OH   cc-pvqz-dk  fc  0.970  ok  6.7 s
+    [26/44] OH   cc-pvqz-dk  fc  0.985  ok  6.5 s
+    [27/44] OH   cc-pvqz-dk  fc  1.000  ok  6.7 s
+    [28/44] HOCl cc-pvqz-dk  fc     eq  ok  11.4 s
+    [29/44] HOBr cc-pvqz-dk  fc     eq  ok  12.8 s
+    [30/44] HOI  cc-pvqz-dk  fc     eq  ok  15.3 s
+    [31/44] Cl   cc-pvqz-dk  fc   atom  ok  3.1 s
+    [32/44] Br   cc-pvqz-dk  fc   atom  ok  3.6 s
+    [33/44] I    cc-pvqz-dk  fc   atom  ok  6.1 s
+    [34/44] OH   cc-pvqz-dk  ae  0.940  ok  7.6 s
+    [35/44] OH   cc-pvqz-dk  ae  0.955  ok  6.5 s
+    [36/44] OH   cc-pvqz-dk  ae  0.970  ok  7.4 s
+    [37/44] OH   cc-pvqz-dk  ae  0.985  ok  7.6 s
+    [38/44] OH   cc-pvqz-dk  ae  1.000  ok  7.7 s
+    [39/44] HOCl cc-pvqz-dk  ae     eq  ok  19.8 s
+    [40/44] HOBr cc-pvqz-dk  ae     eq  ok  60.4 s
+    [41/44] HOI  cc-pvqz-dk  ae     eq  ok  102.8 s
+    [42/44] Cl   cc-pvqz-dk  ae   atom  ok  4.0 s
+    [43/44] Br   cc-pvqz-dk  ae   atom  ok  10.0 s
+    [44/44] I    cc-pvqz-dk  ae   atom  ok  22.4 s
+
+== HOCl -> OH + Cl
+  level         core     De/eV  OH re/A    w_OH    D0/eV   D0 kJ  thr/nm
+  cc-pvtz-dk    fc       2.311   0.9711    3742    2.135   206.0     581
+  cc-pvqz-dk    fc       2.432   0.9697    3747    2.256   217.6     550
+  CBS           fc       2.499   0.9694    3748    2.323   224.2     534
+  cc-pvtz-dk    ae       2.351   0.9695    3761    2.176   209.9     570
+  cc-pvqz-dk    ae       2.458   0.9680    3753    2.283   220.3     543
+  CBS           ae       2.516   0.9678    3745    2.340   225.8     530
+  best level CBS fc; the fc-ae spread above is the core error bar
+  corrections: ZPE -0.131 eV, atomic SO -0.045 eV, molecular SO +0.001 eV; dH298 - D0 = +5.3 kJ/mol
+  dH298 = 229 kJ/mol
+  CONTROL: measured D0 2.3916 eV (from memory, verify) -> calc - obs -0.068 eV (-6.6 kJ/mol)
+
+== HOBr -> OH + Br
+  level         core     De/eV  OH re/A    w_OH    D0/eV   D0 kJ  thr/nm
+  cc-pvtz-dk    fc       2.191   0.9711    3742    1.919   185.2     646
+  cc-pvqz-dk    fc       2.312   0.9697    3747    2.040   196.9     608
+  CBS           fc       2.379   0.9694    3748    2.108   203.4     588
+  cc-pvtz-dk    ae       2.273   0.9695    3761    2.002   193.2     619
+  cc-pvqz-dk    ae       2.388   0.9680    3753    2.117   204.2     586
+  CBS           ae       2.451   0.9678    3745    2.179   210.3     569
+  best level CBS fc; the fc-ae spread above is the core error bar
+  corrections: ZPE -0.121 eV, atomic SO -0.161 eV, molecular SO +0.011 eV; dH298 - D0 = +5.1 kJ/mol
+  dH298 = 208 kJ/mol
+
+== HOI -> OH + I
+  level         core     De/eV  OH re/A    w_OH    D0/eV   D0 kJ  thr/nm
+  cc-pvtz-dk    fc       2.185   0.9711    3742    1.806   174.2     687
+  cc-pvqz-dk    fc       2.329   0.9697    3747    1.950   188.2     636
+  CBS           fc       2.394   0.9694    3748    2.015   194.5     615
+  cc-pvtz-dk    ae       2.272   0.9695    3761    1.894   182.8     655
+  cc-pvqz-dk    ae       2.421   0.9680    3753    2.042   197.0     607
+  CBS           ae       2.489   0.9678    3745    2.110   203.6     588
+  best level CBS fc; the fc-ae spread above is the core error bar
+  corrections: ZPE -0.110 eV, atomic SO -0.323 eV, molecular SO +0.054 eV; dH298 - D0 = +5.0 kJ/mol
+  dH298 = 199 kJ/mol   (Bauer's threshold 582 nm = 206 kJ/mol; IUPAC 236 kJ/mol = 507 nm)
+
+  532 nm = 2.331 eV. D0 = 2.015 eV: HO + I is OPEN at 532 nm -> Bauer's null bounds sigma(532) < ~1e-20
+  triplet vertical with SOC (04): 2.403 eV -- +0.388 eV above D0 (a repulsive state must sit above it)
+  Bauer 1998 threshold 582 nm = 2.130 eV (dH298 basis); ours 615 nm from D0
+  IUPAC 2007 threshold 507 nm = 2.445 eV (dH298 basis); ours 615 nm from D0

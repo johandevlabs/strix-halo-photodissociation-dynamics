@@ -2442,6 +2442,29 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       (an OH action spectrum over 500-600 nm, or the 532 nm test repeated)
       is the recommendation. J(HOI) at the computed f: +18-32% at SZA 0-60.
 
+      *Decision, 2026-10-01: how far to take HOI's dynamics.* Full HOI
+      would mean four spin-free states (a3A" -- the unmeasured band below
+      the double band; 1A" + 3A' -- the 407 nm band; 1A' -- 340 nm), i.e. 12
+      spin-orbit-coupled states mixed at ~20%, so either SOC-adiabatic
+      surfaces or spin-free EOM surfaces plus a SOC matrix, and a new
+      coupled multi-state propagator: ~2 days of EVO raster, ~1 day of SOC
+      grid, 1-2 weeks of development. Reasons not to start there:
+        - For the triplet band, 3D changes little: HOBr's 1D -> 3D moved the
+          peak 2 nm and widened it 4%, and HOI's sigma(532) is insensitive
+          to every tail/absorber variant (3.64e-20). The limiting
+          uncertainty is the triplet's f (2-4x, electronic structure), which
+          no PES or propagation fixes.
+        - For the measured double band, NEVPT2 puts 1A" and 3A' 0.55 eV
+          apart where the measurement shows one band and EOM has them 0.18
+          eV apart; a surface built on it would reproduce that error. The
+          electronic structure has to be fixed first (EOM spin-free
+          surfaces + SOC coupling).
+      Chosen instead: a **2D (r(O-I), angle) band model for the triplet SOC
+      states** -- the bend is the missing dimension that matters most for
+      the band's width -- to check that the 1D shape and sigma(532) hold.
+      The full multi-state HOI treatment stays open as a project in its own
+      right (entry below).
+
       *For HOBr's absolute sigma:* the 3-4x deficit is a property of this
       method, not a missing orbital; a response-type SOC transition moment
       (or MRCI-SO) would be the next step if the absolute scale is needed.
@@ -2458,6 +2481,31 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       triplet's borrowed f for HOCl/HOBr/HOI together. Matters for the
       absolute sigma (the ratios cancel), and for how far to trust the HOI
       triplet's f against Bauer's 532 nm bound.
+
+- [ ] **HOI 2D band model (r, angle) for the triplet SOC states (in
+      progress, 2026-10-01).**
+      - `HOI/03_surfaces/09_raster_2d.py`: CCSD(T) + EOM triplets (HOBr 02's
+        point calculation, imported) on r(O-I) 1.70-2.80 A x 75-135 deg,
+        299 points, r(O-H) frozen; 8 workers x 4 threads, ~3.7 h.
+      - `HOI/01_method/07_soc_scan.py --grid2d`: the SOC states on a coarse
+        r 1.80-2.40 x 85-125 deg grid (35 points, ~3 h). The 2D model takes
+        the SOC offsets, the ground's SOC lowering and ln f from the fine 1D
+        scan in r and corrects them in angle from this grid.
+      - `HOI/02_band_model/12_band_soc_2d.py`: Jacobi (R, gamma), J = 0,
+        sinc/FFT x Gauss-Legendre, split-operator with the angular step in
+        the j basis; 2D ground levels by direct diagonalisation; the three
+        triplet components EOM-anchored as in 11; Boltzmann 295/220 K; the
+        SAME surfaces with the angle frozen as the comparison; -0.18 eV
+        calibration from 11. Checked on synthetic surfaces (levels as
+        built, sum rule 1.000).
+
+- [ ] **OPEN (noted 2026-10-01): HOI in full -- the whole spectrum.** Four
+      spin-free states (a3A", 1A", 3A', 1A') from EOM-CCSD on a 3D raster
+      (EOM orders 1A"/3A' correctly; NEVPT2 does not), a SOC coupling matrix
+      on a coarser grid from QD-NEVPT2 state interaction, diabatised, and a
+      coupled 12-state propagator. Gives sigma(lambda, T) for both measured
+      bands and the predicted triplet band from one model -- new for HOI.
+      Does not settle the triplet's absolute f. Only after the 2D check.
 
 - [ ] **DEFERRED (noted 2026-09-29, do not lose): the write-up for the
       atmospheric-chemistry colleague.** Form not chosen yet (Claude doc /

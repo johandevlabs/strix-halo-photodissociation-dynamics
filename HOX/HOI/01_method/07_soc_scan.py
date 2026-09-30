@@ -50,7 +50,7 @@ HARTREE2EV = 27.211386245988
 NM_PER_EV = 1239.841984
 R_EQ, ROH_EQ, TH_EQ = 1.9907, 0.9694, 104.65      # 01_geometry.py
 NK, NSF = 8, 6
-FIELDS = (["r_ox_A", "ncas", "nelecas", "conv_cas", "proj_last_in",
+FIELDS = (["r_ox_A", "theta_deg", "ncas", "nelecas", "conv_cas", "proj_last_in",
            "proj_first_out", "e_soc0_Ha", "e_sf0_Ha"]
           + [f"dE_{k}" for k in range(1, NK + 1)]
           + [f"f_{k}" for k in range(1, NK + 1)]
@@ -70,11 +70,26 @@ def radii():
     return sorted(set(rs + [R_EQ]))
 
 
-def compute_point(r, args, s04, f07):
+def points(grid2d):
+    """(r, theta) to compute. 1D: the cut at the equilibrium angle. 2D: the
+    coarse grid the 2D band model interpolates the SOC offsets and dipoles
+    on (they vary slowly; the fine shape comes from the EOM raster)."""
+    if not grid2d:
+        return [(r, TH_EQ) for r in radii()]
+    return [(round(float(r), 4), float(t))
+            for t in np.arange(85.0, 125.01, 10.0)
+            for r in np.arange(1.80, 2.4001, 0.10)]
+
+
+def pkey(r, t):
+    return (round(float(r), 4), round(float(t), 3))
+
+
+def compute_point(r, theta, args, s04, f07):
     from pyscf import gto, scf, mcscf, fci
     t0 = time.time()
-    row = dict(r_ox_A=r, status="ok")
-    mol = gto.M(atom=s04.geometry("I", r, ROH_EQ, TH_EQ), basis=args.basis,
+    row = dict(r_ox_A=r, theta_deg=theta, status="ok")
+    mol = gto.M(atom=s04.geometry("I", r, ROH_EQ, theta), basis=args.basis,
                 spin=0, charge=0, symmetry=False, unit="Angstrom", verbose=0)
     mf = scf.RHF(mol).x2c()
     mf.conv_tol = 1e-12
@@ -114,12 +129,39 @@ def compute_point(r, args, s04, f07):
 
 
 def load(path):
+    """Keyed (r, theta); the 1D CSV predates the theta column, so a missing
+    or empty one means the equilibrium angle."""
     if not os.path.exists(path):
         return {}
-    return {round(float(r["r_ox_A"]), 4): r for r in csv.DictReader(open(path))}
+    out = {}
+    for r in csv.DictReader(open(path)):
+        t = r.get("theta_deg") or TH_EQ
+        r["theta_deg"] = t
+        out[pkey(r["r_ox_A"], t)] = r
+    return out
+
+
+def report_2d(rows):
+    ok = [r for r in rows if not r["status"].startswith("fail")]
+    th = sorted({float(r["theta_deg"]) for r in ok})
+    rs = sorted({float(r["r_ox_A"]) for r in ok})
+    grid = {pkey(r["r_ox_A"], r["theta_deg"]): r for r in ok}
+    for title, fn in (("E3 (the bright component) / eV",
+                       lambda x: f"{float(x['dE_3']):8.3f}"),
+                      ("f1+f2+f3",
+                       lambda x: f"{sum(float(x[f'f_{k}']) for k in (1, 2, 3)):8.1e}"),
+                      ("E3 - spin-free T1 / meV",
+                       lambda x: f"{(float(x['dE_3']) - float(x['sf_1'])) * 1000:8.0f}")):
+        print(f"\n  {title}, rows r/A, columns angle/deg")
+        print("  " + " " * 6 + "".join(f"{t:8.0f}" for t in th))
+        for r_ in rs:
+            print(f"  {r_:6.2f}" + "".join(
+                fn(grid[pkey(r_, t)]) if pkey(r_, t) in grid else f"{'--':>8}"
+                for t in th))
 
 
 def report(rows):
+    rows = [r for r in rows if abs(float(r["theta_deg"]) - TH_EQ) < 1e-3]
     ok = sorted((r for r in rows if not r["status"].startswith("fail")),
                 key=lambda r: float(r["r_ox_A"]))
     if not ok:
@@ -155,19 +197,26 @@ def main():
     p.add_argument("--n-occ", type=int, default=6)
     p.add_argument("--n-vir", type=int, default=1)
     p.add_argument("--max-cycle", type=int, default=100)
-    p.add_argument("--csv", default=str(CSV))
+    p.add_argument("--csv", default=None)
+    p.add_argument("--grid2d", action="store_true",
+                   help="r 1.80-2.40 A x angle 85-125 deg (35 points), for the "
+                        "2D band model; own CSV hoi_soc_2d.csv")
     p.add_argument("--report-only", action="store_true")
     args = p.parse_args()
+    args.csv = args.csv or str(CSV if not args.grid2d
+                               else CSV.with_name("hoi_soc_2d.csv"))
 
     print("=" * 76)
-    print("== HOI: spin-orbit states along O-I")
+    print("== HOI: spin-orbit states along O-I"
+          + (" and the angle (2D grid)" if args.grid2d else ""))
     print(f"== {args.basis}, {args.soc}-QD-NEVPT2, fixed CAS({2 * args.n_occ},"
           f"{args.n_occ + args.n_vir}), {args.nroots} Ms=0 roots")
     print("=" * 76)
     done = load(args.csv)
-    todo = [r for r in radii() if round(r, 4) not in done
-            or done[round(r, 4)]["status"].startswith("fail")]
-    print(f"  {len(radii())} radii, {len(todo)} to compute")
+    pts = points(args.grid2d)
+    todo = [(r, t) for r, t in pts if pkey(r, t) not in done
+            or done[pkey(r, t)]["status"].startswith("fail")]
+    print(f"  {len(pts)} points, {len(todo)} to compute")
 
     if todo and not args.report_only:
         s04 = _load("s04", HOX / "HOBr" / "01_method" / "04_soc_vertical.py")
@@ -178,19 +227,21 @@ def main():
             w = csv.DictWriter(fh, fieldnames=FIELDS, extrasaction="ignore")
             if new:
                 w.writeheader()
-            for r in todo:
+            for r, t in todo:
                 try:
-                    row, t0 = compute_point(r, args, s04, f07)
+                    row, t0 = compute_point(r, t, args, s04, f07)
                 except Exception as exc:
-                    row, t0 = dict(r_ox_A=r, status=f"fail:{type(exc).__name__}"
+                    row, t0 = dict(r_ox_A=r, theta_deg=t,
+                                   status=f"fail:{type(exc).__name__}"
                                    f":{exc}"[:100]), time.time()
                 row["wall_s"] = round(time.time() - t0, 1)
                 w.writerow(row)
                 fh.flush()
-                print(f"    r = {r:.4f}: {row['status']}, E1-3 "
+                print(f"    r = {r:.4f}, angle {t:.1f}: {row['status']}, E1-3 "
                       + ", ".join(str(row.get(f'dE_{k}', '--')) for k in (1, 2, 3))
                       + f", {row['wall_s']} s", flush=True)
-    report(list(load(args.csv).values()))
+    rows = list(load(args.csv).values())
+    report_2d(rows) if args.grid2d else report(rows)
 
 
 if __name__ == "__main__":

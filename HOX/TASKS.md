@@ -2398,8 +2398,8 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       OH action spectrum over 500-600 nm remains the measurement that would
       settle it.
 
-- [ ] **The triplet's borrowed f: Minaev's active space (running,
-      2026-09-30).** Chosen over two-component TDDFT (Johan: keep DFT out
+- [x] **The triplet's borrowed f: Minaev's active space. 2026-09-30.**
+      Result entry below. Chosen over two-component TDDFT (Johan: keep DFT out
       of it). `HOI/01_method/08_cas_bench.py` runs 04 for HOCl, HOBr and HOI
       in cc-pvtz-dk, 12 roots, in CAS(12,7) (ours), CAS(12,9) (Minaev's: the
       three lowest virtuals, two a' and one a") and CAS(12,11), and
@@ -2407,6 +2407,45 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       a canonical --cas window contains. CAS(12,8) with sigma*(O-H) was
       already flat (round 2), so the new ingredient is the a" virtual. If f
       stays flat, the gap to Minaev is his orbital relaxation (response).
+
+- [x] **Result: the triplet f does not depend on the active space; the
+      singlets' does. 2026-09-30.** `HOI/logs/cas_bench.log` (+ per-run logs),
+      cc-pvtz-dk, 12 roots, ~2.3 h for all nine:
+
+      | f(a3A") | CAS(12,7) | CAS(12,9) | CAS(12,11) | measured |
+      | --- | --- | --- | --- | --- |
+      | HOCl | 8.3e-7 | 6.2e-7 | 1.2e-6 | 3.3e-5 |
+      | HOBr | 1.58e-5 | 1.26e-5 | 1.39e-5 | 4.7-6.2e-5 |
+      | HOI | 1.53e-4 | 1.30e-4 | 1.45e-4 | -- |
+      | lender f, HOBr / HOI | 1.39e-3 / 3.10e-3 | 1.25e-3 / 2.91e-3 | 6.97e-4 / 1.95e-3 | 6.5e-4 / 1.17e-3 |
+
+      The canonical windows add sigma*(O-H), then the halogen's (n+1)s/p;
+      the a" virtual (Minaev's third) enters only at CAS(12,11). None moves
+      the triplet f by more than ~20%, in any molecule. What the larger
+      space DOES fix is the singlet (lender) bands: HOBr's 352 nm band goes
+      from 2.1x to 1.07x the measured f, HOI's 407 band from 2.6x to 1.7x.
+      So: the triplet deficit is not the active space. It is the method --
+      state interaction over a finite set of CASSCF-quality states, without
+      the orbital relaxation of Minaev's quadratic response -- and it is
+      largest for Cl (30-50x low), smaller for Br (3-5x).
+
+      *Consequence for HOI -- revises the entry above.* The rescue "the
+      triplet is overestimated like the singlets" loses its footing: in
+      CAS(12,11) the lenders are nearly right and the triplet f is
+      unchanged (1.45e-4). If anything the Cl -> Br trend says the method
+      UNDERestimates the triplet f, less so as the halogen gets heavier.
+      Treating the missing part as a missing dipole amplitude of HOBr's size
+      (|mu| 3-5e-3 au-equivalent in sqrt(f)), sign unknown, gives HOI f
+      0.6-2.6e-4; Minaev has 1.6-2.5e-4. Every estimate puts sigma(532) at
+      1.5-6e-20: **1.5-6x over Bauer's 532 nm bound.** The tension with the
+      single 532 nm photolysis null stands, and the measurement to settle it
+      (an OH action spectrum over 500-600 nm, or the 532 nm test repeated)
+      is the recommendation. J(HOI) at the computed f: +18-32% at SZA 0-60.
+
+      *For HOBr's absolute sigma:* the 3-4x deficit is a property of this
+      method, not a missing orbital; a response-type SOC transition moment
+      (or MRCI-SO) would be the next step if the absolute scale is needed.
+      The band shape and temperature ratio do not depend on it.
 
 - [ ] **DEFERRED (noted 2026-09-29, do not lose): the HOBr f deficit, via
       Minaev's mechanism.** (Now being tested -- entry above.) Ours 1.5e-5 against measured 4.7-6.2e-5, and

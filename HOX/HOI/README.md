@@ -80,11 +80,16 @@ spin-orbit states along O–I) peaks at 514 nm raw, or about 555 nm after
 calibrating on Bauer's two measured bands (the calculation is 0.17–0.19 eV
 too blue on both). Its FWHM is 0.35 eV and its f is 1.45e-4, giving σ(532)
 = 2.8–3.6e-20, 3× Bauer's bound. The same model overestimates the measured
-singlet bands' f by 2.4–4.3×, however. If the triplet's borrowed f is off
-the same way, σ(532) ≈ 0.8–1.5e-20, right at the bound. Taken together,
-f(a³A″) ≈ 4e-5 and σ(532) ≈ 1e-20. J(HOI) is then 5–9% higher at SZA 0–60°
-(photolysis cut at the 585 nm threshold), and 18–32% higher if the
-computed f is right.
+singlet bands' f by 2.4–4.3×, which suggested the triplet might be
+overestimated in the same way. The active-space benchmark
+(`01_method/08_cas_bench.py`) rules that out. A larger CAS brings the
+singlet bands to within 1.1–1.7× of measurement, but leaves the triplet f
+unchanged (1.3–1.5e-4). For HOCl and HOBr the same method underestimates
+the triplet (30–50× and 3–5×). So the calculation is more likely low than
+high for HOI. Every estimate (ours, Minaev's 1.6–2.5e-4, and an
+extrapolation from HOBr's error) puts σ(532) at 1.5–6e-20, which is 1.5–6×
+over Bauer's bound. J(HOI) at the computed f is 18–32% higher at SZA 0–60°,
+with photolysis cut at the 585 nm threshold.
 
 On the way: along this cut the spin-free a³A″ has a shallow well near
 2.4 Å, which spin-orbit coupling mostly removes. The triplet's dipole is

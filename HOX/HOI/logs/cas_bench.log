@@ -1,0 +1,60 @@
+============================================================================
+== CAS benchmark for the borrowed triplet f, 12 roots, cc-pvtz-dk
+============================================================================
+  HOBr avas: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/01_method/04_soc_vertical.py --molecule HOBr --basis cc-pvtz-dk --nroots 12
+    -> done (4.4 min)
+  HOCl avas: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/01_method/04_soc_vertical.py --molecule HOCl --geom 1.7069 0.9648 101.88 --basis cc-pvtz-dk --nroots 12
+    -> done (3.3 min)
+  HOI avas: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOI/01_method/04_soc_vertical.py --basis cc-pvtz-dk --nroots 12
+    -> done (5.7 min)
+  HOBr cas9: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/01_method/04_soc_vertical.py --molecule HOBr --basis cc-pvtz-dk --nroots 12 --cas 9 12
+    -> done (5.3 min)
+  HOCl cas9: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/01_method/04_soc_vertical.py --molecule HOCl --geom 1.7069 0.9648 101.88 --basis cc-pvtz-dk --nroots 12 --cas 9 12
+    -> done (4.9 min)
+  HOI cas9: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOI/01_method/04_soc_vertical.py --basis cc-pvtz-dk --nroots 12 --cas 9 12
+    -> done (5.3 min)
+  HOBr cas11: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/01_method/04_soc_vertical.py --molecule HOBr --basis cc-pvtz-dk --nroots 12 --cas 11 12
+    -> done (34.2 min)
+  HOCl cas11: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/01_method/04_soc_vertical.py --molecule HOCl --geom 1.7069 0.9648 101.88 --basis cc-pvtz-dk --nroots 12 --cas 11 12
+    -> done (39.2 min)
+  HOI cas11: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOI/01_method/04_soc_vertical.py --basis cc-pvtz-dk --nroots 12 --cas 11 12
+    -> done (33.4 min)
+
+== triplet band f and lender band f against measurement
+        space     T/eV    f(3A")               obs  calc/obs  f(lender)      obs  c^2 %
+  HOCl  avas     3.394  8.29e-07   3.3e-05-3.4e-05 0.02-0.03   1.52e-03  3.0e-04    0.1
+  HOCl  cas9     3.349  6.18e-07   3.3e-05-3.4e-05 0.02-0.02   1.24e-03  3.0e-04    0.1
+  HOCl  cas11    3.334  1.17e-06   3.3e-05-3.4e-05 0.03-0.04   7.09e-04  3.0e-04    0.1
+  HOBr  avas     2.910  1.58e-05   4.7e-05-6.2e-05 0.25-0.34   1.39e-03  6.5e-04    2.2
+  HOBr  cas9     2.859  1.26e-05   4.7e-05-6.2e-05 0.20-0.27   1.25e-03  6.5e-04    2.1
+  HOBr  cas11    2.860  1.39e-05   4.7e-05-6.2e-05 0.22-0.30   6.97e-04  6.5e-04    2.0
+  HOI   avas     2.413  1.53e-04      not measured        --   3.10e-03  1.2e-03   20.3
+  HOI   cas9     2.359  1.30e-04      not measured        --   2.91e-03  1.2e-03   18.6
+  HOI   cas11    2.380  1.45e-04      not measured        --   1.95e-03  1.2e-03   16.1
+
+== the virtuals each canonical window adds (energy, symmetry, largest shares)
+  HOCl:
+    +0.0913 Ha  A'  Cl p 0.51  H s 0.39  O p 0.18
+    +0.1674 Ha  A'  H s 0.94  Cl p 0.15  O p 0.07
+    +0.4707 Ha  A'  Cl p 0.87  H s 0.14  O p 0.06
+    +0.4852 Ha  A'  Cl p 0.94  Cl d 0.05  O p 0.01
+    +0.4873 Ha  A"  Cl p 0.98  Cl d 0.02  H p 0.01
+  HOBr:
+    +0.0641 Ha  A'  Br p 0.63  O p 0.19  H s 0.17
+    +0.1634 Ha  A'  H s 1.18  Br p 0.04  O f -0.00
+    +0.3742 Ha  A'  Br p 0.92  Br s 0.06  Br d 0.02
+    +0.3764 Ha  A"  Br p 1.00  Br d 0.01  H p 0.00
+    +0.3853 Ha  A'  Br p 0.93  O p 0.05  Br s 0.03
+  HOI:
+    +0.0394 Ha  A'  I p 0.67  O p 0.15  H s 0.11
+    +0.1675 Ha  A'  H s 1.21  I p 0.02  I f 0.00
+    +0.3017 Ha  A'  I s 0.93  I p 0.04  H s 0.02
+    +0.3604 Ha  A'  I p 0.83  I d 0.15  H s 0.01
+    +0.3625 Ha  A"  I p 0.94  I d 0.06  H p 0.00
+
+  Reading it. If cas9/cas11 raise HOCl's and HOBr's triplet f towards the
+  measured values, the missing lenders were virtuals outside CAS(12,7), and
+  the same space's HOI value is the one to set against Bauer's 532 nm bound.
+  If f stays flat, the difference from Minaev is his orbital relaxation --
+  response, not a bigger CAS -- and HOI's f carries HOBr's 3-4x uncertainty
+  in both directions.

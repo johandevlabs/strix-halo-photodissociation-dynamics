@@ -509,7 +509,9 @@ def main(default="HOBr", doc=__doc__, **defaults):
     if todo and not args.report_only:
         tasks = [(spec["halogen"], r, r_oh, theta, b, args.nroots,
                   args.memory) for b, r in todo]
-        exists = os.path.exists(csv_path)
+        # an EMPTY file (a run killed before its first row flushed) still
+        # needs the header, or every later row is read as one
+        exists = os.path.exists(csv_path) and os.path.getsize(csv_path) > 0
         t0 = time.time()
         ctx = mp.get_context("fork")
         counter = ctx.Value("i", 0)

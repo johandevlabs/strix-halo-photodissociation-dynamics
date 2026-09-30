@@ -206,7 +206,7 @@ def main():
         s04 = _load("s04", HERE.parent / "04_soc_vertical.py")
         f07 = _load("f07", HERE.parents[2] / "HOCl" / "01_method" / "07_fc_active_space.py")
         os.makedirs(os.path.dirname(os.path.abspath(args.csv)), exist_ok=True)
-        new = not os.path.exists(args.csv)
+        new = not (os.path.exists(args.csv) and os.path.getsize(args.csv) > 0)
         with open(args.csv, "a", newline="") as fh:
             w = csv.DictWriter(fh, fieldnames=FIELDS, extrasaction="ignore")
             if new:

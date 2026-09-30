@@ -109,7 +109,9 @@ def load_scan(path):
     dE = np.array([[float(x[f"dE_{k}"]) for k in range(1, NK + 1)] for x in rows])
     f = np.array([[float(x[f"f_{k}"]) for k in range(1, NK + 1)] for x in rows])
     sf1 = np.array([float(x["sf_1"]) for x in rows])
-    return r, dE, f, sf1
+    so = np.array([(float(x["e_soc0_Ha"]) - float(x["e_sf0_Ha"])) * HARTREE2EV
+                   for x in rows])
+    return r, dE, f, sf1, so
 
 
 def extend(x, r, y):
@@ -153,7 +155,13 @@ def f_of(E_ev, s):
 
 def model(args):
     r, eS_all, om = load_cut(args.cut)
-    rk, dE, fk, sf1 = load_scan(args.scan)
+    rk, dE, fk, sf1, so = load_scan(args.scan)
+    # The ground state's own SOC lowering grows along O-I (-54 meV at r_eq
+    # towards the atom's -314): CCSD(T) is spin-free, so add it, or the
+    # ground well -- and every V_k built on it -- tilts the wrong way.
+    if args.no_so_ground:
+        so = np.zeros_like(so)
+    eS_all = eS_all + extend(r, rk, so) / HARTREE2EV
     keep = r <= S_MAX_ANG + 1e-9
     e_ref = float(eS_all[keep].min())
     rS, eS = r[keep], eS_all[keep] - e_ref
@@ -164,6 +172,10 @@ def model(args):
     print(f"  ground: {rS.size} CCSD(T) points {rS.min():.2f}-{rS.max():.2f} A;"
           f" SOC scan {rk.size} points {rk.min():.2f}-{rk.max():.2f} A;"
           f" reduced mass OH-I {MU_AU / AMU2AU:.3f} amu")
+    print(f"  ground-state SOC lowering {so[0] * 1000:.0f} meV at {rk[0]:.2f} A"
+          f" to {so[-1] * 1000:.0f} meV at {rk[-1]:.2f} A"
+          + (" -- NOT applied (--no-so-ground)" if args.no_so_ground else
+             ", added to V_S"))
 
     r_dvr, e_lev, c_lev = b03.vib_levels(rS, eS, args.nlev, MU_AU)
     print(f"  O-I stretch v=0->1 {(e_lev[1] - e_lev[0]) * b03.HARTREE2CM:.0f} "
@@ -184,16 +196,28 @@ def model(args):
     wT = np.exp(-(e_lev - e_lev[0]) / (KB_AU * T))
     wT /= wT.sum()
 
-    def curves(k, anchor):
+    ok = np.isfinite(om)
+    om_x = extend(x_ang, r[ok], om[ok])
+
+    def curves(k, anchor, tail="linear"):
         dk = extend(x_ang, rk, dE[:, k])
+        if tail == "eom" and k < 3:
+            # beyond the scan (2.70 A) follow the EOM a 3A" shape, carrying
+            # the SOC offset of state k at the last scan point; blended over
+            # 0.1 A. EOM stays single-reference-valid (w1 >= 0.90) to 2.60 A
+            # and is a shape proxy beyond.
+            off = float(dE[-1, k] - np.interp(rk[-1], r[ok], om[ok]))
+            u = np.clip((x_ang - (rk[-1] - 0.1)) / 0.1, 0.0, 1.0)
+            wgt = 0.5 - 0.5 * np.cos(np.pi * u)
+            dk = (1 - wgt) * dk + wgt * (om_x + off)
         if anchor == "eom" and k < 3:
             # EOM a 3A" + 07's SOC offset of state k from its spin-free T1
-            ok = np.isfinite(om)
-            dk = (extend(x_ang, r[ok], om[ok])
-                  + extend(x_ang, rk, dE[:, k] - sf1))
+            dk = om_x + extend(x_ang, rk, dE[:, k] - sf1)
         V = V_S + dk / HARTREE2EV
-        mu2 = 3.0 * np.clip(extend(x_ang, rk, fk[:, k]), 0, None) \
-            / (2.0 * np.clip(dk, 0.3, None) / HARTREE2EV)
+        # f spans 1e-8..1e-2 along the scan: interpolate ln f, so the spline
+        # cannot undershoot below zero between points
+        fint = np.exp(extend(x_ang, rk, np.log(np.clip(fk[:, k], 1e-14, None))))
+        mu2 = 3.0 * fint / (2.0 * np.clip(dk, 0.3, None) / HARTREE2EV)
         mu = np.sqrt(mu2)
         if args.condon:
             mu = np.full_like(mu, float(np.interp(R_EQ, x_ang, mu)))
@@ -238,20 +262,31 @@ def model(args):
               f"{s['sig_k'][k][i532]:12.2e}")
 
     # ---- calibration on the measured bands
+    def centroid(sig):
+        w = sig / E_ev                    # ~ |mu|^2 density
+        return float((E_ev * w).sum() / w.sum())
+
+    # Group by where each state's band sits. The measured 407 band is 1A" +
+    # 3A' (05, Minaev); NEVPT2 puts those two 0.55 eV apart (443 and 368 nm,
+    # straddling the measured dip, where EOM has them 0.18 eV apart), so a
+    # single PEAK is meaningless for the group -- its f-weighted CENTROID is
+    # compared, and the split itself is reported.
     peaks = [stats(E_ev, s["sig_k"][k])[0] for k in range(NK)]
     vis = [k for k in range(3, NK) if 2.6 < peaks[k] < 3.45]
     uv = [k for k in range(3, NK) if peaks[k] >= 3.45]
     trip = [0, 1, 2]
     s_vis, s_uv = s["sig_k"][vis].sum(0), s["sig_k"][uv].sum(0)
-    pv, pu = stats(E_ev, s_vis)[0], stats(E_ev, s_uv)[0]
-    shift_v = NM_EV / BAUER["vis"][0] - pv
-    shift_u = NM_EV / BAUER["uv"][0] - pu
-    print(f"\n  CALIBRATION against Bauer's measured bands:")
-    print(f"    407 band = states {[k + 1 for k in vis]}: calc peak "
-          f"{NM_EV / pv:.0f} nm, f {f_of(E_ev, s_vis):.2e}; obs 406 nm, f "
+    cv, cu = centroid(s_vis), centroid(s_uv)
+    shift_v = NM_EV / BAUER["vis"][0] - cv
+    shift_u = NM_EV / BAUER["uv"][0] - cu
+    print(f"\n  CALIBRATION against Bauer's measured bands (f-weighted centroids):")
+    print(f"    407 band = states {[k + 1 for k in vis]}: calc centroid "
+          f"{NM_EV / cv:.0f} nm (bands at "
+          + ", ".join(f"{NM_EV / peaks[k]:.0f}" for k in vis if f_of(E_ev, s['sig_k'][k]) > 1e-4)
+          + f" nm), f {f_of(E_ev, s_vis):.2e}; obs 406 nm, f "
           f"{F_OBS['vis']:.2e}; shift obs-calc {shift_v:+.3f} eV")
-    print(f"    340 band = states {[k + 1 for k in uv]}: calc peak "
-          f"{NM_EV / pu:.0f} nm, f {f_of(E_ev, s_uv):.2e}; obs 340 nm, f "
+    print(f"    340 band = states {[k + 1 for k in uv]}: calc centroid "
+          f"{NM_EV / cu:.0f} nm, f {f_of(E_ev, s_uv):.2e}; obs 340 nm, f "
           f"{F_OBS['uv']:.2e}; shift obs-calc {shift_u:+.3f} eV")
     shifts = sorted([shift_v, shift_u])
 
@@ -268,6 +303,30 @@ def model(args):
             # move the band by the calibration shift: sigma_cal(E) = sigma(E - sh)
             cal.append(float(np.interp(NM_EV / 532.0 - sh, E_ev, st)))
         print(line + f"; calibrated {min(cal):.2e}-{max(cal):.2e}")
+    # ---- how much does sigma(532) depend on what lies beyond the scan?
+    # The spin-free a 3A" has a shallow well at ~2.4 A along this cut
+    # (EOM: 1.97 eV there, 2.23 at 3.2 A); SOC mostly removes it. The
+    # absorber and the tail decide what happens to slow parts of the packet.
+    print(f"\n  sensitivity of the a 3A\" band (states 1-3) to the tail and "
+          f"the absorber:")
+    print(f"    {'tail':<7}{'absorber/A':>11}{'peak/nm':>9}{'FWHM/eV':>9}"
+          f"{'sigma(532)':>12}{'unabsorbed':>12}")
+    for tail, ra in (("linear", args.r_abs), ("linear", 3.0), ("eom", args.r_abs),
+                     ("eom", 3.0), ("eom", 3.3)):
+        Wt = b03.absorber(x_ang, ra, args.eta, 3, 0.4)
+        tot, lmax = np.zeros_like(E), 0.0
+        for k in trip:
+            V, mu = curves(k, "nevpt2", tail)
+            s_v, _, left = run_state(x_ang, V, mu, chis, e_lev, Wt, args, E)
+            tot += (wT[:, None] * s_v).sum(axis=0)
+            lmax = max(lmax, left)
+        pk, _, fw = stats(E_ev, tot)
+        print(f"    {tail:<7}{ra:11.2f}{NM_EV / pk:9.0f}{fw:9.3f}"
+              f"{tot[i532]:12.2e}{lmax:12.1e}")
+    print("    (unabsorbed > 1e-2: part of the packet is held in the well --"
+          " 1D resonances, below\n     ~2.2 eV, i.e. red of ~560 nm; 532 nm "
+          "lies above them)")
+
     st = out["nevpt2"]["sig_k"][trip].sum(0)
     s_all = s["sig_k"].sum(0)
 
@@ -296,7 +355,10 @@ def model(args):
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots(figsize=(8, 4.6))
         ax.semilogy(lam, s_all, "k", label="computed, states 1-8")
-        ax.semilogy(lam, st, "C3", label='computed a 3A" (1-3)')
+        ax.semilogy(lam, st, "C3", label='computed a 3A" (1-3), raw')
+        sh = 0.5 * (shift_v + shift_u)
+        ax.semilogy(lam, np.interp(E_ev - sh, E_ev, st), "C3--",
+                    label=f'a 3A" calibrated ({sh:+.2f} eV)')
         lb = np.linspace(280, 490, 200)
         ax.semilogy(lb, bauer(lb), "C0--", label="Bauer 1998 (fit)")
         ax.axvline(532, color="0.6", lw=0.8)
@@ -328,6 +390,8 @@ def main():
     p.add_argument("--temperature", type=float, default=295.0)
     p.add_argument("--condon", action="store_true")
     p.add_argument("--no-eom", action="store_true")
+    p.add_argument("--no-so-ground", action="store_true",
+                   help="leave out the ground state's r-dependent SOC lowering")
     p.add_argument("--csv", default=str(DATA / "hoi_band_soc_1d.csv"))
     p.add_argument("--png", default=str(DATA / "hoi_band_soc_1d.png"))
     model(p.parse_args())

@@ -430,7 +430,7 @@ def main(default="HOBr", default_basis="def2-tzvp", doc=__doc__):
         if todo and not args.report_only:
             tasks = [(spec["halogen"], a, b, t, bs, args.memory)
                      for bs, a, b, t in todo]
-            new = os.path.exists(csv_path)
+            new = os.path.exists(csv_path) and os.path.getsize(csv_path) > 0
             t0 = time.time()
             ctx = mp.get_context("fork")     # 3.14 defaults to forkserver,
             counter = ctx.Value("i", 0)      # which re-imports and loses the

@@ -2327,8 +2327,8 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       directly and never touches the I2 subtraction that limits absorption
       spectroscopy there.
 
-- [ ] **HOI 1D band model on the spin-orbit states (in progress,
-      2026-09-29).** Turns "3-4e-20 at 532 nm" into a computed band with a
+- [x] **HOI 1D band model on the spin-orbit states. 2026-09-30.** Result
+      entry below; the setup was: Turns "3-4e-20 at 532 nm" into a computed band with a
       calibration behind it.
       - `HOI/01_method/02_oi_cut.py`: HOBr's 02 registered for HOI --
         CCSD(T) ground + EOM triplets along r(O-I), 1.60-3.40 A, cc-pvtz-dk.
@@ -2343,6 +2343,60 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
         and the shift applied to the triplet (states 1-3) at 532 nm; EOM-
         anchored triplet as a second estimate. Checked on synthetic surfaces
         (sum rule 1.000 for all 8 states).
+
+- [x] **The computed HOI triplet band: 3x over Bauer's 532 nm bound as
+      computed, AT it if its f is off the way the singlets' is. 2026-09-30.**
+      Logs `HOI/logs/{oi_cut,soc_scan,band_soc_1d,j_hoi_triplet}.log`.
+
+      *The runs.* Cut: EOM valid to 2.60 A (w1 >= 0.90, T1 <= 0.014), 3A'
+      below 3A" from 2.75 A, vertical 2.415 eV, slope -3.56 eV/A. SOC scan
+      reproduces 04 at r_eq to 1 meV; SA-CASSCF "unconverged" at the tight
+      tolerance but every curve smooth (second differences = curvature);
+      states 2/3 swap at 2.65 A where their f is 1e-6. Spin-free T1 from
+      the scan tracks EOM (2.440/2.415 at r_eq, 0.935/0.938 at 2.5 A).
+
+      *A CSV bug, fixed.* The first (OOM) attempt left `hoi_oi_cut.csv`
+      EMPTY; the next run saw the file, skipped the header, and 29 points
+      went in headerless; the third run could then match nothing and redid
+      all 31. Duplicates agreed to 2e-4 meV; the file is repaired (header,
+      one row per radius). Every resumable script (HOBr 01/02/14, HOI 07)
+      now treats an empty file as new. Also confirmed: 4 threads per worker
+      took (370 s a point against 1100 s single-threaded).
+
+      *Physics found on the way.* (1) The spin-free a 3A" along this cut
+      has a shallow WELL near 2.4 A (EOM 1.97 eV, against 2.23 at 3.2 A);
+      SOC mostly removes it (the atom's -0.32 eV lowers the asymptote more
+      than the well). It holds slow parts of the packet (1D resonances red
+      of ~560 nm) and does not touch 532 nm: sigma(532) = 3.64e-20 in all
+      five tail/absorber settings. (2) Strongly non-Condon: the triplet's
+      summed f falls 5.1e-4 (1.75 A) -> 1.5e-4 (r_eq) -> 4.5e-5 (2.2 A).
+      (3) The ground state's SOC lowering runs -33 meV (1.75 A) to -142 meV
+      (2.70 A); added to the CCSD(T) ground curve.
+
+      *The band.* Raw: peak 514 nm, FWHM 0.345 eV, f 1.45e-4 (EOM-anchored
+      520 nm, 0.39 eV). Calibration on Bauer's two measured bands by f-
+      weighted centroid: the calculation is 0.173 eV (407 band) and 0.192
+      eV (340 band) too blue -- consistent, and like HOBr. (NEVPT2 splits
+      the 407 band's 1A"/3A' pair to 443 and 368 nm, 0.55 eV, where EOM has
+      them 0.18 eV apart: a single-peak calibration would be wrong.)
+      Calibrated triplet: peak ~555 nm, **sigma(532) = 2.8-3.6e-20, 3x
+      Bauer's ~1e-20.**
+
+      *But the same model's singlet bands are too strong* -- f 2.77e-3
+      against 1.17e-3 measured (407 band, 2.4x) and 8.0e-3 against 1.85e-3
+      (340 band, 4.3x). If the triplet's borrowed f is overestimated the
+      same way, f(a3A") = 3.4-6.1e-5 and sigma(532) = 0.8-1.5e-20: AT the
+      bound. Not guaranteed -- for HOBr the triplet was 3-4x too WEAK while
+      its lenders were too strong -- but it means the calculation and
+      Bauer's null do not contradict each other; together they say
+      f(a3A") ~ 4e-5, sigma(532) ~ 1e-20.
+
+      *J(HOI)* with the computed, calibrated band shape and phi = 0 red of
+      the 585 nm threshold (which removes 22% of it): at Bauer's bound +5-7%
+      (no-Rayleigh-loss) to +7-9% (direct beam) at SZA 0-60, +20-48% at
+      80-85 direct; as computed +18% to +32%; with 4x f, 1.7-2.3x. The
+      OH action spectrum over 500-600 nm remains the measurement that would
+      settle it.
 
 - [ ] **DEFERRED (noted 2026-09-29, do not lose): the HOBr f deficit, via
       Minaev's mechanism.** Ours 1.5e-5 against measured 4.7-6.2e-5, and

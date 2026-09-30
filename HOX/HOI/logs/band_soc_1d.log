@@ -1,0 +1,59 @@
+==============================================================================
+== HOI 1D band model on the spin-orbit states, along r(O-I)
+==============================================================================
+  ground: 21 CCSD(T) points 1.60-2.60 A; SOC scan 21 points 1.75-2.70 A; reduced mass OH-I 14.994 amu
+  ground-state SOC lowering -33 meV at 1.75 A to -142 meV at 2.70 A, added to V_S
+  O-I stretch v=0->1 583 cm-1 (3D harmonic nu3 583 from 01)
+  !! state 2 (nevpt2): 2.9e-03 of the packet unabsorbed
+  !! state 1 (eom): 3.4e-01 of the packet unabsorbed
+  !! state 2 (eom): 4.2e-01 of the packet unabsorbed
+  !! state 3 (eom): 8.5e-02 of the packet unabsorbed
+
+  sum rule Int sigma/E dE = 4 pi^2 <mu^2> / 3c, per state:
+    state 1: 1.000    state 2: 1.000    state 3: 1.000    state 4: 1.000    state 5: 1.000    state 6: 1.000    state 7: 1.000    state 8: 1.000   (1.000 = the band is all on the grid)
+
+  per state, 295 K (nevpt2 curves):
+    k dE(r_eq)/eV  peak/eV  peak/nm  FWHM/eV         f  sigma(532)
+    1       2.383    2.279    544.1    0.286  4.92e-06    1.62e-21
+    2       2.386    2.273    545.4    0.263  1.04e-07    3.59e-23
+    3       2.439    2.418    512.9    0.341  1.40e-04    3.47e-20
+    4       2.822    2.796    443.5    0.340  6.32e-04    3.07e-22
+    5       3.036    3.053    406.1    0.388  4.25e-08    2.97e-30
+    6       3.092    2.977    416.4    0.282  1.40e-05    2.99e-29
+    7       3.368    3.365    368.4    0.392  2.13e-03    3.47e-30
+    8       3.851    3.832    323.6    0.392  8.00e-03    1.12e-31
+
+  CALIBRATION against Bauer's measured bands (f-weighted centroids):
+    407 band = states [4, 5, 6, 7]: calc centroid 385 nm (bands at 443, 368 nm), f 2.77e-03; obs 406 nm, f 1.17e-03; shift obs-calc -0.173 eV
+    340 band = states [8]: calc centroid 323 nm, f 8.00e-03; obs 340 nm, f 1.85e-03; shift obs-calc -0.192 eV
+
+  THE a 3A" BAND (states 1-3) and sigma(532 nm); Bauer's bound 1e-20 cm2:
+    nevpt2  peak 514 nm, FWHM 0.345 eV, f 1.45e-04, sigma(532) raw 3.64e-20; calibrated 3.30e-20-3.57e-20
+    eom     peak 520 nm, FWHM 0.391 eV, f 1.45e-04, sigma(532) raw 3.60e-20; calibrated 2.77e-20-2.99e-20
+
+  sensitivity of the a 3A" band (states 1-3) to the tail and the absorber:
+    tail    absorber/A  peak/nm  FWHM/eV  sigma(532)  unabsorbed
+    linear        2.75      514    0.345    3.64e-20     2.9e-03
+    linear        3.00      514    0.345    3.64e-20     3.8e-03
+    eom           2.75      514    0.345    3.64e-20     2.5e-02
+    eom           3.00      514    0.345    3.64e-20     5.2e-02
+    eom           3.30      514    0.345    3.64e-20     9.9e-02
+    (unabsorbed > 1e-2: part of the packet is held in the well -- 1D resonances, below
+     ~2.2 eV, i.e. red of ~560 nm; 532 nm lies above them)
+
+  the whole computed spectrum (states 1-8) against Bauer's fit:
+      nm       calc    triplet      Bauer  calc/Bauer
+     340   1.24e-18   1.06e-25   3.86e-19        3.21
+     380   4.68e-19   1.38e-24   2.07e-19        2.26
+     407   1.32e-19   9.11e-23   3.32e-19        0.40
+     440   1.92e-19   2.37e-21   1.13e-19        1.70
+     460   1.55e-19   9.16e-21   2.42e-20        6.39
+     480   7.40e-20   2.34e-20   2.96e-21       25.05
+     490   5.47e-20   3.18e-20   8.55e-22       64.04
+     500   4.79e-20   3.88e-20        nan         nan
+     532   3.67e-20   3.64e-20        nan         nan
+     560   1.48e-20   1.48e-20        nan         nan
+     600   1.35e-21   1.35e-21        nan         nan
+
+  csv: /home/johan/Projects/strix-halo-photodissociation-dynamics/HOX/HOI/data/hoi_band_soc_1d.csv
+  png: /home/johan/Projects/strix-halo-photodissociation-dynamics/HOX/HOI/data/hoi_band_soc_1d.png

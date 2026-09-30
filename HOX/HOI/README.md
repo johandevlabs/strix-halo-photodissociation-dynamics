@@ -73,8 +73,22 @@ threshold of 570–600 nm, and it agrees with Bauer's 582 nm, not IUPAC's
 (f 1.5e-4) and Minaev's (1.6–2.5e-4) both put 3–4e-20 cm² at 532 nm.
 Meeting Bauer's bound needs f ≲ 4e-5, less than HOBr's measured triplet
 band. An OH action spectrum over 500–600 nm, as Barnes did for HOBr, would
-settle it, and it avoids the I₂ subtraction. The J(HOI) stakes: +6–11% at
-the bound, +20–50% at the computed f. Details are in `TASKS.md`; paper
+settle it, and it avoids the I₂ subtraction.
+
+**The computed band** (`02_band_model/11_band_soc_1d.py`, a 1D model on the
+spin-orbit states along O–I) peaks at 514 nm raw, or about 555 nm after
+calibrating on Bauer's two measured bands (the calculation is 0.17–0.19 eV
+too blue on both). Its FWHM is 0.35 eV and its f is 1.45e-4, giving σ(532)
+= 2.8–3.6e-20, 3× Bauer's bound. The same model overestimates the measured
+singlet bands' f by 2.4–4.3×, however. If the triplet's borrowed f is off
+the same way, σ(532) ≈ 0.8–1.5e-20, right at the bound. Taken together,
+f(a³A″) ≈ 4e-5 and σ(532) ≈ 1e-20. J(HOI) is then 5–9% higher at SZA 0–60°
+(photolysis cut at the 585 nm threshold), and 18–32% higher if the
+computed f is right.
+
+On the way: along this cut the spin-free a³A″ has a shallow well near
+2.4 Å, which spin-orbit coupling mostly removes. The triplet's dipole is
+strongly non-Condon (f falls 3× from 1.75 Å to equilibrium). Details are in `TASKS.md`; paper
 notes are in `../references/README.md`.
 
 Offline test: `python 01_method/tests/test_hoi_report.py`.

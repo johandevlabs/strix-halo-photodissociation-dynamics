@@ -1,0 +1,46 @@
+========================================================================
+== HOI a 3A" along O-I, 1 bases
+== CCSD(T) + EOM-EE-CCSD triplet, 6 roots, x2c, Cs
+== spectators fixed at r(O-H) = 0.9694 A, angle = 104.65 deg
+========================================================================
+  31 radii x 1 bases = 31 points
+  8 workers x 4 threads x 10000 MB
+  31 to compute, 0 already present
+/home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOBr/01_method/02_obr_cut.py:432: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  ax[0].legend(fontsize=8)
+    [1/31] cc-pvtz-dk 1.85: ok (315.08 s)
+    [2/31] cc-pvtz-dk 1.9: ok (352.95 s)
+    [3/31] cc-pvtz-dk 1.8: ok (358.88 s)
+    [4/31] cc-pvtz-dk 1.95: ok (380.88 s)
+    [5/31] cc-pvtz-dk 1.75: ok (382.15 s)
+    [6/31] cc-pvtz-dk 1.65: ok (424.43 s)
+    [7/31] cc-pvtz-dk 1.7: ok (425.04 s)
+    [8/31] cc-pvtz-dk 1.6: ok (443.4 s)
+    [9/31] cc-pvtz-dk 2.0: ok (371.9 s)
+    [10/31] cc-pvtz-dk 2.05: ok (389.27 s)
+    [11/31] cc-pvtz-dk 2.1: ok (406.72 s)
+    [12/31] cc-pvtz-dk 2.15: ok (393.61 s)
+    [13/31] cc-pvtz-dk 2.2: ok (407.06 s)
+    [14/31] cc-pvtz-dk 2.35: ok (394.3 s)
+    [15/31] cc-pvtz-dk 2.25: ok (430.91 s)
+    [16/31] cc-pvtz-dk 2.3: ok (449.14 s)
+    [17/31] cc-pvtz-dk 2.4: ok (378.74 s)
+    [18/31] cc-pvtz-dk 2.45: ok (357.27 s)
+    [19/31] cc-pvtz-dk 2.5: ok (352.5 s)
+    [20/31] cc-pvtz-dk 2.55: ok (354.94 s)
+    [21/31] cc-pvtz-dk 2.6: ok (353.74 s)
+    [22/31] cc-pvtz-dk 2.65: warn:w1 (356.17 s)
+    [23/31] cc-pvtz-dk 2.7: warn:w1 (367.32 s)
+    [24/31] cc-pvtz-dk 2.75: warn:Ap_below+w1 (379.85 s)
+    [25/31] cc-pvtz-dk 3.2: warn:Ap_below+w1 (257.1 s)
+    [26/31] cc-pvtz-dk 2.8: warn:Ap_below+w1 (369.67 s)
+    [27/31] cc-pvtz-dk 2.9: warn:Ap_below+w1 (345.5 s)
+    [28/31] cc-pvtz-dk 3.1: warn:Ap_below+w1 (323.79 s)
+    [29/31] cc-pvtz-dk 3.0: warn:Ap_below+w1 (343.05 s)
+    [30/31] cc-pvtz-dk 3.3: warn:Ap_below+w1 (287.88 s)
+    [31/31] cc-pvtz-dk 3.4: warn:Ap_below+w1 (269.76 s)
+  done in 24.9 min
+
+  wrote /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOI/data/hoi_oi_cut.png
+
+  csv: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOI/data/hoi_oi_cut.csv

@@ -149,6 +149,41 @@ def report_reference_spins(mc):
     return mults
 
 
+def describe_active(mol, mf, ncas, nelecas):
+    """What a canonical --cas window contains: for each active orbital its
+    energy, A'/A" (the molecule lies in the xy plane, so A" = odd in z) and
+    its largest Mulliken shares by atom and shell. The virtuals beyond
+    sigma*(O-X) are the point of a larger space, so they are named."""
+    nocc = int(np.sum(mf.mo_occ > 0))
+    lo = nocc - nelecas // 2
+    S = mf.get_ovlp()
+    labels = mol.ao_labels(fmt=False)
+    def zpow(m):                     # 'z^2' -> 2, 'yz' -> 1, 'xz^2' -> 2
+        m, n, i = str(m), 0, 0
+        while i < len(m):
+            if m[i] == "z":
+                if i + 2 < len(m) + 1 and m[i + 1:i + 2] == "^":
+                    n += int(m[i + 2]); i += 3; continue
+                n += 1
+            i += 1
+        return n
+    odd_z = np.array([zpow(l[3]) % 2 == 1 for l in labels])
+    keys = [f"{l[1]} {l[2][-1] if l[2] else ''}" for l in labels]
+    print(f"  --cas window: {nelecas // 2} occupied + "
+          f"{ncas - nelecas // 2} virtual canonical orbitals")
+    for i in range(lo, lo + ncas):
+        c = mf.mo_coeff[:, i]
+        w = c * (S @ c)
+        sym = 'A"' if w[odd_z].sum() > 0.5 else "A'"
+        share = {}
+        for k, v in zip(keys, w):
+            share[k] = share.get(k, 0.0) + float(v)
+        top = sorted(share.items(), key=lambda kv: -kv[1])[:3]
+        tag = "occ" if i < nocc else "vir"
+        print(f"    {tag} {i:3d}  e {mf.mo_energy[i]:+8.4f} Ha  {sym:<3}"
+              + "  ".join(f"{k} {v:.2f}" for k, v in top))
+
+
 def build_reference(spec, basis, geom, cas, nroots, max_cycle, minao, verbose):
     basis = resolve_basis_for(spec["halogen"], basis)
     mol = gto.M(atom=geometry(spec["halogen"], *geom), basis=basis, spin=0,
@@ -164,6 +199,7 @@ def build_reference(spec, basis, geom, cas, nroots, max_cycle, minao, verbose):
     if cas is not None:
         ncas, nelecas = cas
         mo = mf.mo_coeff
+        describe_active(mol, mf, ncas, nelecas)
     else:
         from pyscf.mcscf import avas
         try:

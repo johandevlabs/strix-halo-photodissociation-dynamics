@@ -2398,8 +2398,18 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       OH action spectrum over 500-600 nm remains the measurement that would
       settle it.
 
+- [ ] **The triplet's borrowed f: Minaev's active space (running,
+      2026-09-30).** Chosen over two-component TDDFT (Johan: keep DFT out
+      of it). `HOI/01_method/08_cas_bench.py` runs 04 for HOCl, HOBr and HOI
+      in cc-pvtz-dk, 12 roots, in CAS(12,7) (ours), CAS(12,9) (Minaev's: the
+      three lowest virtuals, two a' and one a") and CAS(12,11), and
+      tabulates triplet and lender f against measurement. 04 now names what
+      a canonical --cas window contains. CAS(12,8) with sigma*(O-H) was
+      already flat (round 2), so the new ingredient is the a" virtual. If f
+      stays flat, the gap to Minaev is his orbital relaxation (response).
+
 - [ ] **DEFERRED (noted 2026-09-29, do not lose): the HOBr f deficit, via
-      Minaev's mechanism.** Ours 1.5e-5 against measured 4.7-6.2e-5, and
+      Minaev's mechanism.** (Now being tested -- entry above.) Ours 1.5e-5 against measured 4.7-6.2e-5, and
       Minaev's 7-8e-5. His dominant lender is 4 1A' at ~9 eV (sigma* <-
       sigma, M ~ 1 au), plus orbital relaxation in quadratic response. Ours
       is flat from 6 to 16 roots and in full valence, so the missing lenders

@@ -1,0 +1,29 @@
+==============================================================================
+== HOI a 3A" band in 2D (r(O-I), angle), SOC components, EOM-anchored
+==============================================================================
+  grid 384 x 64 (R 1.55-3.8 A, Gauss-Legendre in cos gamma); dt 1.0 au x 6000
+  2D levels above v=0 (cm-1): 571, 1093, 1134, 1658, 1690
+  (O-I stretch 583, bend 1104 harmonic in 3D from 01; 1D stretch 583)
+    level 0: <r(O-I)> 2.007 A, <angle> 103.7 +/- 7.7 deg
+    level 1: <r(O-I)> 2.018 A, <angle> 103.5 +/- 7.9 deg
+    level 2: <r(O-I)> 2.009 A, <angle> 104.5 +/- 13.2 deg
+    level 3: <r(O-I)> 2.029 A, <angle> 103.3 +/- 8.1 deg
+    level 4: <r(O-I)> 2.020 A, <angle> 104.3 +/- 13.3 deg
+    level 5: <r(O-I)> 2.040 A, <angle> 103.1 +/- 8.3 deg
+  v=0 outside the computed angles 75-135: 5.4e-05
+  largest unabsorbed fraction: 2D 4.8e-01, angle frozen 5.5e-01
+  sum rule (2D, 295 K): 1.000  (1.000 = the whole band is on the energy grid)
+
+  the a 3A" band (components 1-3), 295 K:
+                          peak/nm  FWHM/eV         f  s(532) raw  calibrated
+  2D (r, angle)               524    0.396  1.37e-04    3.46e-20    2.52e-20
+  angle frozen (1D)           520    0.392  1.41e-04    3.53e-20    2.82e-20
+  11 (1D, EOM-anchored): 520 nm, FWHM 0.391 eV, f 1.45e-4, s(532) 3.60e-20 raw; Bauer's bound 1e-20
+
+  sigma(220 K) / sigma(295 K), 2D, calibrated wavelengths:
+    500 nm: 0.949
+    532 nm: 0.992
+    560 nm: 1.022
+    590 nm: 1.038
+
+  csv: /home/johan/projects/strix-halo-photodissociation-dynamics/HOX/HOI/data/hoi_band_soc_2d.csv

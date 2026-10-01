@@ -91,6 +91,12 @@ extrapolation from HOBr's error) puts σ(532) at 1.5–6e-20, which is 1.5–6×
 over Bauer's bound. J(HOI) at the computed f is 18–32% higher at SZA 0–60°,
 with photolysis cut at the 585 nm threshold.
 
+A 2D model in O–I distance and angle (`02_band_model/12_band_soc_2d.py`)
+confirms the 1D band. The bend shifts the peak 4 nm red (to 524 nm raw),
+widens it 1%, and leaves σ(532) at 3.5e-20 raw, 2.5e-20 calibrated. The
+first HOI temperature dependence for this band is small:
+σ(220 K)/σ(295 K) = 0.95–1.04 over 500–590 nm.
+
 On the way: along this cut the spin-free a³A″ has a shallow well near
 2.4 Å, which spin-orbit coupling mostly removes. The triplet's dipole is
 strongly non-Condon (f falls 3× from 1.75 Å to equilibrium). Details are in `TASKS.md`; paper

@@ -2482,8 +2482,43 @@ Highest novelty of the HOX set, largest relativistic burden. Only after HOBr.
       absolute sigma (the ratios cancel), and for how far to trust the HOI
       triplet's f against Bauer's 532 nm bound.
 
-- [ ] **HOI 2D band model (r, angle) for the triplet SOC states (in
-      progress, 2026-10-01).**
+- [x] **HOI 2D band model (r, angle) for the triplet SOC states.
+      2026-10-02. The bend changes almost nothing; the 1D result holds.**
+      Logs `HOI/logs/{raster_2d,soc_2d,band_soc_2d}.log`; 299 + 35 points,
+      no failures (~4 h + 3 h).
+
+      | a3A" band, 295 K | peak | FWHM | f | sigma(532) raw | calibrated |
+      | --- | --- | --- | --- | --- | --- |
+      | 2D (r, angle) | 524 nm | 0.396 eV | 1.37e-4 | 3.46e-20 | 2.52e-20 |
+      | same surfaces, angle frozen | 520 nm | 0.392 eV | 1.41e-4 | 3.53e-20 | 2.82e-20 |
+      | 11, 1D EOM-anchored | 520 nm | 0.391 eV | 1.45e-4 | 3.60e-20 | 2.8-3.0e-20 |
+
+      The bend moves the peak 4 nm red, widens the band 1%, and changes
+      sigma(532) by 2% raw (11% calibrated, from the peak shift). The 2D
+      levels are physical (O-I stretch 571, bend 1134 cm-1 against 01's
+      harmonic 583 / 1104; v=0 at 103.7 +/- 7.7 deg, 5e-5 of it outside the
+      computed 75-135 deg). The SOC grid: the bright component's energy falls
+      with angle above ~100 deg (2.41 -> 2.27 eV at r 2.0 A, 105 -> 125 deg)
+      and its f varies only +/-15% across 85-125 deg; the SOC offset from the
+      spin-free triplet stays within -19..+22 meV everywhere. First HOI
+      temperature dependence: sigma(220 K)/sigma(295 K) = 0.95 (500 nm),
+      0.99 (532), 1.02 (560), 1.04 (590): small, as for HOBr.
+
+      Caveat carried over from 11: ~50% of the packet stays unabsorbed in
+      145 fs, held in the spin-free triplet's well near 2.4 A, which the
+      EOM-anchored curves keep beyond the SOC scan (2.7 A) because the
+      offset is extrapolated as constant. That shapes the band red of
+      ~560 nm (1D resonances); sigma(532) was shown insensitive in 11.
+
+      *Conclusion for HOI:* sigma(532) = 2.5-3.5e-20 from the dynamics,
+      robust to the second dimension; the uncertainty is the triplet's f
+      (1.5-6x over Bauer's bound across all estimates). Next, optional:
+      the OH-stretch zero-point correction (Johan's suggestion: OH as a
+      Morse spectator whose parameters interpolate from the molecule to the
+      free radical along R; vibrationally adiabatic, i.e. V + ZPE_OH(R,
+      gamma) -- expected 10-30 meV, a few nm).
+
+      Setup, for the record:
       - `HOI/03_surfaces/09_raster_2d.py`: CCSD(T) + EOM triplets (HOBr 02's
         point calculation, imported) on r(O-I) 1.70-2.80 A x 75-135 deg,
         299 points, r(O-H) frozen; 8 workers x 4 threads, ~3.7 h.
